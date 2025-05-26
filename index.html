@@ -518,6 +518,13 @@
                     maxlength="30"
                     aria-label="Nombre del usuario">
 
+                <input 
+                    id="postTitle"
+                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-yellow-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
+                    placeholder="Título del Post (opcional)"
+                    maxlength="100"
+                    aria-label="Título del post">
+
                 <div class="relative">
                     <button id="emojiToggle" class="absolute right-2 top-2 text-xl" aria-label="Abrir selector de emojis">😊</button>
                     <div id="emojiPicker" class="emoji-picker">
@@ -885,6 +892,7 @@
             async function createPost() {
                 const contentInput = document.getElementById('postContent').value.trim();
                 const name = document.getElementById('postName').value.trim() || "Anónimo";
+                const title = document.getElementById('postTitle').value.trim(); // Obtener el título
                 const password = document.getElementById('postPassword').value.trim();
                 const fileInput = document.getElementById('fileUpload');
 
@@ -905,6 +913,7 @@
                     board: state.currentBoard,
                     color: postColors[Math.floor(Math.random() * postColors.length)],
                     text: DOMPurify.sanitize(contentInput),
+                    title: title ? DOMPurify.sanitize(title) : null, // Guardar el título sanitizado o null
                     image: null,
                     name: name,
                     passwordHash: password && bcryptInstance ? bcryptInstance.hashSync(password, 10) : null,
@@ -958,6 +967,7 @@
                     
                     document.getElementById('postContent').value = '';
                     document.getElementById('postName').value = '';
+                    document.getElementById('postTitle').value = ''; // Limpiar el campo de título
                     document.getElementById('postPassword').value = '';
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('fileName').textContent = '';
@@ -1017,20 +1027,27 @@
 
 
                 const q = query(postsCollectionRef, where("board", "==", state.currentBoard), orderBy("timestamp", "desc"));
+                let initialLoadComplete = false;
                 
                 unsubscribePosts = onSnapshot(q, (snapshot) => {
+                    const container = document.getElementById('postsContainer');
+                    const newPostsForInitialLoad = [];
+
                     snapshot.docChanges().forEach((change) => {
                         const postData = { id: change.doc.id, ...change.doc.data() };
                         const existingPostElement = document.querySelector(`[data-id="${change.doc.id}"]`);
-                        const container = document.getElementById('postsContainer');
 
                         if (change.type === "added") {
                             if (!existingPostElement) { // Evitar duplicados si ya existe por alguna razón
-                                const newPostElement = createPostElement(postData);
-                                // Insertar al principio para mantener el orden cronológico inverso
-                                container.insertBefore(newPostElement, container.firstChild); 
-                                applyPostEffects(postData, newPostElement);
-                                state.allPosts.unshift(postData); // Añadir al principio del array local
+                                if (!initialLoadComplete) {
+                                    newPostsForInitialLoad.push(postData);
+                                } else {
+                                    // Para posts añadidos después de la carga inicial, insertar al principio
+                                    const newPostElement = createPostElement(postData);
+                                    container.insertBefore(newPostElement, container.firstChild); 
+                                    applyPostEffects(postData, newPostElement);
+                                    state.allPosts.unshift(postData); 
+                                }
                             } else {
                                 // Si ya existe (raro en 'added'), actualizarlo por si acaso
                                 updatePostElementDOM(existingPostElement, postData);
@@ -1059,6 +1076,23 @@
                             }
                         }
                     });
+
+                    if (!initialLoadComplete && newPostsForInitialLoad.length > 0) {
+                        // Procesar la carga inicial
+                        // El query ya está ordenado por timestamp desc, así que newPostsForInitialLoad debería estar en el orden correcto
+                        // pero docChanges() no garantiza el orden de los eventos 'added' para la carga inicial.
+                        // Por si acaso, re-ordenamos aquí basado en el timestamp del cliente si es necesario,
+                        // aunque lo ideal es que Firestore entregue en orden.
+                        // Para simplificar, asumimos que Firestore entrega en el orden de la query.
+                        newPostsForInitialLoad.forEach(postData => {
+                            const newPostElement = createPostElement(postData);
+                            container.appendChild(newPostElement); // Añadir al final, pero como vienen ordenados desc, se mostrarán bien.
+                            applyPostEffects(postData, newPostElement);
+                        });
+                        state.allPosts = newPostsForInitialLoad.concat(state.allPosts.filter(p => !newPostsForInitialLoad.find(np => np.id === p.id)));
+                    }
+                    initialLoadComplete = true;
+
                     if (loadingMessage) {  // Mover esto fuera del forEach
                         loadingMessage.classList.add('hidden');
                     }
@@ -1091,6 +1125,7 @@
                         <span class="text-xs text-gray-400">Respondiendo a </span>
                         <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.slice(-4)}</span>
                     </div>` : '';
+                const titleHtml = post.title ? `<h4 class="text-lg font-bold mb-1 neon-text">${DOMPurify.sanitize(post.title)}</h4>` : '';
 
                 // Determinar si el usuario actual es el autor del post (para el botón de editar)
                 const canShowEditButton = state.isAdmin || post.passwordHash;
@@ -1104,7 +1139,8 @@
                         </div>
                     </div>
                     ${replyIndicator}
-                    <div class="post-content text-sm mb-2">${contentHtml}</div> 
+                    ${titleHtml}
+                    <div class="post-content text-sm mb-2 mt-1">${contentHtml}</div> 
                     <div class="flex justify-between items-center">
                         <div class="flex gap-1 items-center">
                             <button class="reaction-button heart-reaction-button text-xs px-2 py-1 border border-pink-500 text-pink-400 flex items-center gap-1" aria-label="Reaccionar con Corazón">
@@ -1202,6 +1238,19 @@
                 // Actualizar contenido del post si cambió (texto e imagen)
                 const contentDiv = postElement.querySelector('.post-content');
                 if (contentDiv) contentDiv.innerHTML = getPostContentHtml(postData);
+
+                // Actualizar título si cambió
+                let titleElement = postElement.querySelector('h4.neon-text');
+                if (postData.title) {
+                    if (!titleElement) { // Si no existía el título y ahora sí, hay que crearlo e insertarlo
+                        titleElement = document.createElement('h4');
+                        titleElement.className = 'text-lg font-bold mb-1 neon-text';
+                        contentDiv.parentNode.insertBefore(titleElement, contentDiv);
+                    }
+                    titleElement.innerHTML = DOMPurify.sanitize(postData.title);
+                } else if (titleElement) { // Si existía el título y ahora no, hay que removerlo
+                    titleElement.remove();
+                }
             }
 
             function getPostContentHtml(post) {
@@ -1511,6 +1560,7 @@
                 state.currentEditPostData = postToEdit;
 
                 document.getElementById('editPostName').value = postToEdit.name || '';
+                document.getElementById('editPostTitle').value = postToEdit.title || ''; // Cargar el título existente
                 document.getElementById('editPostContent').value = postToEdit.text || '';
                 
                 const imagePreview = document.getElementById('editImagePreview');
@@ -1561,6 +1611,7 @@
                 }
 
                 updateData.name = document.getElementById('editPostName').value.trim() || "Anónimo";
+                updateData.title = DOMPurify.sanitize(document.getElementById('editPostTitle').value.trim()) || null; // Guardar título o null
                 updateData.text = DOMPurify.sanitize(document.getElementById('editPostContent').value.trim());
                 
                 const newPassword = document.getElementById('editNewPostPassword').value.trim();
