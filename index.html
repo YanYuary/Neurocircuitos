@@ -29,19 +29,15 @@
             --bg-primary: #0d0221;
         }
 
-        /* Tema "light" ahora será el tema Matrix Verde Neón */
-        body.light {
-            --neon-cyan: #39FF14;       /* Verde Matrix Principal para el brillo */
-            --neon-magenta: #00C853;    /* Verde Matrix Secundario para acentos (ej. hover de botones) */
-            --electric-blue: #2lime2;   /* Mantener por si alguna clase específica lo usa, pero el foco es verde */
-            --glitch-pink: #008F11;     /* Mantener por si alguna clase específica lo usa */
-            /* --dark-matter: #0A0A0A; No cambiaremos el fondo oscuro base */
-            --acid-green: #39FF14;      /* Verde principal, puede ser redundante con neon-cyan */
-            --deep-purple: #00C853;     /* Verde secundario, puede ser redundante con neon-magenta */
-            
-            --text-primary: #39FF14;    /* Color del texto principal será verde Matrix */
-            /* --bg-primary: #050505;  No cambiaremos --bg-primary, usará el de :root */
-            --border-color: #39FF14;    /* Color de los bordes será verde Matrix */
+        /* Tema 3: Neón Rosa (con fondo rosado oscuro) */
+        body.pink-theme {
+            --neon-cyan: #FF00FF;       /* Rosa Neón Principal para el brillo */
+            --neon-magenta: #FF69B4;    /* Rosa Intenso para acentos */
+            --electric-blue: #C71585;   /* Tono rosa/magenta oscuro */
+            --glitch-pink: #FF1493;     /* Rosa profundo */
+            --text-primary: #FF00FF;    /* Color del texto principal será rosa neón */
+            --bg-primary: #3D001D;      /* Fondo rosado oscuro para que el neón rosa destaque */
+            --border-color: #FF00FF;    /* Color de los bordes será rosa neón */
         }
 
         body {
@@ -304,7 +300,7 @@
         }
 
         .theme-toggle:hover {
-            transform: rotate(30deg);
+            /* transform: rotate(30deg); Eliminado el giro */
             box-shadow: 0 0 10px var(--neon-magenta);
         }
 
@@ -544,9 +540,6 @@
                     </label>
                     <input type="file" id="fileUpload" class="hidden" accept="image/*" aria-hidden="true">
                     <span id="fileName" class="text-xs text-gray-400 ml-2"></span>
-                    <label class="flex items-center ml-4 text-xs text-gray-500"> <input type="checkbox" id="ephemeralMode" class="mr-2" disabled>
-                        Modo efímero (desactivado)
-                    </label>
                 </div>
             </div>
             <div class="flex flex-wrap gap-4">
@@ -656,7 +649,7 @@
             
             let state = {
                 currentBoard: 'meta',
-                darkMode: localStorage.getItem('neurochan_theme') !== 'light',
+                currentTheme: localStorage.getItem('neurochan_theme') || 'dark', // 'dark' (azul), 'pink'
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
                 replyTo: null,
@@ -1154,22 +1147,27 @@
             }
 
             function toggleTheme() {
-                state.darkMode = !state.darkMode;
+                if (state.currentTheme === 'dark') {
+                    state.currentTheme = 'pink'; // Azul -> Rosa
+                } else { // Es 'pink' (o cualquier otro caso, vuelve a dark)
+                    state.currentTheme = 'dark';  // Rosa -> Azul
+                }
                 updateTheme();
                 saveThemePreference();
             }
             
             function saveThemePreference() {
-                localStorage.setItem('neurochan_theme', state.darkMode ? 'dark' : 'light');
+                localStorage.setItem('neurochan_theme', state.currentTheme);
             }
             
             function updateTheme() {
-                if (state.darkMode) {
-                    document.body.classList.remove('light');
+                document.body.classList.remove('pink-theme'); // Quita la clase del tema rosa si estaba
+
+                if (state.currentTheme === 'pink') { // Tema Rosa
+                    document.body.classList.add('pink-theme');
+                    document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); // Fondo rosado oscuro
+                } else { // Tema 'dark' (Azul, por defecto)
                     document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
-                } else {
-                    document.body.classList.add('light');
-                    document.getElementById('themeColorMeta').setAttribute('content', '#f0f4f8');
                 }
             }
 
