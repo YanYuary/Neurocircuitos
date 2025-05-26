@@ -477,7 +477,7 @@
 </head>
 <body class="min-h-screen crt-effect">
     <div class="container mx-auto px-4 py-8 fractal-bg">
-        <header class="text-center mb-10">
+        <header class="text-center mb-10 relative z-10"> <!-- Añadido relative z-10 -->
             <h1 class="glitch text-6xl md:text-8xl font-bold mb-4 neon-text" data-text="🧠 NeuroChan">
                 🧠 NeuroChan
             </h1>
@@ -550,16 +550,13 @@
                     id="submitPost"
                     class="neon-button px-6 py-2 bg-black bg-opacity-70 border border-cyan-500 text-cyan-400 font-bold hover:border-pink-500 hover:text-pink-400"
                     aria-label="Enviar post">
-                    ENVIAR
+                    🚀 ENVIAR
                 </button>
                 <button
                     id="themeToggle"
                     class="theme-toggle px-4 py-2 bg-black bg-opacity-70 border border-pink-500 text-pink-400 font-bold"
                     aria-label="Cambiar tema claro/oscuro">
                     🌓 CAMBIAR TEMA
-                </button>
-                <button id="adminLogoutButton" class="neon-button px-4 py-2 bg-black bg-opacity-70 border border-red-500 text-red-400 font-bold" style="display: none;" aria-label="Cerrar sesión de administrador">
-                    CERRAR SESIÓN ADMIN
                 </button>
             </div>
             <div id="typingPreview" class="mt-4 p-3 bg-black bg-opacity-30 border border-gray-700 hidden">
@@ -572,12 +569,17 @@
         <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
 
-        <div class="admin-panel">
+        <div class="admin-panel flex items-center gap-2">
             <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
                 ⚙️
             </button>
-            <button id="infoToggle" class="admin-toggle ml-2" aria-label="Información del sitio">
+            <button id="infoToggle" class="admin-toggle" aria-label="Información del sitio">
                 ❓
+            </button>
+            <button id="adminLogoutButton" class="admin-toggle text-red-500 hover:text-red-400" style="display: none;" aria-label="Cerrar sesión de administrador">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
             </button>
         </div>
 
@@ -673,6 +675,17 @@
                 <li>La información compartida es para reflexión personal y no sustituye el consejo profesional (médico, psicológico, etc.) cuando sea necesario.</li>
             </ul>
             <p class="text-xs text-gray-400">Recuerda: la verdadera sabiduría reside en el corazón y en la experiencia directa.</p>
+        </div>
+    </div>
+
+    <div id="genericModal" class="modal">
+        <div class="modal-content">
+            <h3 id="genericModalTitle" class="text-xl mb-4 neon-text">Mensaje</h3>
+            <p id="genericModalMessage" class="mb-4">Este es un mensaje de ejemplo.</p>
+            <div id="genericModalButtons" class="flex justify-end gap-2">
+                <!-- Botones se añadirán aquí dinámicamente -->
+                <button class="px-4 py-2 border border-gray-500 generic-modal-close-button">Cerrar</button>
+            </div>
         </div>
     </div>
 
@@ -831,7 +844,7 @@
                 document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
                 document.getElementById('infoToggle').addEventListener('click', openInfoModal);
                 document.getElementById('closeInfoModal').addEventListener('click', closeInfoModal);
-                document.getElementById('confirmEdit').addEventListener('click', confirmEdit);
+                document.getElementById('confirmEdit').addEventListener('click', () => confirmEdit());
                 document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
             }
 
@@ -876,13 +889,13 @@
                 const fileInput = document.getElementById('fileUpload');
 
                 if (!auth.currentUser) {
-                    alert("Error de autenticación. Por favor, recarga la página.");
+                    showGenericModal("Error de Autenticación", "No estás conectado. Por favor, recarga la página para intentar de nuevo.", [{ text: 'Entendido', action: closeGenericModal }]);
                     console.error("Intento de crear post sin usuario autenticado.");
                     return;
                 }
 
                 if (!contentInput && !fileInput.files[0]) {
-                    alert("El contenido no puede estar vacío.");
+                    showGenericModal("Atención", "El contenido del post no puede estar vacío si no adjuntas una imagen.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
 
@@ -914,7 +927,7 @@
                     if (fileInput.files[0]) {
                         const file = fileInput.files[0];
                         if (file.size > MAX_IMAGE_SIZE) {
-                            alert("Imagen demasiado grande. Máximo 2MB permitidos.");
+                            showGenericModal("Error de Archivo", "La imagen es demasiado grande. El tamaño máximo permitido es 2MB.", [{ text: 'Entendido', action: closeGenericModal }]);
                             submitButton.disabled = false;
                             submitButton.textContent = 'ENVIAR';
                             return;
@@ -933,7 +946,7 @@
                     }
                 } catch (error) {
                     console.error("Error creando post:", error);
-                    alert("Error al enviar el post. Intenta de nuevo.");
+                    showGenericModal("Error", "Ocurrió un error al enviar el post. Por favor, inténtalo de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                     submitButton.disabled = false;
                     submitButton.textContent = 'ENVIAR';
                 }
@@ -957,7 +970,7 @@
                     }, 300);
                 } catch (error) {
                     console.error("Error guardando post en Firestore:", error);
-                    alert("Error al guardar el post. Intenta de nuevo.");
+                    showGenericModal("Error de Guardado", "No se pudo guardar el post en la base de datos. Intenta de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                 } finally {
                     const submitButton = document.getElementById('submitPost');
                     submitButton.disabled = false;
@@ -1069,7 +1082,7 @@
                     <div class="flex items-start mb-2">
                         <span class="avatar text-3xl mr-3">${post.avatar}</span>
                         <div>
-                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)} ${post.authorUID ? `(ID Anónimo: ${post.authorUID.slice(-4)})` : ''}</span>
+                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
                             <span class="text-xs text-gray-400 ml-2">${timeString}</span>
                         </div>
                     </div>
@@ -1210,7 +1223,7 @@
             function adminLogout() {
                 state.isAdmin = false;
                 localStorage.removeItem('neurochan_admin');
-                alert('Sesión de administrador cerrada.');
+                showGenericModal("Sesión Cerrada", "Has cerrado la sesión de administrador.", [{ text: 'OK', action: closeGenericModal }]);
                 document.getElementById('adminLogoutButton').style.display = 'none';
                 document.getElementById('adminToggle')?.classList.remove('text-pink-400');
                 loadAndRenderPostsRealtime(); // Re-render posts to update UI based on admin status
@@ -1219,7 +1232,7 @@
             async function reactWith(postId, reactionType, reactionField, buttonClass) {
                 if (!auth.currentUser) {
                     console.warn(`Intento de reaccionar (${reactionType}) sin usuario autenticado.`);
-                    alert("Debes estar conectado para reaccionar. Recarga la página.");
+                    showGenericModal("Error de Autenticación", "Debes estar conectado para reaccionar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
                 const userUID = auth.currentUser.uid;
@@ -1235,11 +1248,11 @@
                 const userReactions = postData.reactedBy && postData.reactedBy[userUID] ? postData.reactedBy[userUID] : [];
 
                 if (userReactions.includes(reactionType)) {
-                    alert("Ya has dado esta reacción a este post.");
+                    showGenericModal("Reacción Duplicada", "Ya has dado esta reacción a este post.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
                 if (userReactions.length >= 3) {
-                    alert("Solo puedes dar hasta 3 tipos de reacciones diferentes por post.");
+                    showGenericModal("Límite de Reacciones", "Solo puedes dar hasta 3 tipos de reacciones diferentes por post.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
 
@@ -1264,7 +1277,7 @@
                     }
                 } catch (error) {
                     console.error(`Error al reaccionar con ${reactionType}:`, error);
-                    alert("Error al procesar tu reacción.");
+                    showGenericModal("Error de Reacción", "Ocurrió un error al procesar tu reacción.", [{ text: 'OK', action: closeGenericModal }]);
                 }
             }
 
@@ -1300,11 +1313,6 @@
                 if (state.currentTheme === 'pink') { // Tema Rosa
                     document.body.classList.add('pink-theme');
                     document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); // Fondo rosado oscuro
-                    if (state.isAdmin) { // Ensure admin logout button is visible if admin
-                         const adminLogoutBtn = document.getElementById('adminLogoutButton');
-                         if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline-block';
-                    }
-
                 } else { // Tema 'dark' (Azul, por defecto)
                     document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
                 }
@@ -1313,16 +1321,22 @@
             async function deletePostFirestore(postId) {
                  if (!auth.currentUser) {
                     console.warn("Intento de borrar sin usuario autenticado.");
-                    alert("Debes estar conectado para borrar. Recarga la página.");
+                    showGenericModal("Error de Autenticación", "Debes estar conectado para borrar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
-                if (!confirm("¿Seguro que quieres borrar este post permanentemente?")) return;
-                try {
-                    await deleteDoc(doc(db, "Posts", postId));
-                } catch (error) {
-                    console.error("Error borrando post:", error);
-                    alert("Error al borrar el post.");
-                }
+
+                showGenericModal(
+                    "Confirmar Borrado",
+                    "¿Seguro que quieres borrar este post permanentemente? Esta acción no se puede deshacer.",
+                    [
+                        { text: 'Cancelar', class: 'border-gray-500', action: closeGenericModal },
+                        { text: 'Borrar Definitivamente', class: 'bg-red-500 text-white', action: async () => {
+                            try { await deleteDoc(doc(db, "Posts", postId)); closeGenericModal(); }
+                            catch (error) { console.error("Error borrando post:", error); showGenericModal("Error", "No se pudo borrar el post.", [{ text: 'OK', action: closeGenericModal }]); }
+                        }}
+                    ],
+                    false // No cerrar al hacer clic fuera
+                );
             }
             
             let currentPostPasswordHash = null;
@@ -1345,20 +1359,20 @@
             async function deletePostWithPassword() {
                 if (!auth.currentUser) {
                     console.warn("Intento de borrar con contraseña sin usuario autenticado.");
-                    alert("Debes estar conectado para borrar. Recarga la página.");
+                    showGenericModal("Error de Autenticación", "Debes estar conectado para borrar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     closeDeleteModal();
                     return;
                 }
                 const passwordAttempt = document.getElementById('deletePasswordInput').value;
                 if (!state.currentDeletePostId || currentPostPasswordHash === null) { 
-                    alert("No se puede borrar este post o no requiere contraseña.");
+                    showGenericModal("Error", "No se puede borrar este post o no requiere contraseña.", [{ text: 'Entendido', action: closeGenericModal }]);
                     closeDeleteModal();
                     return;
                 }
 
                 if (bcryptInstance && bcryptInstance.compareSync(passwordAttempt, currentPostPasswordHash)) {
                     await deletePostFirestore(state.currentDeletePostId);
-                    closeDeleteModal();
+                    closeDeleteModal(); // Cerramos el modal de contraseña
                 } else {
                     alert("Contraseña incorrecta.");
                 }
@@ -1402,17 +1416,44 @@
                     setupAdminPanel();
                     loadAndRenderPostsRealtime(); 
                 } else {
-                    alert("Contraseña incorrecta");
+                    showGenericModal("Acceso Denegado", "La contraseña de administrador es incorrecta.", [{ text: 'Intentar de Nuevo', action: () => { document.getElementById('adminPasswordInput').focus(); document.getElementById('adminPasswordInput').value = ''; } }, { text: 'Cancelar', action: closeAdminModal }]);
                 }
             }
+
+            // --- Modal Genérico ---
+            function showGenericModal(title, message, buttons = [{ text: 'OK', action: closeGenericModal }], closeModalOnClickOutside = true) {
+                const modal = document.getElementById('genericModal');
+                document.getElementById('genericModalTitle').textContent = title;
+                document.getElementById('genericModalMessage').innerHTML = DOMPurify.sanitize(message); // Permitir HTML simple como <br>
+
+                const buttonsContainer = document.getElementById('genericModalButtons');
+                buttonsContainer.innerHTML = ''; // Limpiar botones anteriores
+
+                buttons.forEach(btnConfig => {
+                    const button = document.createElement('button');
+                    button.textContent = btnConfig.text;
+                    button.className = `px-4 py-2 rounded ${btnConfig.class || 'border border-gray-500'}`;
+                    button.addEventListener('click', () => {
+                        if (btnConfig.action) btnConfig.action();
+                    });
+                    buttonsContainer.appendChild(button);
+                });
+
+                modal.style.display = 'flex';
+
+                if (closeModalOnClickOutside) {
+                    modal.onclick = function(event) { if (event.target === modal) closeGenericModal(); };
+                } else {
+                    modal.onclick = null; // No cerrar al hacer clic fuera
+                }
+            }
+
+            function closeGenericModal() { document.getElementById('genericModal').style.display = 'none'; }
 
             // --- Funciones para Editar Post ---
             function openEditModal(postId) {
                 const postToEdit = state.allPosts.find(p => p.id === postId);
-                if (!postToEdit) {
-                    alert("Post no encontrado.");
-                    return;
-                }
+                if (!postToEdit) { showGenericModal("Error", "Post no encontrado.", [{ text: 'OK', action: closeGenericModal }]); return; }
 
                 state.currentEditPostId = postId;
                 state.currentEditPostData = postToEdit;
@@ -1462,21 +1503,21 @@
                 if (!state.isAdmin && postData.passwordHash) {
                     const passwordAttempt = document.getElementById('editPostPasswordPrompt').value;
                     if (!bcryptInstance || !bcryptInstance.compareSync(passwordAttempt, postData.passwordHash)) {
-                        alert("Contraseña del post incorrecta.");
+                        showGenericModal("Error de Edición", "La contraseña del post es incorrecta.", [{ text: 'Entendido', action: closeGenericModal }]);
                         return;
                     }
                 }
 
                 updateData.name = document.getElementById('editPostName').value.trim() || "Anónimo";
                 updateData.text = DOMPurify.sanitize(document.getElementById('editPostContent').value.trim());
-
+                
                 const newPassword = document.getElementById('editNewPostPassword').value.trim();
                 if (newPassword && bcryptInstance) {
                     updateData.passwordHash = bcryptInstance.hashSync(newPassword, 10);
                 } else if (newPassword && !bcryptInstance) {
-                    alert("Error con bcrypt: no se puede actualizar la contraseña.");
+                    showGenericModal("Error de Contraseña", "Hubo un problema al procesar la nueva contraseña. No se pudo actualizar.", [{ text: 'OK', action: closeGenericModal }]);
                 }
-
+                
                 const fileInput = document.getElementById('editFileUpload');
                 const removeCurrentImage = document.getElementById('removeCurrentImage').checked;
 
@@ -1487,7 +1528,7 @@
                 if (fileInput.files[0]) {
                     const file = fileInput.files[0];
                     if (file.size > MAX_IMAGE_SIZE) {
-                        alert("Imagen demasiado grande. Máximo 2MB.");
+                        showGenericModal("Error de Archivo", "La imagen seleccionada es demasiado grande. El máximo es 2MB.", [{ text: 'Entendido', action: closeGenericModal }]);
                         confirmButton.disabled = false;
                         confirmButton.textContent = 'Guardar Cambios';
                         return;
@@ -1510,9 +1551,10 @@
                 try {
                     await updateDoc(doc(db, "Posts", state.currentEditPostId), updateData);
                     closeEditModal();
+                    showGenericModal("Éxito", "El post ha sido actualizado correctamente.", [{ text: 'OK', action: closeGenericModal }]);
                 } catch (error) {
                     console.error("Error actualizando post:", error);
-                    alert("Error al guardar los cambios.");
+                    showGenericModal("Error de Actualización", "No se pudieron guardar los cambios en el post.", [{ text: 'OK', action: closeGenericModal }]);
                 } finally {
                     buttonElement.disabled = false;
                     buttonElement.textContent = 'Guardar Cambios';
@@ -1522,4 +1564,3 @@
     </script>
 </body>
 </html>
-
