@@ -622,8 +622,9 @@
         import { 
             getFirestore, collection, addDoc, onSnapshot, 
             doc, deleteDoc, updateDoc, query, where, orderBy,
-            increment, Timestamp // Timestamp for type checking if needed, serverTimestamp for writing
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            increment, Timestamp, serverTimestamp          // ← añade serverTimestamp
+            } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
         import { 
             getAuth, signInAnonymously, onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -810,7 +811,7 @@
                     name: name,
                     passwordHash: password ? bcrypt.hashSync(password, 10) : null,
                     resonateCount: 0,
-                    timestamp: new Date().toISOString(), 
+                    timestamp: serverTimestamp(), 
                     replyTo: state.replyTo, 
                 };
 
@@ -941,12 +942,11 @@
                 container.innerHTML = ''; 
 
                 postsToRender.forEach(post => {
-                    let displayTimestamp = post.timestamp;
-                    if (post.timestamp && typeof post.timestamp.toDate === 'function') {
-                        displayTimestamp = post.timestamp.toDate().toISOString();
-                    } else if (typeof post.timestamp === 'object' && post.timestamp.seconds) { 
-                        displayTimestamp = new Timestamp(post.timestamp.seconds, post.timestamp.nanoseconds).toDate().toISOString();
-                    }
+                                   
+                    const displayTimestamp = post.timestamp?.toDate
+                        ? post.timestamp.toDate().toISOString()
+                        : 'sin-fecha';
+                    
 
                     const postElement = createPostElement({ ...post, timestamp: displayTimestamp });
                     container.appendChild(postElement);
