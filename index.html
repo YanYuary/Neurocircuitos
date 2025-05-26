@@ -228,8 +228,6 @@
             100% { box-shadow: 0 0 20px var(--deep-purple); }
         }
 
-        /* Removed .post-fadeout and @keyframes fadeOut as posts are persistent */
-
         .transmission-effect {
             position: relative;
             overflow: hidden;
@@ -248,7 +246,7 @@
                 rgba(255, 255, 255, 0.1) 50%,
                 rgba(255, 255, 255, 0) 100%
             );
-            animation: transmissionScan 2s linear; /* Consider if this should be one-time or on new posts */
+            animation: transmissionScan 2s linear; 
         }
 
         @keyframes transmissionScan {
@@ -302,7 +300,6 @@
             box-shadow: 0 0 10px var(--neon-magenta);
         }
 
-        /* Accesibilidad */
         [aria-hidden="true"] {
             visibility: hidden;
         }
@@ -312,7 +309,6 @@
             outline-offset: 2px;
         }
 
-        /* Contraste mejorado para modo claro */
         body.light .neon-text {
             text-shadow: none;
             color: var(--electric-blue);
@@ -323,7 +319,6 @@
             border-color: var(--electric-blue);
         }
 
-        /* Emoji picker */
         .emoji-picker {
             display: none;
             position: absolute;
@@ -355,7 +350,6 @@
             background-color: rgba(0, 255, 255, 0.2);
         }
 
-        /* Respuestas en hilo */
         .reply-indicator {
             border-left: 2px solid var(--neon-cyan);
             padding-left: 1rem;
@@ -372,7 +366,6 @@
             color: var(--neon-magenta);
         }
 
-        /* Tooltip de preview */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -401,7 +394,6 @@
             opacity: 1;
         }
 
-        /* Modal de borrado */
         .modal {
             display: none;
             position: fixed;
@@ -424,7 +416,6 @@
             width: 90%;
         }
 
-        /* Admin panel */
         .admin-panel {
             position: fixed;
             top: 1rem;
@@ -472,7 +463,6 @@
             width: 90%;
         }
 
-        /* Efecto de pulso al resonar */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -483,7 +473,6 @@
             animation: pulse 0.5s ease;
         }
 
-        /* Estilo para el mensaje de carga */
         #loadingMessage {
             text-align: center;
             font-size: 1.2rem;
@@ -644,7 +633,7 @@
             apiKey: "AIzaSyDQ6q9KkYS0To-BJEjxQSQUyQ65C6wam6o",
             authDomain: "neurocircuitos.firebaseapp.com",
             projectId: "neurocircuitos",
-            storageBucket: "neurocircuitos.appspot.com", // Corrected: .appspot.com typically
+            storageBucket: "neurocircuitos.appspot.com", 
             messagingSenderId: "988092454441",
             appId: "1:988092454441:web:e260431acea58ada5f2e38",
             measurementId: "G-9678SEZ792"
@@ -663,25 +652,21 @@
             const ADMIN_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRv/zY0K7fW3uZJq8X7V2/dJ3S.QdO'; // bcrypt.hashSync('root42', 10)
             const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
-            // Estado de la aplicación (posts ahora se manejan por Firestore)
             let state = {
-                // posts: [], // No longer stored locally, fetched from Firestore
                 currentBoard: 'meta',
                 darkMode: localStorage.getItem('neurochan_theme') !== 'light',
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
                 replyTo: null,
                 currentDeletePostId: null,
-                allPosts: [] // Cache of all posts from Firestore for reply previews
+                allPosts: [] 
             };
 
-            // Avatar options
             const avatars = [
                 '👾', '🤖', '👹', '👻', '💀', '👽', '🎮', '🕹️', '🔮', '🧿',
-                '👁️', '🧠', '🦾', '🦿', '🧬', '🔭', '🛸', '�', '🌀', '🌠'
+                '👁️', '🧠', '🦾', '🦿', '🧬', '🔭', '🛸', '🌌', '🌀', '🌠'
             ];
 
-            // Background colors for posts
             const postColors = [
                 'bg-gradient-to-br from-cyan-900 to-blue-900',
                 'bg-gradient-to-br from-purple-900 to-pink-900',
@@ -691,7 +676,6 @@
                 'bg-gradient-to-br from-yellow-900 to-orange-900'
             ];
 
-            // Board information
             const boards = {
                 meta: {
                     title: "/meta/ - Metaprogramación y Viaje Dimensional",
@@ -715,32 +699,38 @@
                 }
             };
 
-            let unsubscribePosts = null; // To store the unsubscribe function for onSnapshot
+            let unsubscribePosts = null; 
 
-            // Inicialización cuando el DOM está listo
             document.addEventListener('DOMContentLoaded', function() {
                 setupEventListeners();
                 setupEmojiPicker();
-                updateTheme(); // Cargar preferencia de tema
+                updateTheme(); 
                 if (state.isAdmin) setupAdminPanel();
 
-                // Firebase Authentication
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         console.log("Usuario autenticado anónimamente:", user.uid);
-                        loadAndRenderPostsRealtime(); // Cargar posts después de la autenticación
+                        loadAndRenderPostsRealtime(); 
                     } else {
                         console.log("Usuario no autenticado, intentando autenticación anónima...");
                         signInAnonymously(auth).catch((error) => {
                             console.error("Error en autenticación anónima:", error);
-                            // Show error message to user if needed
-                            document.getElementById('loadingMessage').textContent = 'Error de conexión. Intenta recargar.';
+                            let userMessage = 'Error de conexión. Intenta recargar.';
+                            const loadingMessageElement = document.getElementById('loadingMessage');
+
+                            if (loadingMessageElement) {
+                                loadingMessageElement.classList.remove('hidden'); // Asegurar que el mensaje sea visible
+                                if (error.code === 'auth/configuration-not-found') {
+                                    userMessage = 'ERROR DE CONFIGURACIÓN DE FIREBASE: El inicio de sesión anónimo no está habilitado. Por favor, ve a tu consola de Firebase -> Authentication -> Sign-in method y habilita el proveedor "Anónimo".';
+                                    console.error("ACCIÓN REQUERIDA: Habilita el proveedor de inicio de sesión 'Anónimo' en la sección 'Authentication' -> 'Sign-in method' de tu Firebase console.");
+                                }
+                                loadingMessageElement.textContent = userMessage;
+                            }
                         });
                     }
                 });
             });
 
-            // Configurar todos los event listeners
             function setupEventListeners() {
                 document.getElementById('submitPost').addEventListener('click', createPost);
                 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
@@ -794,12 +784,17 @@
                 textarea.focus();
             }
 
-            // Crear un nuevo post en Firestore
             async function createPost() {
                 const contentInput = document.getElementById('postContent').value.trim();
                 const name = document.getElementById('postName').value.trim() || "Anónimo";
                 const password = document.getElementById('postPassword').value.trim();
                 const fileInput = document.getElementById('fileUpload');
+
+                if (!auth.currentUser) {
+                    alert("Error de autenticación. Por favor, recarga la página.");
+                    console.error("Intento de crear post sin usuario autenticado.");
+                    return;
+                }
 
                 if (!contentInput && !fileInput.files[0]) {
                     alert("El contenido no puede estar vacío.");
@@ -810,16 +805,15 @@
                     avatar: avatars[Math.floor(Math.random() * avatars.length)],
                     board: state.currentBoard,
                     color: postColors[Math.floor(Math.random() * postColors.length)],
-                    content: contentInput, // Será reemplazado por URL de imagen si se sube una
+                    content: contentInput, 
                     isImage: false,
                     name: name,
                     passwordHash: password ? bcrypt.hashSync(password, 10) : null,
                     resonateCount: 0,
-                    timestamp: new Date().toISOString(), // Guardar como ISO string
+                    timestamp: new Date().toISOString(), 
                     replyTo: state.replyTo, 
                 };
 
-                // Resetear replyTo después de usarlo
                 state.replyTo = null;
                 document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
                 
@@ -846,7 +840,7 @@
                         };
                         reader.readAsDataURL(file);
                     } else {
-                        newPostData.content = DOMPurify.sanitize(newPostData.content); // Sanitizar si es texto
+                        newPostData.content = DOMPurify.sanitize(newPostData.content); 
                         await completePostCreationFirestore(newPostData);
                     }
                 } catch (error) {
@@ -860,9 +854,7 @@
             async function completePostCreationFirestore(postData) {
                 try {
                     await addDoc(postsCollectionRef, postData);
-                    // No es necesario renderizar manualmente, onSnapshot lo hará.
                     
-                    // Limpiar inputs
                     document.getElementById('postContent').value = '';
                     document.getElementById('postName').value = '';
                     document.getElementById('postPassword').value = '';
@@ -870,7 +862,6 @@
                     document.getElementById('fileName').textContent = '';
                     document.getElementById('typingPreview').classList.add('hidden');
 
-                    // Efecto visual de confirmación
                     const button = document.getElementById('submitPost');
                     button.classList.add('bg-pink-500', 'text-white');
                     setTimeout(() => {
@@ -885,7 +876,6 @@
                     submitButton.textContent = 'ENVIAR';
                 }
             }
-
 
             function compressImage(imageData, callback) {
                 const img = new Image();
@@ -903,14 +893,27 @@
                 img.src = imageData;
             }
             
-            // Cargar y renderizar posts en tiempo real desde Firestore
             function loadAndRenderPostsRealtime() {
                 const loadingMessage = document.getElementById('loadingMessage');
-                loadingMessage.classList.remove('hidden');
+                if (loadingMessage) { 
+                    loadingMessage.classList.remove('hidden');
+                    loadingMessage.textContent = 'Cargando transmisiones...'; // Reset message
+                }
 
                 if (unsubscribePosts) {
-                    unsubscribePosts(); // Detener listener anterior si existe
+                    unsubscribePosts(); 
                 }
+
+                if (!auth.currentUser) {
+                    console.log("Esperando autenticación para cargar posts...");
+                    // El listener onAuthStateChanged se encargará de llamar a esta función de nuevo.
+                    // Opcionalmente, mostrar un mensaje si loadingMessage existe.
+                     if (loadingMessage) {
+                        loadingMessage.textContent = 'Esperando conexión segura...';
+                     }
+                    return;
+                }
+
 
                 const q = query(postsCollectionRef, where("board", "==", state.currentBoard), orderBy("timestamp", "desc"));
                 
@@ -919,37 +922,37 @@
                     querySnapshot.forEach((doc) => {
                         postsFromFirestore.push({ id: doc.id, ...doc.data() });
                     });
-                    state.allPosts = postsFromFirestore; // Actualizar cache para previews
+                    state.allPosts = postsFromFirestore; 
                     renderBoardPosts(postsFromFirestore);
-                    loadingMessage.classList.add('hidden');
+                    if (loadingMessage) { 
+                        loadingMessage.classList.add('hidden');
+                    }
                 }, (error) => {
                     console.error("Error obteniendo posts:", error);
-                    loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
+                    if (loadingMessage) { 
+                         loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
+                         loadingMessage.classList.remove('hidden');
+                    }
                 });
             }
 
-            // Renderizar los posts del tablero actual en la UI
             function renderBoardPosts(postsToRender) {
                 const container = document.getElementById('postsContainer');
-                container.innerHTML = ''; // Limpiar posts anteriores
+                container.innerHTML = ''; 
 
                 postsToRender.forEach(post => {
-                    // Asegurarse que el timestamp es un string ISO para compatibilidad con createPostElement
-                    // Firestore Timestamps tienen toDate()
                     let displayTimestamp = post.timestamp;
                     if (post.timestamp && typeof post.timestamp.toDate === 'function') {
                         displayTimestamp = post.timestamp.toDate().toISOString();
-                    } else if (typeof post.timestamp === 'object' && post.timestamp.seconds) { // Firestore Timestamp like object
+                    } else if (typeof post.timestamp === 'object' && post.timestamp.seconds) { 
                         displayTimestamp = new Timestamp(post.timestamp.seconds, post.timestamp.nanoseconds).toDate().toISOString();
                     }
-
 
                     const postElement = createPostElement({ ...post, timestamp: displayTimestamp });
                     container.appendChild(postElement);
                     applyPostEffects(post, postElement);
                 });
             }
-
 
             function applyPostEffects(post, element) {
                 const content = (post.content || "").toLowerCase();
@@ -961,9 +964,9 @@
             function createPostElement(post) {
                 const postElement = document.createElement('div');
                 postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
-                postElement.dataset.id = post.id; // Firestore document ID (string)
+                postElement.dataset.id = post.id; 
 
-                const date = new Date(post.timestamp); // timestamp ya es ISO string
+                const date = new Date(post.timestamp); 
                 const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const contentHtml = getPostContentHtml(post);
                 const replyIndicator = post.replyTo ? 
@@ -981,7 +984,8 @@
                         </div>
                     </div>
                     ${replyIndicator}
-                    <div class="post-content text-sm mb-2">${contentHtml}</div> <div class="flex justify-between items-center">
+                    <div class="post-content text-sm mb-2">${contentHtml}</div> 
+                    <div class="flex justify-between items-center">
                         <div class="flex gap-2">
                             <button class="resonate-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Resonar con este post">
                                 💡 Resonar (${post.resonateCount})
@@ -1003,7 +1007,7 @@
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
                         if (state.isAdmin) deletePostFirestore(post.id);
-                        else openDeleteModal(post.id, post.passwordHash); // Pasar passwordHash
+                        else openDeleteModal(post.id, post.passwordHash); 
                     });
                 }
                 postElement.querySelectorAll('.reply-link').forEach(link => {
@@ -1013,7 +1017,7 @@
             }
 
             function showReplyPreview(postId, element) {
-                const post = state.allPosts.find(p => p.id === postId); // Usar state.allPosts
+                const post = state.allPosts.find(p => p.id === postId); 
                 if (!post) return;
                 let tooltip = element.querySelector('.tooltip-text');
                 if (!tooltip) {
@@ -1032,29 +1036,25 @@
             }
 
             function replyToPost(postId) {
-                state.replyTo = postId; // postId es string (Firestore ID)
+                state.replyTo = postId; 
                 document.getElementById('postContent').placeholder = `>>${postId.slice(-4)} `;
                 document.getElementById('postContent').focus();
             }
 
             function getPostContentHtml(post) {
-                // Sanitizar contenido antes de procesarlo para URLs, etc.
                 const sanitizedContent = DOMPurify.sanitize(post.content);
 
-                if (post.isImage) { // Si isImage es true, content es una URL base64 o una URL externa
+                if (post.isImage) { 
                      return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
                 }
                 
-                // Chequear si el contenido sanitizado es una URL de imagen externa
                 if (isImageUrl(sanitizedContent)) {
                      return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
                 }
 
-
                 if (isUrl(sanitizedContent)) {
                     if (isYoutubeUrl(sanitizedContent)) {
                         const videoId = extractYoutubeId(sanitizedContent);
-                        // Usar URL de no-cookie para mayor privacidad y evitar errores de 'unsafe-inline' si hay CSP.
                         return `<div class="mb-2"><iframe class="w-full h-48" src="https://www.youtube-nocookie.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
                     } else if (isSoundcloudUrl(sanitizedContent)) {
                         return `<div class="mb-2"><iframe class="w-full h-48" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(sanitizedContent)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe></div>`;
@@ -1062,13 +1062,12 @@
                         return `<a href="${sanitizedContent}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-pink-400 underline">${sanitizedContent}</a>`;
                     }
                 }
-                let formattedContent = sanitizedContent.replace(/>>&gt;(\w+)/g, (match, id) => { // IDs son alfanuméricos en Firestore
-                     // Buscar el post original por su ID completo (no solo los últimos 4)
+                let formattedContent = sanitizedContent.replace(/>>>(\w+)/g, (match, id) => { 
                     const originalPost = state.allPosts.find(p => p.id === id || p.id.endsWith(id));
                     if (originalPost) {
                         return `<a href="#" class="reply-link text-cyan-400" data-post-id="${originalPost.id}">>>${originalPost.id.slice(-4)}</a>`;
                     }
-                    return match; // Si no se encuentra, dejar como está
+                    return match; 
                 });
                 formattedContent = formattedContent.replace(/\n/g, '<br>');
                 return formattedContent;
@@ -1099,18 +1098,25 @@
                     "/meta/ Tableros de la Mente" : 
                     `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
                 
-                loadAndRenderPostsRealtime(); // Recargar posts para el nuevo tablero
+                loadAndRenderPostsRealtime(); 
             }
 
             async function resonatePost(postId) {
+                if (!auth.currentUser) {
+                    console.warn("Intento de resonar sin usuario autenticado.");
+                    alert("Debes estar conectado para resonar. Recarga la página.");
+                    return;
+                }
                 const postRef = doc(db, "Posts", postId);
                 try {
                     await updateDoc(postRef, { resonateCount: increment(1) });
-                    // onSnapshot actualizará la UI. Animar el botón localmente para feedback inmediato.
                     const button = document.querySelector(`[data-id="${postId}"] .resonate-button`);
                     if (button) {
-                        const currentCount = parseInt(button.textContent.match(/\((\d+)\)/)[1]) + 1;
-                        button.textContent = `💡 Resonar (${currentCount})`;
+                        const currentCountMatch = button.textContent.match(/\((\d+)\)/);
+                        if (currentCountMatch && currentCountMatch[1]){
+                            const currentCount = parseInt(currentCountMatch[1]) + 1;
+                            button.textContent = `💡 Resonar (${currentCount})`;
+                        }
                         button.classList.add('active', 'pulse');
                         setTimeout(() => button.classList.remove('active'), 1000);
                         setTimeout(() => button.classList.remove('pulse'), 500);
@@ -1125,22 +1131,25 @@
             function updateTheme() { /* ... (mantener como estaba) ... */ }
 
             async function deletePostFirestore(postId) {
+                 if (!auth.currentUser) {
+                    console.warn("Intento de borrar sin usuario autenticado.");
+                    alert("Debes estar conectado para borrar. Recarga la página.");
+                    return;
+                }
                 if (!confirm("¿Seguro que quieres borrar este post permanentemente?")) return;
                 try {
                     await deleteDoc(doc(db, "Posts", postId));
-                    // onSnapshot actualizará la UI.
                 } catch (error) {
                     console.error("Error borrando post:", error);
                     alert("Error al borrar el post.");
                 }
             }
             
-            // Guardar el passwordHash del post actual en el modal
             let currentPostPasswordHash = null;
 
             function openDeleteModal(postId, passwordHash) {
                 state.currentDeletePostId = postId;
-                currentPostPasswordHash = passwordHash; // Guardar el hash del post
+                currentPostPasswordHash = passwordHash; 
                 document.getElementById('deleteModal').style.display = 'flex';
                 document.getElementById('deletePasswordInput').value = '';
                 document.getElementById('deletePasswordInput').focus();
@@ -1154,8 +1163,14 @@
             }
 
             async function deletePostWithPassword() {
+                if (!auth.currentUser) {
+                    console.warn("Intento de borrar con contraseña sin usuario autenticado.");
+                    alert("Debes estar conectado para borrar. Recarga la página.");
+                    closeDeleteModal();
+                    return;
+                }
                 const passwordAttempt = document.getElementById('deletePasswordInput').value;
-                if (!state.currentDeletePostId || currentPostPasswordHash === null) { // Chequear si hay hash
+                if (!state.currentDeletePostId || currentPostPasswordHash === null) { 
                     alert("No se puede borrar este post o no requiere contraseña.");
                     closeDeleteModal();
                     return;
@@ -1172,14 +1187,14 @@
             function setupAdminPanel() { /* ... (mantener como estaba) ... */ }
             function toggleAdminModal() { /* ... (mantener como estaba) ... */ }
             function closeAdminModal() { /* ... (mantener como estaba) ... */ }
-            function verifyAdminPassword() { /* ... (mantener como estaba, pero adminPasswordInput) ... */ 
-                const password = document.getElementById('adminPasswordInput').value; // Usar nuevo ID
+            function verifyAdminPassword() { 
+                const password = document.getElementById('adminPasswordInput').value; 
                 if (bcrypt.compareSync(password, ADMIN_HASH)) {
                     state.isAdmin = true;
                     localStorage.setItem('neurochan_admin', 'true');
                     closeAdminModal();
                     setupAdminPanel();
-                    loadAndRenderPostsRealtime(); // Recargar para mostrar/ocultar botones de borrado
+                    loadAndRenderPostsRealtime(); 
                 } else {
                     alert("Contraseña incorrecta");
                 }
