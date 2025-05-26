@@ -1018,14 +1018,48 @@
 
                 const q = query(postsCollectionRef, where("board", "==", state.currentBoard), orderBy("timestamp", "desc"));
                 
-                unsubscribePosts = onSnapshot(q, (querySnapshot) => {
-                    const postsFromFirestore = [];
-                    querySnapshot.forEach((doc) => {
-                        postsFromFirestore.push({ id: doc.id, ...doc.data() });
+                unsubscribePosts = onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        const postData = { id: change.doc.id, ...change.doc.data() };
+                        const existingPostElement = document.querySelector(`[data-id="${change.doc.id}"]`);
+                        const container = document.getElementById('postsContainer');
+
+                        if (change.type === "added") {
+                            if (!existingPostElement) { // Evitar duplicados si ya existe por alguna razón
+                                const newPostElement = createPostElement(postData);
+                                // Insertar al principio para mantener el orden cronológico inverso
+                                container.insertBefore(newPostElement, container.firstChild); 
+                                applyPostEffects(postData, newPostElement);
+                                state.allPosts.unshift(postData); // Añadir al principio del array local
+                            } else {
+                                // Si ya existe (raro en 'added'), actualizarlo por si acaso
+                                updatePostElementDOM(existingPostElement, postData);
+                            }
+                        }
+                        if (change.type === "modified") {
+                            if (existingPostElement) {
+                                updatePostElementDOM(existingPostElement, postData);
+                                // Actualizar el post en el array local
+                                const postIndex = state.allPosts.findIndex(p => p.id === postData.id);
+                                if (postIndex > -1) {
+                                    state.allPosts[postIndex] = postData;
+                                }
+                            } else {
+                                // Si se modificó pero no está en el DOM (podría pasar si se añadió y modificó rápidamente)
+                                const newPostElement = createPostElement(postData);
+                                container.insertBefore(newPostElement, container.firstChild);
+                                applyPostEffects(postData, newPostElement);
+                                state.allPosts.unshift(postData);
+                            }
+                        }
+                        if (change.type === "removed") {
+                            if (existingPostElement) {
+                                existingPostElement.remove();
+                                state.allPosts = state.allPosts.filter(p => p.id !== postData.id); // Eliminar del array local
+                            }
+                        }
                     });
-                    state.allPosts = postsFromFirestore; 
-                    renderBoardPosts(postsFromFirestore);
-                    if (loadingMessage) { 
+                    if (loadingMessage) {  // Mover esto fuera del forEach
                         loadingMessage.classList.add('hidden');
                     }
                 }, (error) => {
@@ -1034,23 +1068,6 @@
                          loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
                          loadingMessage.classList.remove('hidden');
                     }
-                });
-            }
-
-            function renderBoardPosts(postsToRender) {
-                const container = document.getElementById('postsContainer');
-                container.innerHTML = ''; 
-
-                postsToRender.forEach(post => {
-                                   
-                    const displayTimestamp = post.timestamp?.toDate
-                        ? post.timestamp.toDate().toISOString()
-                        : 'sin-fecha';
-                    
-
-                    const postElement = createPostElement({ ...post, timestamp: displayTimestamp });
-                    container.appendChild(postElement);
-                    applyPostEffects(post, postElement);
                 });
             }
 
@@ -1066,8 +1083,8 @@
                 postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
                 postElement.dataset.id = post.id; 
 
-                const date = new Date(post.timestamp); 
-                const timeString = date.toLocaleTimeString ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                const postTimestamp = post.timestamp?.toDate ? post.timestamp.toDate() : new Date(post.timestamp);
+                const timeString = postTimestamp.toLocaleTimeString ? postTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
                 const contentHtml = getPostContentHtml(post);
                 const replyIndicator = post.replyTo ? 
                     `<div class="reply-indicator mb-2">
@@ -1159,6 +1176,34 @@
                 document.getElementById('postContent').focus();
             }
 
+            function updatePostElementDOM(postElement, postData) {
+                // Actualizar contadores de reacción
+                postElement.querySelector('.heart-reaction-button .count').textContent = postData.heartCount || 0;
+                postElement.querySelector('.funny-reaction-button .count').textContent = postData.funnyCount || 0;
+                postElement.querySelector('.angry-reaction-button .count').textContent = postData.angryCount || 0;
+
+                // Actualizar estado 'active' de los botones de reacción
+                const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
+                const userReactions = (currentUserUID && postData.reactedBy && postData.reactedBy[currentUserUID]) ? postData.reactedBy[currentUserUID] : [];
+
+                const heartButton = postElement.querySelector('.heart-reaction-button');
+                const funnyButton = postElement.querySelector('.funny-reaction-button');
+                const angryButton = postElement.querySelector('.angry-reaction-button');
+
+                userReactions.includes('corazón') ? heartButton.classList.add('active') : heartButton.classList.remove('active');
+                userReactions.includes('me diverte') ? funnyButton.classList.add('active') : funnyButton.classList.remove('active');
+                userReactions.includes('me enoja') ? angryButton.classList.add('active') : angryButton.classList.remove('active');
+                
+                // Actualizar nombre si cambió
+                const nameSpan = postElement.querySelector('.flex.items-start.mb-2 > div > span:first-child');
+                if (nameSpan && nameSpan.textContent !== DOMPurify.sanitize(postData.name)) {
+                    nameSpan.textContent = DOMPurify.sanitize(postData.name);
+                }
+                // Actualizar contenido del post si cambió (texto e imagen)
+                const contentDiv = postElement.querySelector('.post-content');
+                if (contentDiv) contentDiv.innerHTML = getPostContentHtml(postData);
+            }
+
             function getPostContentHtml(post) {
                 let html = '';
                 if (post.image) {
@@ -1217,6 +1262,9 @@
                     "/meta/ Tableros de la Mente" : 
                     `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
                 
+                // Limpiar el contenedor de posts inmediatamente al cambiar de tablero
+                document.getElementById('postsContainer').innerHTML = '';
+                state.allPosts = []; // Limpiar también el array local de posts
                 loadAndRenderPostsRealtime(); 
             }
 
@@ -1226,7 +1274,7 @@
                 showGenericModal("Sesión Cerrada", "Has cerrado la sesión de administrador.", [{ text: 'OK', action: closeGenericModal }]);
                 document.getElementById('adminLogoutButton').style.display = 'none';
                 document.getElementById('adminToggle')?.classList.remove('text-pink-400');
-                loadAndRenderPostsRealtime(); // Re-render posts to update UI based on admin status
+                // No es necesario recargar todos los posts, solo actualizar la UI de admin
             }
 
             async function reactWith(postId, reactionType, reactionField, buttonClass) {
@@ -1238,43 +1286,47 @@
                 const userUID = auth.currentUser.uid;
                 const postRef = doc(db, "Posts", postId);
                 
-                // Lógica para limitar reacciones
-                const postDoc = await getDoc(postRef); // Necesario para leer el estado actual de reactedBy
-                if (!postDoc.exists()) {
-                    console.error("El post no existe.");
-                    return;
-                }
-                const postData = postDoc.data();
-                const userReactions = postData.reactedBy && postData.reactedBy[userUID] ? postData.reactedBy[userUID] : [];
-
-                if (userReactions.includes(reactionType)) {
-                    showGenericModal("Reacción Duplicada", "Ya has dado esta reacción a este post.", [{ text: 'Entendido', action: closeGenericModal }]);
-                    return;
-                }
-                if (userReactions.length >= 3) {
-                    showGenericModal("Límite de Reacciones", "Solo puedes dar hasta 3 tipos de reacciones diferentes por post.", [{ text: 'Entendido', action: closeGenericModal }]);
-                    return;
-                }
-
                 try {
-                    const newReactionsForUser = [...userReactions, reactionType];
-                    await updateDoc(postRef, { 
-                        [reactionField]: increment(1),
-                        [`reactedBy.${userUID}`]: newReactionsForUser // Actualiza el array de reacciones del usuario
-                    });
+                    // Actualización optimista de la UI primero (como ya lo tenías)
                     const button = document.querySelector(`[data-id="${postId}"] .${buttonClass}`);
-                    if (button) {
-                        const countSpan = button.querySelector('.count');
-                        if (countSpan) {
-                            const currentCount = parseInt(countSpan.textContent);
-                            if (!isNaN(currentCount)) {
-                                countSpan.textContent = currentCount + 1;
-                            }
-                        }
-                        button.classList.add('active', 'pulse');
-                        setTimeout(() => button.classList.remove('active'), 1000);
-                        setTimeout(() => button.classList.remove('pulse'), 500);
+                    const countSpan = button ? button.querySelector('.count') : null;
+                    let currentCount = countSpan ? parseInt(countSpan.textContent) : 0;
+                    if (isNaN(currentCount)) currentCount = 0;
+
+                    const postDoc = await getDoc(postRef); // Leer estado actual para lógica de Firestore
+                    if (!postDoc.exists()) {
+                        console.error("El post no existe.");
+                        return;
                     }
+                    const postData = postDoc.data();
+                    let userReactions = postData.reactedBy && postData.reactedBy[userUID] ? [...postData.reactedBy[userUID]] : [];
+
+                    if (userReactions.includes(reactionType)) {
+                        // Quitar reacción (UI ya actualizada optimistamente por el toggle)
+                        userReactions = userReactions.filter(r => r !== reactionType);
+                        if (countSpan) countSpan.textContent = Math.max(0, currentCount - 1); // Asegurar que la UI refleje el decremento
+                        if (button) button.classList.remove('active');
+                        
+                        await updateDoc(postRef, {
+                            [reactionField]: increment(-1),
+                            [`reactedBy.${userUID}`]: userReactions
+                        });
+                    } else {
+                        // Añadir reacción (UI ya actualizada optimistamente por el toggle)
+                        userReactions.push(reactionType);
+                        if (countSpan) countSpan.textContent = currentCount + 1; // Asegurar que la UI refleje el incremento
+                        if (button) {
+                            button.classList.add('active', 'pulse');
+                            setTimeout(() => button.classList.remove('pulse'), 500);
+                        }
+                        
+                        await updateDoc(postRef, {
+                            [reactionField]: increment(1),
+                            [`reactedBy.${userUID}`]: userReactions
+                        });
+                    }
+                    // No es estrictamente necesario llamar a updatePostElementDOM aquí si la UI ya se actualizó
+                    // de forma optimista y onSnapshot se encargará de la consistencia final.
                 } catch (error) {
                     console.error(`Error al reaccionar con ${reactionType}:`, error);
                     showGenericModal("Error de Reacción", "Ocurrió un error al procesar tu reacción.", [{ text: 'OK', action: closeGenericModal }]);
@@ -1414,7 +1466,7 @@
                     localStorage.setItem('neurochan_admin', 'true');
                     closeAdminModal();
                     setupAdminPanel();
-                    loadAndRenderPostsRealtime(); 
+                    // No es necesario recargar todos los posts, setupAdminPanel actualiza la UI
                 } else {
                     showGenericModal("Acceso Denegado", "La contraseña de administrador es incorrecta.", [{ text: 'Intentar de Nuevo', action: () => { document.getElementById('adminPasswordInput').focus(); document.getElementById('adminPasswordInput').value = ''; } }, { text: 'Cancelar', action: closeAdminModal }]);
                 }
