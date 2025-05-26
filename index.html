@@ -809,8 +809,8 @@
                     avatar: avatars[Math.floor(Math.random() * avatars.length)],
                     board: state.currentBoard,
                     color: postColors[Math.floor(Math.random() * postColors.length)],
-                    content: contentInput, 
-                    isImage: false,
+                    text: DOMPurify.sanitize(contentInput),
+                    image: null,
                     name: name,
                     passwordHash: password ? bcrypt.hashSync(password, 10) : null,
                     resonateCount: 0,
@@ -837,8 +837,7 @@
                         const reader = new FileReader();
                         reader.onload = async function(e) {
                             compressImage(e.target.result, async function(compressedImage) {
-                                newPostData.content = compressedImage;
-                                newPostData.isImage = true;
+                                newPostData.image = compressedImage;
                                 await completePostCreationFirestore(newPostData);
                             });
                         };
@@ -1047,9 +1046,19 @@
             function getPostContentHtml(post) {
                 const sanitizedContent = DOMPurify.sanitize(post.content);
 
-                if (post.isImage) { 
-                     return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
+                let html = '';
+                if (post.image) {
+                    html += `<img src="${post.image}" alt="Imagen" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border"
+                    onerror="this.parentNode.innerHTML='<p class=\'text-red-400\'>Error al cargar imagen</p>'">`;
                 }
+                if (post.text) {
+                    const textSanitized = DOMPurify.sanitize(post.text).replace(/\n/g,'<br>');
+                    html += `<p>${textSanitized}</p>`;
+                }
+                return html || '[sin contenido]';
+
+
+                
                 
                 if (isImageUrl(sanitizedContent)) {
                      return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
@@ -1187,9 +1196,27 @@
                 }
             }
 
-            function setupAdminPanel() { /* ... (mantener como estaba) ... */ }
-            function toggleAdminModal() { /* ... (mantener como estaba) ... */ }
-            function closeAdminModal() { /* ... (mantener como estaba) ... */ }
+            
+            // Muestra u oculta iconos y paneles según state.isAdmin
+            function setupAdminPanel() {
+                // Si eres admin, muestra todos los botones 🗑️ que ya existen
+                document.querySelectorAll('.delete-button').forEach(btn => btn.style.display = 'inline-block');
+                // Cambia el color del engranaje solo a modo visual
+                document.getElementById('adminToggle')?.classList.add('text-pink-400');
+            }
+            // Abre el modal de contraseña
+            function toggleAdminModal() {
+                document.getElementById('adminModal').style.display = 'flex';
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminPasswordInput').focus();
+            }
+            
+            // Cierra el modal de admin
+            function closeAdminModal() {
+                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('adminPasswordInput').value = '';
+            }
+         
             function verifyAdminPassword() { 
                 const password = document.getElementById('adminPasswordInput').value; 
                 if (bcrypt.compareSync(password, ADMIN_HASH)) {
