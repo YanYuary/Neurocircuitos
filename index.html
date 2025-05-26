@@ -474,6 +474,13 @@
             animation: pulse 0.5s ease;
         }
 
+        .reaction-button.pulse {          /* nuevo: hace “pop” al reaccionar */
+            transform: scale(1.15);
+            transition: transform .15s;
+        }
+
+
+        
         #loadingMessage {
             text-align: center;
             font-size: 1.2rem;
@@ -814,7 +821,11 @@
                     image: null,
                     name: name,
                     passwordHash: password ? bcrypt.hashSync(password, 10) : null,
-                    resonateCount: 0,
+                    reactions: {            // ❤️ 😆 😡
+                        love: 0,
+                        laugh: 0,
+                        angry: 0
+                    },
                     timestamp: serverTimestamp(), 
                     replyTo: state.replyTo, 
                 };
@@ -989,10 +1000,22 @@
                     ${replyIndicator}
                     <div class="post-content text-sm mb-2">${contentHtml}</div> 
                     <div class="flex justify-between items-center">
+                        
                         <div class="flex gap-2">
-                            <button class="resonate-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Resonar con este post">
-                                💡 Resonar (${post.resonateCount})
+                            <button class="reaction-button love text-xs px-2 py-1 border border-pink-500  text-pink-400"
+                                    data-reaction="love"  aria-label="Me gusta">
+                                ❤️ (<span>${post.reactions?.love ?? 0}</span>)
                             </button>
+                            <button class="reaction-button laugh text-xs px-2 py-1 border border-yellow-500 text-yellow-400"
+                                    data-reaction="laugh" aria-label="Me divierte">
+                                😆 (<span>${post.reactions?.laugh ?? 0}</span>)
+                            </button>
+                            <button class="reaction-button angry text-xs px-2 py-1 border border-red-500   text-red-400"
+                                    data-reaction="angry" aria-label="Me enoja">
+                                😡 (<span>${post.reactions?.angry ?? 0}</span>)
+                            </button>
+
+                            
                             <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
                                 ↩ Responder
                             </button>
@@ -1005,6 +1028,13 @@
                 `;
 
                 postElement.querySelector('.resonate-button').addEventListener('click', () => resonatePost(post.id));
+
+                postElement.querySelectorAll('.reaction-button')
+                    .forEach(btn => {
+                        btn.addEventListener('click', () =>
+                            reactToPost(post.id, btn.dataset.reaction));
+                    });
+                
                 postElement.querySelector('.reply-button').addEventListener('click', () => replyToPost(post.id));
                 const deleteBtn = postElement.querySelector('.delete-button');
                 if (deleteBtn) {
@@ -1105,31 +1135,33 @@
                 loadAndRenderPostsRealtime(); 
             }
 
-            async function resonatePost(postId) {
-                if (!auth.currentUser) {
-                    console.warn("Intento de resonar sin usuario autenticado.");
-                    alert("Debes estar conectado para resonar. Recarga la página.");
-                    return;
+            async function reactToPost(postId, type /* 'love' | 'laugh' | 'angry' */) {
+              if (!auth.currentUser) {
+                alert("Debes estar conectado para reaccionar.");
+                return;
+              }
+              const postRef = doc(db, "Posts", postId);
+            
+              try {
+                await updateDoc(postRef, {
+                  [`reactions.${type}`]: increment(1)
+                });
+            
+                // UI ↓
+                const holder   = document.querySelector(`[data-id="${postId}"]`);
+                const btn      = holder?.querySelector(`button[data-reaction="${type}"]`);
+                const spanCnt  = btn?.querySelector("span");
+                if (spanCnt) {
+                  spanCnt.textContent = Number(spanCnt.textContent) + 1;
+                  btn.classList.add('pulse');
+                  setTimeout(() => btn.classList.remove('pulse'), 500);
                 }
-                const postRef = doc(db, "Posts", postId);
-                try {
-                    await updateDoc(postRef, { resonateCount: increment(1) });
-                    const button = document.querySelector(`[data-id="${postId}"] .resonate-button`);
-                    if (button) {
-                        const currentCountMatch = button.textContent.match(/\((\d+)\)/);
-                        if (currentCountMatch && currentCountMatch[1]){
-                            const currentCount = parseInt(currentCountMatch[1]) + 1;
-                            button.textContent = `💡 Resonar (${currentCount})`;
-                        }
-                        button.classList.add('active', 'pulse');
-                        setTimeout(() => button.classList.remove('active'), 1000);
-                        setTimeout(() => button.classList.remove('pulse'), 500);
-                    }
-                } catch (error) {
-                    console.error("Error al resonar:", error);
-                }
+              } catch (error) {
+                console.error("Error al reaccionar:", error);
+              }
             }
 
+                
             function toggleTheme() {
                 state.darkMode = !state.darkMode;
                 updateTheme();
@@ -1150,9 +1182,6 @@
                 }
             }
 
-
-
-        
 
             async function deletePostFirestore(postId) {
                  if (!auth.currentUser) {
@@ -1193,6 +1222,8 @@
                     closeDeleteModal();
                     return;
                 }
+
+                
                 const passwordAttempt = document.getElementById('deletePasswordInput').value;
                 if (!state.currentDeletePostId || currentPostPasswordHash === null) { 
                     alert("No se puede borrar este post o no requiere contraseña.");
