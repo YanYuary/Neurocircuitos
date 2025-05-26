@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d0221" id="themeColorMeta">
+    <title>🧠 NeuroChan: Tableros de la Mente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+        :root {
+            --neon-cyan: #0ff0fc;
+            --neon-magenta: #ff00ff;
+            --electric-blue: #0453fa;
+            --glitch-pink: #ff2a6d;
+            --dark-matter: #0d0221;
+            --acid-green: #00ff9d;
+            --deep-purple: #6a00f4;
+            --light-bg: #f0f4f8;
+            --light-text: #1a1a1a;
+            --border-color: #0ff0fc;
+            --text-primary: #0ff0fc;
+            --bg-primary: #0d0221;
+        }
+
+        body.light {
+            --border-color: #0453fa;
+            --text-primary: #1a1a1a;
+            --bg-primary: #f0f4f8;
+            --neon-cyan: #0453fa;
+            --neon-magenta: #9c00ff;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(9, 1, 31, 0.8), rgba(9, 1, 31, 0.8)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="10" height="10" x="0" y="0" fill="%230ff0fc" opacity="0.1"/></svg>');
+            background-size: 20px 20px;
+            animation: scanlines 0.5s linear infinite;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1549921296-3ec74c52753f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            opacity: .25;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .post-content {
+            font-family: 'Inter', sans-serif;
+            max-width: 65ch;
+        }
+
+        @keyframes scanlines {
+            from { background-position: 0 0; }
+            to { background-position: 0 20px; }
+        }
+
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            color: var(--glitch-pink);
+            animation: glitch-effect 3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        }
+
+        .glitch::after {
+            color: var(--electric-blue);
+            animation: glitch-effect 2s infinite reverse;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+        }
+
+        @keyframes glitch-effect {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+
+        .neon-text {
+            text-shadow: 
+                0 0 5px var(--neon-cyan),
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan);
+        }
+
+        .neon-border {
+            box-shadow: 
+                0 0 5px var(--neon-cyan),
+                0 0 10px var(--neon-cyan),
+                inset 0 0 5px var(--neon-cyan),
+                inset 0 0 10px var(--neon-cyan);
+            border: 1px solid var(--border-color);
+        }
+
+        .neon-button {
+            transition: all 0.3s;
+        }
+
+        .neon-button:hover {
+            box-shadow: 
+                0 0 10px var(--neon-magenta),
+                0 0 20px var(--neon-magenta),
+                inset 0 0 10px var(--neon-magenta);
+            transform: scale(1.05);
+        }
+
+        .post {
+            animation: fadeIn 0.5s ease-out, float 15s ease-in-out infinite;
+            transition: all 0.5s;
+            transform-origin: top center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        .avatar {
+            filter: 
+                sepia(100%)
+                hue-rotate(180deg)
+                saturate(500%)
+                contrast(1.5)
+                drop-shadow(0 0 5px var(--neon-magenta));
+        }
+
+        .fractal-bg {
+            background: 
+                radial-gradient(circle at 20% 30%, var(--electric-blue), transparent 50%),
+                radial-gradient(circle at 80% 70%, var(--glitch-pink), transparent 50%),
+                linear-gradient(45deg, var(--dark-matter), #1a0538);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .typing-effect::after {
+            content: "|";
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .crt-effect {
+            position: relative;
+        }
+
+        .crt-effect::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .dream-glow {
+            animation: dreamPulse 3s infinite alternate;
+        }
+
+        @keyframes dreamPulse {
+            0% { box-shadow: 0 0 5px var(--acid-green); }
+            100% { box-shadow: 0 0 20px var(--acid-green); }
+        }
+
+        .tech-glow {
+            animation: techPulse 3s infinite alternate;
+        }
+
+        @keyframes techPulse {
+            0% { box-shadow: 0 0 5px var(--electric-blue); }
+            100% { box-shadow: 0 0 20px var(--electric-blue); }
+        }
+
+        .dimension-glow {
+            animation: dimensionPulse 3s infinite alternate;
+        }
+
+        @keyframes dimensionPulse {
+            0% { box-shadow: 0 0 5px var(--deep-purple); }
+            100% { box-shadow: 0 0 20px var(--deep-purple); }
+        }
+
+        .post-fadeout {
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: scale(0.9); }
+        }
+
+        .transmission-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transmission-effect::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            animation: transmissionScan 2s linear;
+        }
+
+        @keyframes transmissionScan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .board-selector {
+            transition: all 0.3s;
+        }
+
+        .board-selector:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .board-selector.active {
+            background-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .resonate-button {
+            transition: all 0.3s;
+        }
+
+        .resonate-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px var(--neon-magenta);
+        }
+
+        .resonate-button.active {
+            color: var(--neon-magenta);
+            text-shadow: 0 0 5px var(--neon-magenta);
+        }
+
+        .file-upload-label {
+            transition: all 0.3s;
+        }
+
+        .file-upload-label:hover {
+            box-shadow: 0 0 10px var(--acid-green);
+            border-color: var(--acid-green);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+            box-shadow: 0 0 10px var(--neon-magenta);
+        }
+
+        /* Accesibilidad */
+        [aria-hidden="true"] {
+            visibility: hidden;
+        }
+
+        button:focus, input:focus, textarea:focus {
+            outline: 2px solid var(--acid-green);
+            outline-offset: 2px;
+        }
+
+        /* Contraste mejorado para modo claro */
+        body.light .neon-text {
+            text-shadow: none;
+            color: var(--electric-blue);
+        }
+
+        body.light .neon-border {
+            box-shadow: none;
+            border-color: var(--electric-blue);
+        }
+
+        /* Emoji picker */
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            z-index: 50;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+        }
+
+        .emoji-picker.active {
+            display: grid;
+        }
+
+        .emoji-option {
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-align: center;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .emoji-option:hover {
+            background-color: rgba(0, 255, 255, 0.2);
+        }
+
+        /* Respuestas en hilo */
+        .reply-indicator {
+            border-left: 2px solid var(--neon-cyan);
+            padding-left: 1rem;
+            margin-left: 1rem;
+        }
+
+        .reply-link {
+            color: var(--neon-cyan);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .reply-link:hover {
+            color: var(--neon-magenta);
+        }
+
+        /* Tooltip de preview */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Modal de borrado */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        /* Admin panel */
+        .admin-panel {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 40;
+        }
+
+        .admin-toggle {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-toggle:hover {
+            background-color: rgba(0, 255, 255, 0.2);
+        }
+
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-modal-content {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        /* Efecto de pulso al resonar */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen crt-effect">
+    <div class="container mx-auto px-4 py-8 fractal-bg">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="glitch text-6xl md:text-8xl font-bold mb-4" data-text="🧠 NeuroChan">
+                <span class="neon-text">🧠 NeuroChan</span>
+            </h1>
+            <p class="text-xl md:text-2xl neon-text" id="boardTitle">/meta/ Tableros de la Mente</p>
+            <div class="h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 my-4 opacity-50"></div>
+        </header>
+
+        <!-- Board Navigation -->
+        <div class="flex flex-wrap gap-2 mb-6 justify-center">
+            <button class="board-selector active px-4 py-2 rounded border border-cyan-500 text-cyan-400" data-board="meta" aria-label="Tablero meta">
+                /meta/
+            </button>
+            <button class="board-selector px-4 py-2 rounded border border-purple-500 text-purple-400" data-board="dreams" aria-label="Tablero sueños">
+                /sueños/
+            </button>
+            <button class="board-selector px-4 py-2 rounded border border-pink-500 text-pink-400" data-board="techno" aria-label="Tablero tecnosoma">
+                /tecnosoma/
+            </button>
+            <button class="board-selector px-4 py-2 rounded border border-green-500 text-green-400" data-board="retro" aria-label="Tablero retro anime">
+                /retro-anime/
+            </button>
+        </div>
+
+        <!-- Board Info -->
+        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70" id="boardInfo">
+            <h2 class="text-2xl mb-2 neon-text">/meta/ - Metaprogramación y Viaje Dimensional</h2>
+            <p class="mb-2">Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime</p>
+            <p>Todos los posts son efímeros. Nada se guarda. La realidad es temporal.</p>
+        </div>
+
+        <!-- Post Form -->
+        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70 relative">
+            <div class="mb-4">
+                <input 
+                    id="postName"
+                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
+                    placeholder="Nombre (opcional)"
+                    maxlength="30"
+                    aria-label="Nombre del usuario">
+
+                <div class="relative">
+                    <button id="emojiToggle" class="absolute right-2 top-2 text-xl" aria-label="Abrir selector de emojis">😊</button>
+                    <div id="emojiPicker" class="emoji-picker">
+                        <!-- Emojis will be added by JS -->
+                    </div>
+                    <textarea
+                        id="postContent"
+                        class="w-full p-3 bg-black bg-opacity-50 text-green-400 border border-cyan-500 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        rows="4"
+                        placeholder="Transmite tus pensamientos... (soporta texto, imágenes por URL)"
+                        aria-label="Contenido del post"></textarea>
+                </div>
+
+                <input
+                    id="postPassword"
+                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
+                    placeholder="Contraseña (opcional)"
+                    type="password"
+                    aria-label="Contraseña para borrado">
+
+                <div class="flex items-center mt-2">
+                    <label for="fileUpload" class="file-upload-label px-4 py-2 bg-black bg-opacity-50 border border-cyan-500 text-cyan-400 cursor-pointer rounded mr-2">
+                        📁 Subir Imagen
+                    </label>
+                    <input type="file" id="fileUpload" class="hidden" accept="image/*" aria-hidden="true">
+                    <span id="fileName" class="text-xs text-gray-400 ml-2"></span>
+                    <label class="flex items-center ml-4 text-xs">
+                        <input type="checkbox" id="ephemeralMode" class="mr-2">
+                        Modo efímero
+                    </label>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-4">
+                <button
+                    id="submitPost"
+                    class="neon-button px-6 py-2 bg-black bg-opacity-70 border border-cyan-500 text-cyan-400 font-bold hover:border-pink-500 hover:text-pink-400"
+                    aria-label="Enviar post">
+                    ENVIAR
+                </button>
+                <button
+                    id="clearPage"
+                    class="neon-button px-6 py-2 bg-black bg-opacity-70 border border-purple-500 text-purple-400 font-bold hover:border-red-500 hover:text-red-400"
+                    aria-label="Borrar todos los posts">
+                    PURGAR REALIDAD
+                </button>
+                <button
+                    id="themeToggle"
+                    class="theme-toggle px-4 py-2 bg-black bg-opacity-70 border border-pink-500 text-pink-400 font-bold"
+                    aria-label="Cambiar tema claro/oscuro">
+                    🌓 CAMBIAR TEMA
+                </button>
+            </div>
+            <div id="typingPreview" class="mt-4 p-3 bg-black bg-opacity-30 border border-gray-700 hidden">
+                <p id="typingText" class="typing-effect text-green-400"></p>
+            </div>
+        </div>
+
+        <!-- Posts Container -->
+        <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Posts will be dynamically inserted here -->
+        </div>
+
+        <!-- Admin Toggle -->
+        <div class="admin-panel">
+            <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
+                ⚙️
+            </button>
+        </div>
+
+        <!-- Audio Toggle -->
+        <div class="fixed bottom-4 right-4">
+            <button id="audioToggle" class="neon-button w-12 h-12 rounded-full bg-black bg-opacity-70 border border-cyan-500 flex items-center justify-center" aria-label="Alternar audio">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="bgAudio" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-1699.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Delete Post Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl mb-4">Confirmar borrado</h3>
+            <p class="mb-4">Introduce la contraseña para borrar este post:</p>
+            <input type="password" id="deletePassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            <div class="flex justify-end gap-2">
+                <button id="cancelDelete" class="px-4 py-2 border border-gray-500">Cancelar</button>
+                <button id="confirmDelete" class="px-4 py-2 bg-red-500 text-white">Borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <h3 class="text-xl mb-4">Acceso de Administrador</h3>
+            <p class="mb-4">Introduce la contraseña maestra:</p>
+            <input type="password" id="adminPassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            <div class="flex justify-end gap-2">
+                <button id="cancelAdmin" class="px-4 py-2 border border-gray-500">Cancelar</button>
+                <button id="confirmAdmin" class="px-4 py-2 bg-green-500 text-white">Acceder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Módulo principal encapsulado en IIFE
+        (function() {
+            // Constantes y configuraciones
+            const POSTS_KEY = 'neurochan_posts';
+            const POST_EXPIRATION = 180000; // 3 minutos
+            const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+            const ADMIN_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRv/zY0K7fW3uZJq8X7V2/dJ3S.QdO'; // bcrypt.hashSync('root42', 10)
+            const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
+            const MAX_POSTS = 50;
+
+            // Estado de la aplicación
+            let state = {
+                posts: JSON.parse(localStorage.getItem(POSTS_KEY)) || [],
+                currentBoard: 'meta',
+                darkMode: localStorage.getItem('neurochan_theme') !== 'light',
+                audioEnabled: false,
+                isAdmin: localStorage.getItem('neurochan_admin') === 'true',
+                replyTo: null,
+                currentDeletePostId: null
+            };
+
+            // Avatar options
+            const avatars = [
+                '👾', '🤖', '👹', '👻', '💀', '👽', '🎮', '🕹️', '🔮', '🧿',
+                '👁️', '🧠', '🦾', '🦿', '🧬', '🔭', '🛸', '🌌', '🌀', '🌠'
+            ];
+
+            // Background colors for posts
+            const postColors = [
+                'bg-gradient-to-br from-cyan-900 to-blue-900',
+                'bg-gradient-to-br from-purple-900 to-pink-900',
+                'bg-gradient-to-br from-blue-900 to-indigo-900',
+                'bg-gradient-to-br from-pink-900 to-red-900',
+                'bg-gradient-to-br from-green-900 to-teal-900',
+                'bg-gradient-to-br from-yellow-900 to-orange-900'
+            ];
+
+            // Board information (traducido al español)
+            const boards = {
+                meta: {
+                    title: "/meta/ - Metaprogramación y Viaje Dimensional",
+                    description: "Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime",
+                    footer: "Todos los posts son efímeros. Nada se guarda. La realidad es temporal."
+                },
+                dreams: {
+                    title: "/sueños/ - Exploración Lúcida y Oneironáutica",
+                    description: "Temas: Control de Sueños, Hipnagogia, Sueños Compartidos, Proyección Astral",
+                    footer: "El mundo de los sueños es tan real como el de la vigilia. Los límites son delgados."
+                },
+                techno: {
+                    title: "/tecnosoma/ - Conciencia Cibernética",
+                    description: "Temas: Aumento Neural, Tecnología Cyberpunk, Interfaces Mente-Máquina",
+                    footer: "La carne es débil. La máquina está dispuesta. La mente es eterna."
+                },
+                retro: {
+                    title: "/retro-anime/ - Nostalgia Neon y Delirio Cyber",
+                    description: "Temas: Anime Clásico, Retro-Futurismo, Estética Cyberpunk",
+                    footer: "Fantasmas en la máquina. Recuerdos en la estática. Sueños en los datos."
+                }
+            };
+
+            // Inicialización cuando el DOM está listo
+            document.addEventListener('DOMContentLoaded', function() {
+                setupEventListeners();
+                renderPosts();
+                setupEmojiPicker();
+
+                // Agregar posts de ejemplo si no hay ninguno
+                if (state.posts.length === 0) {
+                    addSamplePosts();
+                }
+
+                // Cargar preferencia de tema
+                updateTheme();
+
+                // Configurar admin panel si es admin
+                if (state.isAdmin) {
+                    setupAdminPanel();
+                }
+            });
+
+            // Configurar todos los event listeners
+            function setupEventListeners() {
+                // Botón de enviar post
+                document.getElementById('submitPost').addEventListener('click', createPost);
+
+                // Botón de limpiar posts
+                document.getElementById('clearPage').addEventListener('click', clearPosts);
+
+                // Botón de cambiar tema
+                document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+                // Configurar audio toggle
+                setupAudioToggle();
+
+                // Configurar subida de archivos
+                setupFileUpload();
+
+                // Configurar selectores de tablero
+                document.querySelectorAll('.board-selector').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        changeBoard(btn.dataset.board);
+                    });
+                });
+
+                // Configurar modal de borrado
+                document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
+                document.getElementById('confirmDelete').addEventListener('click', deletePostWithPassword);
+
+                // Configurar admin panel
+                document.getElementById('adminToggle').addEventListener('click', toggleAdminModal);
+                document.getElementById('cancelAdmin').addEventListener('click', closeAdminModal);
+                document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
+            }
+
+            // Configurar el selector de emojis
+            function setupEmojiPicker() {
+                const emojiToggle = document.getElementById('emojiToggle');
+                const emojiPicker = document.getElementById('emojiPicker');
+                const textarea = document.getElementById('postContent');
+
+                // Llenar el picker con emojis
+                EMOJIS.forEach(emoji => {
+                    const emojiBtn = document.createElement('button');
+                    emojiBtn.className = 'emoji-option';
+                    emojiBtn.textContent = emoji;
+                    emojiBtn.addEventListener('click', function() {
+                        insertAtCursor(textarea, emoji);
+                        emojiPicker.classList.remove('active');
+                    });
+                    emojiPicker.appendChild(emojiBtn);
+                });
+
+                // Alternar visibilidad del picker
+                emojiToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    emojiPicker.classList.toggle('active');
+                });
+
+                // Cerrar picker al hacer clic fuera
+                document.addEventListener('click', function(e) {
+                    if (!emojiPicker.contains(e.target) && e.target !== emojiToggle) {
+                        emojiPicker.classList.remove('active');
+                    }
+                });
+            }
+
+            // Insertar texto en la posición del cursor
+            function insertAtCursor(textarea, text) {
+                const startPos = textarea.selectionStart;
+                const endPos = textarea.selectionEnd;
+                const currentText = textarea.value;
+                
+                textarea.value = currentText.substring(0, startPos) + text + currentText.substring(endPos);
+                textarea.selectionStart = textarea.selectionEnd = startPos + text.length;
+                textarea.focus();
+            }
+
+            // Crear un nuevo post
+            function createPost() {
+                const content = document.getElementById('postContent').value.trim();
+                const name = document.getElementById('postName').value.trim() || "Anónimo";
+                const password = document.getElementById('postPassword').value.trim();
+                const ephemeral = document.getElementById('ephemeralMode').checked;
+                const fileInput = document.getElementById('fileUpload');
+
+                if (!content && !fileInput.files[0]) return;
+
+                const now = new Date();
+                const post = {
+                    id: Date.now(),
+                    content: content,
+                    name: name,
+                    timestamp: now.toISOString(),
+                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
+                    color: postColors[Math.floor(Math.random() * postColors.length)],
+                    board: state.currentBoard,
+                    expiresAt: Date.now() + POST_EXPIRATION,
+                    resonateCount: 0,
+                    replyTo: state.replyTo,
+                    passwordHash: password ? bcrypt.hashSync(password, 10) : null,
+                    ephemeral: ephemeral
+                };
+
+                // Resetear replyTo después de usarlo
+                state.replyTo = null;
+                document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
+
+                // Manejar subida de imagen si está presente
+                if (fileInput.files[0]) {
+                    const file = fileInput.files[0];
+
+                    // Verificar tamaño de imagen
+                    if (file.size > MAX_IMAGE_SIZE) {
+                        alert("Imagen demasiado grande. Máximo 2MB permitidos.");
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Comprimir imagen si es necesario
+                        compressImage(e.target.result, function(compressedImage) {
+                            post.content = compressedImage;
+                            post.isImage = true;
+                            completePostCreation(post);
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    completePostCreation(post);
+                }
+            }
+
+            // Comprimir imagen usando canvas
+            function compressImage(imageData, callback) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Calcular nuevas dimensiones manteniendo relación de aspecto
+                    const maxWidth = 800;
+                    const maxHeight = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a JPEG con calidad 80%
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+                    callback(compressedData);
+                };
+                img.src = imageData;
+            }
+
+            function completePostCreation(post) {
+                // Sanitizar contenido HTML antes de guardar
+                post.content = DOMPurify.sanitize(post.content);
+
+                // Solo guardar en localStorage si no es efímero
+                if (!post.ephemeral) {
+                    state.posts.unshift(post);
+                    
+                    // Limitar número máximo de posts
+                    if (state.posts.length > MAX_POSTS) {
+                        state.posts = state.posts.slice(0, MAX_POSTS);
+                    }
+                    
+                    savePosts();
+                }
+
+                renderPosts();
+
+                // Limpiar inputs
+                document.getElementById('postContent').value = '';
+                document.getElementById('postName').value = '';
+                document.getElementById('postPassword').value = '';
+                document.getElementById('fileUpload').value = '';
+                document.getElementById('fileName').textContent = '';
+                document.getElementById('ephemeralMode').checked = false;
+                document.getElementById('typingPreview').classList.add('hidden');
+
+                // Efecto visual de confirmación
+                const button = document.getElementById('submitPost');
+                button.classList.add('bg-pink-500', 'text-white');
+                setTimeout(function() {
+                    button.classList.remove('bg-pink-500', 'text-white');
+                }, 300);
+
+                // Configurar timeout para expiración del post
+                setTimeout(function() {
+                    fadeOutPost(post.id);
+                }, POST_EXPIRATION);
+            }
+
+            // Renderizar todos los posts para el tablero actual
+            function renderPosts() {
+                const container = document.getElementById('postsContainer');
+                container.innerHTML = '';
+
+                const boardPosts = state.posts.filter(post => post.board === state.currentBoard);
+
+                boardPosts.forEach(post => {
+                    const postElement = createPostElement(post);
+                    container.appendChild(postElement);
+
+                    // Aplicar efecto de transmisión al nuevo post
+                    if (post.id === state.posts[0]?.id) {
+                        postElement.classList.add('transmission-effect');
+                        setTimeout(function() {
+                            postElement.classList.remove('transmission-effect');
+                        }, 2000);
+                    }
+
+                    // Aplicar efectos basados en palabras clave
+                    applyPostEffects(post, postElement);
+                });
+            }
+
+            // Aplicar efectos visuales basados en contenido del post
+            function applyPostEffects(post, element) {
+                const content = post.content.toLowerCase();
+
+                if (content.includes('sueño') || content.includes('dream')) {
+                    element.classList.add('dream-glow');
+                }
+                if (content.includes('tecno') || content.includes('tech') || content.includes('ciber')) {
+                    element.classList.add('tech-glow');
+                }
+                if (content.includes('dimensión') || content.includes('realidad')) {
+                    element.classList.add('dimension-glow');
+                }
+            }
+
+            // Crear elemento HTML para un post
+            function createPostElement(post) {
+                const postElement = document.createElement('div');
+                postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
+                postElement.dataset.id = post.id;
+
+                const date = new Date(post.timestamp);
+                const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                // Determinar el contenido del post (imagen, video, texto, etc.)
+                const contentHtml = getPostContentHtml(post);
+
+                // Estructura de respuesta si es un reply
+                const replyIndicator = post.replyTo ? 
+                    `<div class="reply-indicator mb-2">
+                        <span class="text-xs text-gray-400">Respondiendo a </span>
+                        <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.toString().slice(-4)}</span>
+                    </div>` : '';
+
+                postElement.innerHTML = `
+                    <div class="flex items-start mb-2">
+                        <span class="avatar text-3xl mr-3">${post.avatar}</span>
+                        <div>
+                            <span class="text-xs text-gray-400">${post.name}</span>
+                            <span class="text-xs text-gray-400 ml-2">${timeString}</span>
+                        </div>
+                    </div>
+                    ${replyIndicator}
+                    <div class="post-content text-sm mb-2">${contentHtml}</div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex gap-2">
+                            <button class="resonate-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Resonar con este post">
+                                💡 Resonar (${post.resonateCount})
+                            </button>
+                            <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
+                                ↩ Responder
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            ${state.isAdmin || post.passwordHash ? '<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>' : ''}
+                            <span class="text-xs text-gray-500 ml-2">ID: ${post.id.toString().slice(-4)}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Añadir evento al botón de resonar
+                const resonateBtn = postElement.querySelector('.resonate-button');
+                resonateBtn.addEventListener('click', function() {
+                    resonatePost(post.id);
+                });
+
+                // Añadir evento al botón de responder
+                const replyBtn = postElement.querySelector('.reply-button');
+                replyBtn.addEventListener('click', function() {
+                    replyToPost(post.id);
+                });
+
+                // Añadir evento al botón de borrar (si está visible)
+                const deleteBtn = postElement.querySelector('.delete-button');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        if (state.isAdmin) {
+                            deletePost(post.id);
+                        } else {
+                            openDeleteModal(post.id);
+                        }
+                    });
+                }
+
+                // Añadir eventos a los links de reply
+                const replyLinks = postElement.querySelectorAll('.reply-link');
+                replyLinks.forEach(link => {
+                    link.addEventListener('mouseenter', function() {
+                        showReplyPreview(link.dataset.postId, link);
+                    });
+                });
+
+                return postElement;
+            }
+
+            // Mostrar preview de un post al hacer hover en un reply link
+            function showReplyPreview(postId, element) {
+                const post = state.posts.find(p => p.id === parseInt(postId));
+                if (!post) return;
+
+                // Crear tooltip si no existe
+                let tooltip = element.querySelector('.tooltip-text');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip-text text-xs p-2';
+                    
+                    // Limitar contenido del preview
+                    let previewContent = post.content;
+                    if (previewContent.length > 100) {
+                        previewContent = previewContent.substring(0, 100) + '...';
+                    }
+                    
+                    tooltip.innerHTML = `
+                        <div class="flex items-center mb-1">
+                            <span class="text-xs mr-2">${post.avatar}</span>
+                            <span class="text-xs">${post.name}</span>
+                        </div>
+                        <div class="text-xs">${previewContent}</div>
+                    `;
+                    element.appendChild(tooltip);
+                }
+            }
+
+            // Responder a un post
+            function replyToPost(postId) {
+                state.replyTo = postId;
+                document.getElementById('postContent').placeholder = `>>${postId.toString().slice(-4)} `;
+                document.getElementById('postContent').focus();
+            }
+
+            // Obtener HTML del contenido del post según su tipo
+            function getPostContentHtml(post) {
+                if (post.isImage || isImageUrl(post.content)) {
+                    return `<img src="${post.content}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\'text-red-400\'>Error al cargar imagen</p>'">`;
+                }
+
+                if (isUrl(post.content)) {
+                    if (isYoutubeUrl(post.content)) {
+                        const videoId = extractYoutubeId(post.content);
+                        return `
+                            <div class="mb-2">
+                                <iframe class="w-full h-48" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        `;
+                    } else if (isSoundcloudUrl(post.content)) {
+                        return `
+                            <div class="mb-2">
+                                <iframe class="w-full h-48" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(post.content)}"></iframe>
+                            </div>
+                        `;
+                    } else {
+                        return `<a href="${post.content}" target="_blank" class="text-cyan-400 hover:text-pink-400 underline">${post.content}</a>`;
+                    }
+                }
+
+                // Formatear texto con saltos de línea y detectar replies
+                let formattedContent = post.content;
+                
+                // Detectar patrones >>ID y convertirlos en links
+                formattedContent = formattedContent.replace(/>>(\d{4,})/g, (match, id) => {
+                    return `<a href="#" class="reply-link text-cyan-400" data-post-id="${id}">${match}</a>`;
+                });
+
+                // Reemplazar saltos de línea
+                formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+                return formattedContent;
+            }
+
+            // Limpiar todos los posts del tablero actual
+            function clearPosts() {
+                if (confirm("Esto borrará todas las transmisiones. ¿Continuar?")) {
+                    state.posts = state.posts.filter(post => post.board !== state.currentBoard);
+                    savePosts();
+
+                    // Efecto visual de confirmación
+                    const button = document.getElementById('clearPage');
+                    button.classList.add('bg-red-500', 'text-white');
+                    setTimeout(function() {
+                        button.classList.remove('bg-red-500', 'text-white');
+                    }, 300);
+
+                    // Aplicar efecto de desvanecimiento a todos los posts antes de eliminarlos
+                    const postsElements = document.querySelectorAll('.post');
+                    postsElements.forEach(post => {
+                        post.style.animation = 'glitch-effect 1s forwards';
+                        setTimeout(function() {
+                            post.style.opacity = '0';
+                            post.style.transform = 'scale(0.9)';
+                        }, 500);
+                    });
+
+                    setTimeout(renderPosts, 1000);
+                }
+            }
+
+            // Guardar posts en localStorage
+            function savePosts() {
+                localStorage.setItem(POSTS_KEY, JSON.stringify(state.posts));
+            }
+
+            // Funciones de utilidad para verificar URLs
+            const isUrl = (str) => {
+                try {
+                    new URL(str);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            };
+
+            const isImageUrl = (url) => {
+                if (!isUrl(url)) return false;
+                return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(url);
+            };
+
+            const isYoutubeUrl = (url) => {
+                if (!isUrl(url)) return false;
+                return url.includes('youtube.com') || url.includes('youtu.be');
+            };
+
+            const extractYoutubeId = (url) => {
+                const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            };
+
+            const isSoundcloudUrl = (url) => {
+                if (!isUrl(url)) return false;
+                return url.includes('soundcloud.com');
+            };
+
+            // Vista previa del texto mientras se escribe
+            function updateTypingEffect(text) {
+                const preview = document.getElementById('typingPreview');
+                const typingText = document.getElementById('typingText');
+
+                if (text.trim()) {
+                    preview.classList.remove('hidden');
+                    typingText.textContent = text;
+                } else {
+                    preview.classList.add('hidden');
+                }
+            }
+
+            // Configurar toggle de audio
+            function setupAudioToggle() {
+                const audio = document.getElementById('bgAudio');
+                const toggle = document.getElementById('audioToggle');
+
+                toggle.addEventListener('click', function() {
+                    state.audioEnabled = !state.audioEnabled;
+
+                    if (state.audioEnabled) {
+                        audio.play();
+                        toggle.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14a2 2 0 100-4 2 2 0 000 4z" />
+                            </svg>
+                        `;
+                        toggle.classList.add('border-pink-500');
+                        toggle.classList.remove('border-cyan-500');
+                    } else {
+                        audio.pause();
+                        toggle.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" />
+                            </svg>
+                        `;
+                        toggle.classList.add('border-cyan-500');
+                        toggle.classList.remove('border-pink-500');
+                    }
+                });
+            }
+
+            // Configurar subida de archivos
+            function setupFileUpload() {
+                const fileInput = document.getElementById('fileUpload');
+                const fileName = document.getElementById('fileName');
+
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files[0]) {
+                        fileName.textContent = fileInput.files[0].name;
+                    } else {
+                        fileName.textContent = '';
+                    }
+                });
+            }
+
+            // Agregar posts de ejemplo
+            function addSamplePosts() {
+                const samplePosts = [
+                    {
+                        content: "El ego es solo una construcción temporal. Todos somos flujos de conciencia fluyendo a través de los neurocircuitos del universo.",
+                        name: "Anónimo",
+                        avatar: "🧠",
+                        color: "bg-gradient-to-br from-cyan-900 to-blue-900",
+                        board: "meta",
+                        resonateCount: 3,
+                        passwordHash: null
+                    },
+                    {
+                        content: "https://i.imgur.com/J5COECB.png",
+                        name: "Fantasma",
+                        avatar: "👁️",
+                        color: "bg-gradient-to-br from-purple-900 to-pink-900",
+                        board: "meta",
+                        resonateCount: 1,
+                        passwordHash: null,
+                        isImage: true
+                    },
+                    {
+                        content: "¿Alguien más ha experimentado deslizamiento dimensional durante el sueño REM? Anoche juraría que accedí a un Tokyo-3 paralelo.",
+                        name: "Soñador",
+                        avatar: "🌀",
+                        color: "bg-gradient-to-br from-blue-900 to-indigo-900",
+                        board: "dreams",
+                        resonateCount: 5,
+                        passwordHash: null
+                    },
+                    {
+                        content: "La estética de Ghost in the Shell (1995) es la representación visual más cercana que tenemos del alma digital.",
+                        name: "Shell",
+                        avatar: "🤖",
+                        color: "bg-gradient-to-br from-pink-900 to-red-900",
+                        board: "retro",
+                        resonateCount: 7,
+                        passwordHash: null
+                    },
+                    {
+                        content: "La realidad es una alucinación compartida. La pregunta es: ¿con quién la estamos compartiendo?",
+                        name: "Viajero",
+                        avatar: "👽",
+                        color: "bg-gradient-to-br from-green-900 to-teal-900",
+                        board: "meta",
+                        resonateCount: 2,
+                        passwordHash: null
+                    },
+                    {
+                        content: "https://i.imgur.com/3ZQ3Z9J.jpg",
+                        name: "Neon",
+                        avatar: "🌌",
+                        color: "bg-gradient-to-br from-yellow-900 to-orange-900",
+                        board: "retro",
+                        resonateCount: 4,
+                        passwordHash: null,
+                        isImage: true
+                    },
+                    {
+                        content: "El primer aumento cibernético debería ser una interfaz neural directa para grabar sueños. La vida despierta es demasiado limitada.",
+                        name: "Aumento",
+                        avatar: "🦾",
+                        color: "bg-gradient-to-br from-purple-900 to-indigo-900",
+                        board: "techno",
+                        resonateCount: 6,
+                        passwordHash: null
+                    },
+                    {
+                        content: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        name: "Probador",
+                        avatar: "🎮",
+                        color: "bg-gradient-to-br from-red-900 to-pink-900",
+                        board: "retro",
+                        resonateCount: 0,
+                        passwordHash: null
+                    }
+                ];
+
+                samplePosts.forEach(function(post, index) {
+                    setTimeout(function() {
+                        const now = new Date();
+                        const postObj = {
+                            id: Date.now() + index,
+                            content: post.content,
+                            name: post.name,
+                            timestamp: now.toISOString(),
+                            avatar: post.avatar,
+                            color: post.color,
+                            board: post.board,
+                            expiresAt: Date.now() + POST_EXPIRATION,
+                            resonateCount: post.resonateCount,
+                            passwordHash: post.passwordHash,
+                            isImage: post.isImage || false
+                        };
+
+                        state.posts.unshift(postObj);
+                        savePosts();
+
+                        // Solo renderizar si es para el tablero actual
+                        if (post.board === state.currentBoard) {
+                            const container = document.getElementById('postsContainer');
+                            const postElement = createPostElement(postObj);
+                            container.prepend(postElement);
+
+                            // Trigger animation
+                            setTimeout(function() {
+                                postElement.style.animation = 'fadeIn 0.5s ease-out';
+                            }, 50);
+                        }
+
+                        // Configurar expiración
+                        setTimeout(function() {
+                            fadeOutPost(postObj.id);
+                        }, POST_EXPIRATION);
+                    }, index * 200);
+                });
+            }
+
+            // Cambiar de tablero
+            function changeBoard(board) {
+                state.currentBoard = board;
+
+                // Actualizar botón activo
+                document.querySelectorAll('.board-selector').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.board === board) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // Actualizar información del tablero
+                const boardInfo = document.getElementById('boardInfo');
+                boardInfo.innerHTML = `
+                    <h2 class="text-2xl mb-2 neon-text">${boards[board].title}</h2>
+                    <p class="mb-2">${boards[board].description}</p>
+                    <p>${boards[board].footer}</p>
+                `;
+
+                // Actualizar título del tablero
+                document.getElementById('boardTitle').textContent = board === 'meta' ? 
+                    "/meta/ Tableros de la Mente" : 
+                    `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
+
+                // Renderizar posts para este tablero
+                renderPosts();
+            }
+
+            // Efecto de resonar en un post
+            function resonatePost(postId) {
+                const post = state.posts.find(p => p.id === postId);
+                if (!post) return;
+
+                post.resonateCount++;
+                savePosts();
+
+                // Actualizar visualmente el botón
+                const button = document.querySelector(`[data-id="${postId}"] .resonate-button`);
+                if (button) {
+                    button.textContent = `💡 Resonar (${post.resonateCount})`;
+                    button.classList.add('active', 'pulse');
+                    
+                    setTimeout(function() {
+                        button.classList.remove('active');
+                    }, 1000);
+                    
+                    setTimeout(function() {
+                        button.classList.remove('pulse');
+                    }, 500);
+                }
+            }
+
+            // Desvanecer y eliminar un post expirado
+            function fadeOutPost(postId) {
+                const post = state.posts.find(p => p.id === postId);
+                if (!post) return;
+
+                const postElement = document.querySelector(`[data-id="${postId}"]`);
+                if (postElement) {
+                    postElement.classList.add('post-fadeout');
+                    setTimeout(function() {
+                        state.posts = state.posts.filter(p => p.id !== postId);
+                        savePosts();
+                        renderPosts();
+                    }, 1000);
+                }
+            }
+
+            // Alternar entre temas claro/oscuro
+            function toggleTheme() {
+                state.darkMode = !state.darkMode;
+                updateTheme();
+                saveThemePreference();
+            }
+
+            // Guardar preferencia de tema
+            function saveThemePreference() {
+                localStorage.setItem('neurochan_theme', state.darkMode ? 'dark' : 'light');
+            }
+
+            // Actualizar tema basado en el estado
+            function updateTheme() {
+                const themeToggle = document.getElementById('themeToggle');
+                const themeColorMeta = document.getElementById('themeColorMeta');
+
+                if (state.darkMode) {
+                    document.documentElement.classList.remove('light');
+                    themeToggle.textContent = '🌓 CAMBIAR TEMA';
+                    themeToggle.classList.remove('bg-white', 'text-black');
+                    themeToggle.classList.add('bg-black', 'text-pink-400');
+                    themeColorMeta.content = '#0d0221';
+                } else {
+                    document.documentElement.classList.add('light');
+                    themeToggle.textContent = '🌘 CAMBIAR TEMA';
+                    themeToggle.classList.remove('bg-black', 'text-pink-400');
+                    themeToggle.classList.add('bg-white', 'text-black');
+                    themeColorMeta.content = '#f0f4f8';
+                }
+            }
+
+            // Borrar un post
+            function deletePost(postId) {
+                state.posts = state.posts.filter(p => p.id !== postId);
+                savePosts();
+                renderPosts();
+            }
+
+            // Abrir modal de borrado
+            function openDeleteModal(postId) {
+                state.currentDeletePostId = postId;
+                document.getElementById('deleteModal').style.display = 'flex';
+                document.getElementById('deletePassword').focus();
+            }
+
+            // Cerrar modal de borrado
+            function closeDeleteModal() {
+                state.currentDeletePostId = null;
+                document.getElementById('deleteModal').style.display = 'none';
+                document.getElementById('deletePassword').value = '';
+            }
+
+            // Verificar contraseña y borrar post
+            function deletePostWithPassword() {
+                const password = document.getElementById('deletePassword').value;
+                const post = state.posts.find(p => p.id === state.currentDeletePostId);
+                
+                if (!post) {
+                    closeDeleteModal();
+                    return;
+                }
+
+                if (post.passwordHash && bcrypt.compareSync(password, post.passwordHash)) {
+                    deletePost(post.id);
+                    closeDeleteModal();
+                } else {
+                    alert("Contraseña incorrecta");
+                }
+            }
+
+            // Configurar panel de administrador
+            function setupAdminPanel() {
+                document.getElementById('adminToggle').classList.add('bg-green-500');
+            }
+
+            // Alternar modal de admin
+            function toggleAdminModal() {
+                if (state.isAdmin) {
+                    // Mostrar panel de admin si ya está logueado
+                    alert("Ya estás logueado como administrador");
+                } else {
+                    document.getElementById('adminModal').style.display = 'flex';
+                    document.getElementById('adminPassword').focus();
+                }
+            }
+
+            // Cerrar modal de admin
+            function closeAdminModal() {
+                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('adminPassword').value = '';
+            }
+
+            // Verificar contraseña de admin
+            function verifyAdminPassword() {
+                const password = document.getElementById('adminPassword').value;
+                
+                if (bcrypt.compareSync(password, ADMIN_HASH)) {
+                    state.isAdmin = true;
+                    localStorage.setItem('neurochan_admin', 'true');
+                    closeAdminModal();
+                    setupAdminPanel();
+                    renderPosts(); // Para mostrar botones de borrado
+                } else {
+                    alert("Contraseña incorrecta");
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
