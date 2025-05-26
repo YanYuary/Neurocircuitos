@@ -269,20 +269,19 @@
             box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        .resonate-button {
+        .reaction-button {
             transition: all 0.3s;
         }
 
-        .resonate-button:hover {
+        .reaction-button:hover {
             transform: scale(1.1);
             box-shadow: 0 0 10px var(--neon-magenta);
         }
 
-        .resonate-button.active {
+        .reaction-button.active {
             color: var(--neon-magenta);
             text-shadow: 0 0 5px var(--neon-magenta);
         }
-
         .file-upload-label {
             transition: all 0.3s;
         }
@@ -814,7 +813,10 @@
                     image: null,
                     name: name,
                     passwordHash: password ? bcrypt.hashSync(password, 10) : null,
-                    resonateCount: 0,
+                    // resonateCount: 0, // Eliminado
+                    heartCount: 0,
+                    funnyCount: 0,
+                    angryCount: 0,
                     timestamp: serverTimestamp(), 
                     replyTo: state.replyTo, 
                 };
@@ -989,9 +991,15 @@
                     ${replyIndicator}
                     <div class="post-content text-sm mb-2">${contentHtml}</div> 
                     <div class="flex justify-between items-center">
-                        <div class="flex gap-2">
-                            <button class="resonate-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Resonar con este post">
-                                💡 Resonar (${post.resonateCount})
+                        <div class="flex gap-1 items-center">
+                            <button class="reaction-button heart-reaction-button text-xs px-2 py-1 border border-pink-500 text-pink-400 flex items-center gap-1" aria-label="Reaccionar con Corazón">
+                                ❤️ <span class="count">${post.heartCount || 0}</span>
+                            </button>
+                            <button class="reaction-button funny-reaction-button text-xs px-2 py-1 border border-yellow-500 text-yellow-400 flex items-center gap-1" aria-label="Reaccionar con Me Diverte">
+                                😂 <span class="count">${post.funnyCount || 0}</span>
+                            </button>
+                            <button class="reaction-button angry-reaction-button text-xs px-2 py-1 border border-red-500 text-red-400 flex items-center gap-1" aria-label="Reaccionar con Me Enoja">
+                                😠 <span class="count">${post.angryCount || 0}</span>
                             </button>
                             <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
                                 ↩ Responder
@@ -1004,7 +1012,9 @@
                     </div>
                 `;
 
-                postElement.querySelector('.resonate-button').addEventListener('click', () => resonatePost(post.id));
+                postElement.querySelector('.heart-reaction-button').addEventListener('click', () => reaccionarCorazon(post.id));
+                postElement.querySelector('.funny-reaction-button').addEventListener('click', () => reaccionarMeDiverte(post.id));
+                postElement.querySelector('.angry-reaction-button').addEventListener('click', () => reaccionarMeEnoja(post.id));
                 postElement.querySelector('.reply-button').addEventListener('click', () => replyToPost(post.id));
                 const deleteBtn = postElement.querySelector('.delete-button');
                 if (deleteBtn) {
@@ -1105,29 +1115,44 @@
                 loadAndRenderPostsRealtime(); 
             }
 
-            async function resonatePost(postId) {
+            async function reactWith(postId, reactionType, reactionField, buttonClass) {
                 if (!auth.currentUser) {
-                    console.warn("Intento de resonar sin usuario autenticado.");
-                    alert("Debes estar conectado para resonar. Recarga la página.");
+                    console.warn(`Intento de reaccionar (${reactionType}) sin usuario autenticado.`);
+                    alert("Debes estar conectado para reaccionar. Recarga la página.");
                     return;
                 }
                 const postRef = doc(db, "Posts", postId);
                 try {
-                    await updateDoc(postRef, { resonateCount: increment(1) });
-                    const button = document.querySelector(`[data-id="${postId}"] .resonate-button`);
+                    await updateDoc(postRef, { [reactionField]: increment(1) });
+                    
+                    const button = document.querySelector(`[data-id="${postId}"] .${buttonClass}`);
                     if (button) {
-                        const currentCountMatch = button.textContent.match(/\((\d+)\)/);
-                        if (currentCountMatch && currentCountMatch[1]){
-                            const currentCount = parseInt(currentCountMatch[1]) + 1;
-                            button.textContent = `💡 Resonar (${currentCount})`;
+                        const countSpan = button.querySelector('.count');
+                        if (countSpan) {
+                            const currentCount = parseInt(countSpan.textContent);
+                            if (!isNaN(currentCount)) {
+                                countSpan.textContent = currentCount + 1;
+                            }
                         }
                         button.classList.add('active', 'pulse');
                         setTimeout(() => button.classList.remove('active'), 1000);
                         setTimeout(() => button.classList.remove('pulse'), 500);
                     }
                 } catch (error) {
-                    console.error("Error al resonar:", error);
+                    console.error(`Error al reaccionar con ${reactionType}:`, error);
                 }
+            }
+
+            function reaccionarCorazon(postId) {
+                reactWith(postId, 'corazón', 'heartCount', 'heart-reaction-button');
+            }
+
+            function reaccionarMeDiverte(postId) {
+                reactWith(postId, 'me diverte', 'funnyCount', 'funny-reaction-button');
+            }
+
+            function reaccionarMeEnoja(postId) {
+                reactWith(postId, 'me enoja', 'angryCount', 'angry-reaction-button');
             }
 
             function toggleTheme() {
@@ -1223,7 +1248,7 @@
                 document.getElementById('adminPasswordInput').focus();
             }
             
-            // Cierra el modal de admin ACTUALIZACION DE REGRESO
+            // Cierra el modal de adminssssssssssss
             function closeAdminModal() {
                 document.getElementById('adminModal').style.display = 'none';
                 document.getElementById('adminPasswordInput').value = '';
