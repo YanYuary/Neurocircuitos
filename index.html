@@ -7,7 +7,8 @@
     <title>🧠 NeuroChan: Tableros de la Mente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js" defer></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
@@ -628,7 +629,9 @@
         import { 
             getAuth, signInAnonymously, onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
+             // LINEA AÑADIDA   
+        const bcrypt = globalThis.bcrypt || (globalThis.dcodeIO && globalThis.dcodeIO.bcrypt);
+        
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDQ6q9KkYS0To-BJEjxQSQUyQ65C6wam6o",
