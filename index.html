@@ -623,7 +623,7 @@
         import { 
             getFirestore, collection, addDoc, onSnapshot, 
             doc, deleteDoc, updateDoc, query, where, orderBy,
-            increment, Timestamp, serverTimestamp          // ← añade serverTimestamp
+            increment, serverTimestamp          // ← añade serverTimestamp
             } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { 
@@ -1055,10 +1055,7 @@
                 return html || '[sin contenido]';
             }
 
-            const isUrl = (str) => { try { new URL(str); return true; } catch (_) { return false; } };
-            const isImageUrl = (url) => { if (!isUrl(url)) return false; return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(new URL(url).pathname); };
-            const extractYoutubeId = (url) => { const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; };
-            
+   
             /* ---------- Vista previa mientras escribes ---------- */
             function updateTypingEffect(text) {
                 const preview = document.getElementById('typingPreview');
