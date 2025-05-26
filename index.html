@@ -654,7 +654,7 @@
             // Constantes y configuraciones
             const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
             const ADMIN_HASH = '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRv/zY0K7fW3uZJq8X7V2/dJ3S.QdO';
-            //const ADMIN_HASH = 'sanchopanza'; // bcrypt.hashSync('root42', 10)
+            // ignorar bcrypt.hashSync('root42', 10)
             const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
             let state = {
@@ -1057,9 +1057,7 @@
 
             const isUrl = (str) => { try { new URL(str); return true; } catch (_) { return false; } };
             const isImageUrl = (url) => { if (!isUrl(url)) return false; return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(new URL(url).pathname); };
-            const isYoutubeUrl = (url) => { if (!isUrl(url)) return false; return url.includes('youtube.com') || url.includes('youtu.be'); };
             const extractYoutubeId = (url) => { const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; };
-            const isSoundcloudUrl = (url) => { if (!isUrl(url)) return false; return url.includes('soundcloud.com'); };
             
             /* ---------- Vista previa mientras escribes ---------- */
             function updateTypingEffect(text) {
