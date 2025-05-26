@@ -1054,32 +1054,6 @@
                 return html || '[sin contenido]';
             }
 
-                
-                if (isImageUrl(sanitizedContent)) {
-                     return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
-                }
-
-                if (isUrl(sanitizedContent)) {
-                    if (isYoutubeUrl(sanitizedContent)) {
-                        const videoId = extractYoutubeId(sanitizedContent);
-                        return `<div class="mb-2"><iframe class="w-full h-48" src="https://www.youtube-nocookie.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-                    } else if (isSoundcloudUrl(sanitizedContent)) {
-                        return `<div class="mb-2"><iframe class="w-full h-48" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(sanitizedContent)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe></div>`;
-                    } else {
-                        return `<a href="${sanitizedContent}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-pink-400 underline">${sanitizedContent}</a>`;
-                    }
-                }
-                let formattedContent = sanitizedContent.replace(/>>>(\w+)/g, (match, id) => { 
-                    const originalPost = state.allPosts.find(p => p.id === id || p.id.endsWith(id));
-                    if (originalPost) {
-                        return `<a href="#" class="reply-link text-cyan-400" data-post-id="${originalPost.id}">>>${originalPost.id.slice(-4)}</a>`;
-                    }
-                    return match; 
-                });
-                formattedContent = formattedContent.replace(/\n/g, '<br>');
-                return formattedContent;
-            }
-
             const isUrl = (str) => { try { new URL(str); return true; } catch (_) { return false; } };
             const isImageUrl = (url) => { if (!isUrl(url)) return false; return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(new URL(url).pathname); };
             const isYoutubeUrl = (url) => { if (!isUrl(url)) return false; return url.includes('youtube.com') || url.includes('youtu.be'); };
