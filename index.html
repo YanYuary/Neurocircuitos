@@ -498,6 +498,9 @@
             <button class="board-selector px-4 py-2 rounded border border-green-500 text-green-400" data-board="retro" aria-label="Tablero retro anime">
                 /retro-anime/
             </button>
+            <button class="board-selector px-4 py-2 rounded border border-yellow-500 text-yellow-400" data-board="tarot" aria-label="Tablero tarot">
+                /tarot/
+            </button>
         </div>
 
         <div class="neon-border p-4 mb-8 bg-black bg-opacity-70" id="boardInfo">
@@ -555,6 +558,9 @@
                     aria-label="Cambiar tema claro/oscuro">
                     🌓 CAMBIAR TEMA
                 </button>
+                <button id="adminLogoutButton" class="neon-button px-4 py-2 bg-black bg-opacity-70 border border-red-500 text-red-400 font-bold" style="display: none;" aria-label="Cerrar sesión de administrador">
+                    CERRAR SESIÓN ADMIN
+                </button>
             </div>
             <div id="typingPreview" class="mt-4 p-3 bg-black bg-opacity-30 border border-gray-700 hidden">
                 <p id="typingText" class="typing-effect text-green-400"></p>
@@ -569,6 +575,9 @@
         <div class="admin-panel">
             <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
                 ⚙️
+            </button>
+            <button id="infoToggle" class="admin-toggle ml-2" aria-label="Información del sitio">
+                ❓
             </button>
         </div>
 
@@ -596,6 +605,40 @@
         </div>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content max-w-md">
+            <h3 class="text-xl mb-4 neon-text">Editar Transmisión</h3>
+            
+            <div id="editPasswordPromptContainer" class="mb-4" style="display: none;">
+                <label for="editPostPasswordPrompt" class="block mb-1 text-sm">Contraseña del Post (para editar):</label>
+                <input type="password" id="editPostPasswordPrompt" class="w-full p-2 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            </div>
+
+            <label for="editPostName" class="block mb-1 text-sm">Nombre:</label>
+            <input id="editPostName" class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500" maxlength="30">
+
+            <label for="editPostContent" class="block mb-1 text-sm">Contenido:</label>
+            <textarea id="editPostContent" class="w-full p-3 mb-2 bg-black bg-opacity-50 text-green-400 border border-cyan-500" rows="4"></textarea>
+
+            <div class="mb-2">
+                <img id="editImagePreview" src="#" alt="Previsualización de imagen" class="max-h-40 mb-2 neon-border" style="display:none;">
+                <label for="editFileUpload" class="file-upload-label px-3 py-1 text-xs bg-black bg-opacity-50 border border-cyan-500 text-cyan-400 cursor-pointer rounded mr-2">
+                    Cambiar Imagen
+                </label>
+                <input type="file" id="editFileUpload" class="hidden" accept="image/*">
+                <span id="editFileName" class="text-xs text-gray-400"></span>
+                <label class="ml-2 text-xs"><input type="checkbox" id="removeCurrentImage"> Remover Imagen Actual</label>
+            </div>
+
+            <label for="editNewPostPassword" class="block mb-1 text-sm">Nueva Contraseña (opcional, dejar en blanco para no cambiar):</label>
+            <input type="password" id="editNewPostPassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            <div class="flex justify-end gap-2">
+                <button id="cancelEdit" class="px-4 py-2 border border-gray-500">Cancelar</button>
+                <button id="confirmEdit" class="px-4 py-2 bg-green-500 text-white">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <div id="adminModal" class="admin-modal">
         <div class="admin-modal-content">
             <h3 class="text-xl mb-4">Acceso de Administrador</h3>
@@ -607,20 +650,55 @@
         </div>
     </div>
 
+    <div id="infoModal" class="modal">
+        <div class="modal-content max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl neon-text">Acerca de NeuroChan</h3>
+                <button id="closeInfoModal" class="text-xl">&times;</button>
+            </div>
+            <p class="mb-4 text-sm">
+                NeuroChan es un espacio para la comunidad espiritual de los "Fungis": aquellos que exploran la conciencia, 
+                desafían los metaprogramas del ego que operan en nuestros neurocircuitos y encuentran sabiduría en herramientas como el tarot.
+            </p>
+            <p class="mb-4 text-sm">
+                Aquí puedes compartir tus experiencias con "inochis" (seres o energías), encuentros con entidades inorgánicas, 
+                la naturaleza del ego, despertares de conciencia y cualquier tema relacionado con la expansión de la mente y el espíritu.
+            </p>
+            <h4 class="text-lg mb-2 neon-text">Reglas del Sitio (Guías Espirituales):</h4>
+            <ul class="list-disc list-inside text-sm space-y-1 mb-4">
+                <li>Respeta todas las perspectivas y experiencias. El camino espiritual es único para cada ser.</li>
+                <li>No se tolera el proselitismo ni la imposición de creencias. Comparte, no conviertas.</li>
+                <li>Mantén un lenguaje consciente y evita ataques personales. La crítica constructiva es bienvenida, el odio no.</li>
+                <li>Este es un espacio para la exploración y el aprendizaje mutuo. Sé abierto y curioso.</li>
+                <li>La información compartida es para reflexión personal y no sustituye el consejo profesional (médico, psicológico, etc.) cuando sea necesario.</li>
+            </ul>
+            <p class="text-xs text-gray-400">Recuerda: la verdadera sabiduría reside en el corazón y en la experiencia directa.</p>
+        </div>
+    </div>
+
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getFirestore, collection, addDoc, onSnapshot, 
             doc, deleteDoc, updateDoc, query, where, orderBy,
-            increment, serverTimestamp          // ← añade serverTimestamp
+            increment, serverTimestamp, getDoc // <--- AÑADIR getDoc AQUÍ
             } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { 
             getAuth, signInAnonymously, onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-             // LINEA AÑADIDA   
-        const bcrypt = globalThis.bcrypt || (globalThis.dcodeIO && globalThis.dcodeIO.bcrypt);
+        
+        // Ensure bcrypt is loaded or provide a fallback/error
+        let bcryptInstance;
+        if (typeof bcrypt !== 'undefined') {
+            bcryptInstance = bcrypt;
+        } else if (globalThis.dcodeIO && globalThis.dcodeIO.bcrypt) {
+            bcryptInstance = globalThis.dcodeIO.bcrypt;
+        } else {
+            console.error("Bcrypt.js no está cargado. Las funciones de contraseña no funcionarán.");
+            // Podrías deshabilitar funciones o mostrar un error al usuario aquí
+        }
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -654,7 +732,9 @@
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
                 replyTo: null,
                 currentDeletePostId: null,
-                allPosts: [] 
+                allPosts: [],
+                currentEditPostId: null, // Para la edición
+                currentEditPostData: null // Para almacenar datos del post a editar
             };
 
             const avatars = [
@@ -691,6 +771,11 @@
                     title: "/retro-anime/ - Nostalgia Neon y Delirio Cyber",
                     description: "Temas: Anime Clásico, Retro-Futurismo, Estética Cyberpunk",
                     footer: "Fantasmas en la máquina. Recuerdos en la estática. Sueños en los datos."
+                },
+                tarot: {
+                    title: "/tarot/ - Arcanos y Sincronicidad",
+                    description: "Temas: Lecturas de Tarot, Simbolismo Arcano, Adivinación, Conexión Espiritual",
+                    footer: "Las cartas revelan los ecos del alma y los susurros del destino."
                 }
             };
 
@@ -729,6 +814,7 @@
             function setupEventListeners() {
                 document.getElementById('submitPost').addEventListener('click', createPost);
                 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+                document.getElementById('adminLogoutButton').addEventListener('click', adminLogout);
                 setupAudioToggle();
                 setupFileUpload();
 
@@ -743,6 +829,10 @@
                 document.getElementById('adminToggle').addEventListener('click', toggleAdminModal);
                 document.getElementById('cancelAdmin').addEventListener('click', closeAdminModal);
                 document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
+                document.getElementById('infoToggle').addEventListener('click', openInfoModal);
+                document.getElementById('closeInfoModal').addEventListener('click', closeInfoModal);
+                document.getElementById('confirmEdit').addEventListener('click', confirmEdit);
+                document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
             }
 
             function setupEmojiPicker() {
@@ -797,17 +887,18 @@
                 }
 
                 const newPostData = {
+                    authorUID: auth.currentUser.uid, // Guardar el UID del autor anónimo
                     avatar: avatars[Math.floor(Math.random() * avatars.length)],
                     board: state.currentBoard,
                     color: postColors[Math.floor(Math.random() * postColors.length)],
                     text: DOMPurify.sanitize(contentInput),
                     image: null,
                     name: name,
-                    passwordHash: password ? bcrypt.hashSync(password, 10) : null,
-                    // resonateCount: 0, // Eliminado
+                    passwordHash: password && bcryptInstance ? bcryptInstance.hashSync(password, 10) : null,
                     heartCount: 0,
                     funnyCount: 0,
                     angryCount: 0,
+                    reactedBy: {}, // Para rastrear quién ha reaccionado y cómo
                     timestamp: serverTimestamp(), 
                     replyTo: state.replyTo, 
                 };
@@ -963,7 +1054,7 @@
                 postElement.dataset.id = post.id; 
 
                 const date = new Date(post.timestamp); 
-                const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeString = date.toLocaleTimeString ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
                 const contentHtml = getPostContentHtml(post);
                 const replyIndicator = post.replyTo ? 
                     `<div class="reply-indicator mb-2">
@@ -971,11 +1062,14 @@
                         <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.slice(-4)}</span>
                     </div>` : '';
 
+                // Determinar si el usuario actual es el autor del post (para el botón de editar)
+                const canShowEditButton = state.isAdmin || post.passwordHash;
+
                 postElement.innerHTML = `
                     <div class="flex items-start mb-2">
                         <span class="avatar text-3xl mr-3">${post.avatar}</span>
                         <div>
-                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
+                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)} ${post.authorUID ? `(ID Anónimo: ${post.authorUID.slice(-4)})` : ''}</span>
                             <span class="text-xs text-gray-400 ml-2">${timeString}</span>
                         </div>
                     </div>
@@ -998,6 +1092,7 @@
                         </div>
                         <div class="flex items-center">
                             ${state.isAdmin || post.passwordHash ? '<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>' : ''}
+                            ${canShowEditButton ? `<button class="edit-button text-xs px-1 ml-1" aria-label="Editar post">✏️</button>` : ''}
                             <span class="text-xs text-gray-500 ml-2">ID: ${post.id.slice(-4)}</span>
                         </div>
                     </div>
@@ -1007,6 +1102,7 @@
                 postElement.querySelector('.funny-reaction-button').addEventListener('click', () => reaccionarMeDiverte(post.id));
                 postElement.querySelector('.angry-reaction-button').addEventListener('click', () => reaccionarMeEnoja(post.id));
                 postElement.querySelector('.reply-button').addEventListener('click', () => replyToPost(post.id));
+                
                 const deleteBtn = postElement.querySelector('.delete-button');
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
@@ -1014,6 +1110,11 @@
                         else openDeleteModal(post.id, post.passwordHash); 
                     });
                 }
+                const editBtn = postElement.querySelector('.edit-button');
+                if (editBtn) {
+                    editBtn.addEventListener('click', () => openEditModal(post.id));
+                }
+
                 postElement.querySelectorAll('.reply-link').forEach(link => {
                     link.addEventListener('mouseenter', () => showReplyPreview(link.dataset.postId, link));
                 });
@@ -1106,16 +1207,48 @@
                 loadAndRenderPostsRealtime(); 
             }
 
+            function adminLogout() {
+                state.isAdmin = false;
+                localStorage.removeItem('neurochan_admin');
+                alert('Sesión de administrador cerrada.');
+                document.getElementById('adminLogoutButton').style.display = 'none';
+                document.getElementById('adminToggle')?.classList.remove('text-pink-400');
+                loadAndRenderPostsRealtime(); // Re-render posts to update UI based on admin status
+            }
+
             async function reactWith(postId, reactionType, reactionField, buttonClass) {
                 if (!auth.currentUser) {
                     console.warn(`Intento de reaccionar (${reactionType}) sin usuario autenticado.`);
                     alert("Debes estar conectado para reaccionar. Recarga la página.");
                     return;
                 }
+                const userUID = auth.currentUser.uid;
                 const postRef = doc(db, "Posts", postId);
+                
+                // Lógica para limitar reacciones
+                const postDoc = await getDoc(postRef); // Necesario para leer el estado actual de reactedBy
+                if (!postDoc.exists()) {
+                    console.error("El post no existe.");
+                    return;
+                }
+                const postData = postDoc.data();
+                const userReactions = postData.reactedBy && postData.reactedBy[userUID] ? postData.reactedBy[userUID] : [];
+
+                if (userReactions.includes(reactionType)) {
+                    alert("Ya has dado esta reacción a este post.");
+                    return;
+                }
+                if (userReactions.length >= 3) {
+                    alert("Solo puedes dar hasta 3 tipos de reacciones diferentes por post.");
+                    return;
+                }
+
                 try {
-                    await updateDoc(postRef, { [reactionField]: increment(1) });
-                    
+                    const newReactionsForUser = [...userReactions, reactionType];
+                    await updateDoc(postRef, { 
+                        [reactionField]: increment(1),
+                        [`reactedBy.${userUID}`]: newReactionsForUser // Actualiza el array de reacciones del usuario
+                    });
                     const button = document.querySelector(`[data-id="${postId}"] .${buttonClass}`);
                     if (button) {
                         const countSpan = button.querySelector('.count');
@@ -1131,6 +1264,7 @@
                     }
                 } catch (error) {
                     console.error(`Error al reaccionar con ${reactionType}:`, error);
+                    alert("Error al procesar tu reacción.");
                 }
             }
 
@@ -1166,14 +1300,15 @@
                 if (state.currentTheme === 'pink') { // Tema Rosa
                     document.body.classList.add('pink-theme');
                     document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); // Fondo rosado oscuro
+                    if (state.isAdmin) { // Ensure admin logout button is visible if admin
+                         const adminLogoutBtn = document.getElementById('adminLogoutButton');
+                         if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline-block';
+                    }
+
                 } else { // Tema 'dark' (Azul, por defecto)
                     document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
                 }
             }
-
-
-
-        
 
             async function deletePostFirestore(postId) {
                  if (!auth.currentUser) {
@@ -1221,7 +1356,7 @@
                     return;
                 }
 
-                if (bcrypt.compareSync(passwordAttempt, currentPostPasswordHash)) {
+                if (bcryptInstance && bcryptInstance.compareSync(passwordAttempt, currentPostPasswordHash)) {
                     await deletePostFirestore(state.currentDeletePostId);
                     closeDeleteModal();
                 } else {
@@ -1229,12 +1364,20 @@
                 }
             }
 
+            // --- Modal de Información ---
+            function openInfoModal() { document.getElementById('infoModal').style.display = 'flex'; }
+            function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
+
             
             // Muestra u oculta iconos y paneles según state.isAdmin
             function setupAdminPanel() {
                 // Si eres admin, muestra todos los botones 🗑️ que ya existen
                 document.querySelectorAll('.delete-button').forEach(btn => btn.style.display = 'inline-block');
                 // Cambia el color del engranaje solo a modo visual
+                const adminLogoutBtn = document.getElementById('adminLogoutButton');
+                if (adminLogoutBtn) {
+                    adminLogoutBtn.style.display = 'inline-block';
+                }
                 document.getElementById('adminToggle')?.classList.add('text-pink-400');
             }
             // Abre el modal de contraseña
@@ -1252,7 +1395,7 @@
          
             function verifyAdminPassword() { 
                 const password = document.getElementById('adminPasswordInput').value; 
-                if (bcrypt.compareSync(password, ADMIN_HASH)) {
+                if (bcryptInstance && bcryptInstance.compareSync(password, ADMIN_HASH)) {
                     state.isAdmin = true;
                     localStorage.setItem('neurochan_admin', 'true');
                     closeAdminModal();
@@ -1262,7 +1405,121 @@
                     alert("Contraseña incorrecta");
                 }
             }
+
+            // --- Funciones para Editar Post ---
+            function openEditModal(postId) {
+                const postToEdit = state.allPosts.find(p => p.id === postId);
+                if (!postToEdit) {
+                    alert("Post no encontrado.");
+                    return;
+                }
+
+                state.currentEditPostId = postId;
+                state.currentEditPostData = postToEdit;
+
+                document.getElementById('editPostName').value = postToEdit.name || '';
+                document.getElementById('editPostContent').value = postToEdit.text || '';
+                
+                const imagePreview = document.getElementById('editImagePreview');
+                const removeCurrentImageCheckbox = document.getElementById('removeCurrentImage');
+                if (postToEdit.image) {
+                    imagePreview.src = postToEdit.image;
+                    imagePreview.style.display = 'block';
+                    removeCurrentImageCheckbox.parentElement.style.display = 'inline-block'; // Show remove checkbox
+                    removeCurrentImageCheckbox.checked = false;
+                } else {
+                    imagePreview.style.display = 'none';
+                    removeCurrentImageCheckbox.parentElement.style.display = 'none'; // Hide remove checkbox
+                }
+                document.getElementById('editFileUpload').value = ''; // Clear file input
+                document.getElementById('editFileName').textContent = '';
+
+
+                const passwordPromptContainer = document.getElementById('editPasswordPromptContainer');
+                if (!state.isAdmin && postToEdit.passwordHash) {
+                    passwordPromptContainer.style.display = 'block';
+                    document.getElementById('editPostPasswordPrompt').value = '';
+                } else {
+                    passwordPromptContainer.style.display = 'none';
+                }
+                document.getElementById('editNewPostPassword').value = '';
+                document.getElementById('editModal').style.display = 'flex';
+            }
+
+            function closeEditModal() {
+                document.getElementById('editModal').style.display = 'none';
+                state.currentEditPostId = null;
+                state.currentEditPostData = null;
+            }
+
+            async function confirmEdit() {
+                if (!state.currentEditPostId || !state.currentEditPostData) return;
+
+                const postData = state.currentEditPostData;
+                const updateData = {};
+
+                // Autorización si no es admin y el post tiene contraseña
+                if (!state.isAdmin && postData.passwordHash) {
+                    const passwordAttempt = document.getElementById('editPostPasswordPrompt').value;
+                    if (!bcryptInstance || !bcryptInstance.compareSync(passwordAttempt, postData.passwordHash)) {
+                        alert("Contraseña del post incorrecta.");
+                        return;
+                    }
+                }
+
+                updateData.name = document.getElementById('editPostName').value.trim() || "Anónimo";
+                updateData.text = DOMPurify.sanitize(document.getElementById('editPostContent').value.trim());
+
+                const newPassword = document.getElementById('editNewPostPassword').value.trim();
+                if (newPassword && bcryptInstance) {
+                    updateData.passwordHash = bcryptInstance.hashSync(newPassword, 10);
+                } else if (newPassword && !bcryptInstance) {
+                    alert("Error con bcrypt: no se puede actualizar la contraseña.");
+                }
+
+                const fileInput = document.getElementById('editFileUpload');
+                const removeCurrentImage = document.getElementById('removeCurrentImage').checked;
+
+                const confirmButton = document.getElementById('confirmEdit');
+                confirmButton.disabled = true;
+                confirmButton.textContent = 'GUARDANDO...';
+
+                if (fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    if (file.size > MAX_IMAGE_SIZE) {
+                        alert("Imagen demasiado grande. Máximo 2MB.");
+                        confirmButton.disabled = false;
+                        confirmButton.textContent = 'Guardar Cambios';
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        compressImage(e.target.result, async function(compressedImage) {
+                            updateData.image = compressedImage;
+                            await finalizePostUpdate(updateData, confirmButton);
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    if (removeCurrentImage) updateData.image = null; // Keep existing if not removing and no new file
+                    await finalizePostUpdate(updateData, confirmButton);
+                }
+            }
+
+            async function finalizePostUpdate(updateData, buttonElement) {
+                try {
+                    await updateDoc(doc(db, "Posts", state.currentEditPostId), updateData);
+                    closeEditModal();
+                } catch (error) {
+                    console.error("Error actualizando post:", error);
+                    alert("Error al guardar los cambios.");
+                } finally {
+                    buttonElement.disabled = false;
+                    buttonElement.textContent = 'Guardar Cambios';
+                }
+            }
         })();
     </script>
 </body>
 </html>
+
