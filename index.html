@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0d0221" id="themeColorMeta">
     <title>🧠 NeuroChan: Tableros de la Mente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js](https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js](https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js)"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+        @import url('[https://fonts.googleapis.com/css2?family=VT323&display=swap](https://fonts.googleapis.com/css2?family=VT323&display=swap)');
+        @import url('[https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap](https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap)');
+        @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap)');
 
         :root {
             --neon-cyan: #0ff0fc;
@@ -21,13 +21,14 @@
             --dark-matter: #0d0221;
             --acid-green: #00ff9d;
             --deep-purple: #6a00f4;
-            --light-bg: #f0f4f8;
-            --light-text: #1a1a1a;
+            --light-bg: #f0f4f8; /* Kept for reference, but light theme is disabled */
+            --light-text: #1a1a1a; /* Kept for reference */
             --border-color: #0ff0fc;
             --text-primary: #0ff0fc;
             --bg-primary: #0d0221;
         }
 
+        /* Styles for light theme are kept for reference but not actively used */
         body.light {
             --border-color: #0453fa;
             --text-primary: #1a1a1a;
@@ -41,9 +42,9 @@
             background-color: var(--bg-primary);
             color: var(--text-primary);
             overflow-x: hidden;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(9, 1, 31, 0.8), rgba(9, 1, 31, 0.8)),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="10" height="10" x="0" y="0" fill="%230ff0fc" opacity="0.1"/></svg>');
+                url('data:image/svg+xml;utf8,<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="100" height="100" viewBox="0 0 100 100"><rect width="10" height="10" x="0" y="0" fill="%230ff0fc" opacity="0.1"/></svg>');
             background-size: 20px 20px;
             animation: scanlines 0.5s linear infinite;
             transition: background-color 0.5s, color 0.5s;
@@ -53,7 +54,7 @@
             content: "";
             position: fixed;
             inset: 0;
-            background: url('https://images.unsplash.com/photo-1549921296-3ec74c52753f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            background: url('[https://images.unsplash.com/photo-1549921296-3ec74c52753f?auto=format&fit=crop&w=1920&q=80](https://images.unsplash.com/photo-1549921296-3ec74c52753f?auto=format&fit=crop&w=1920&q=80)') center/cover no-repeat;
             opacity: .25;
             mix-blend-mode: overlay;
             pointer-events: none;
@@ -105,14 +106,14 @@
         }
 
         .neon-text {
-            text-shadow: 
+            text-shadow:
                 0 0 5px var(--neon-cyan),
                 0 0 10px var(--neon-cyan),
                 0 0 20px var(--neon-cyan);
         }
 
         .neon-border {
-            box-shadow: 
+            box-shadow:
                 0 0 5px var(--neon-cyan),
                 0 0 10px var(--neon-cyan),
                 inset 0 0 5px var(--neon-cyan),
@@ -125,7 +126,7 @@
         }
 
         .neon-button:hover {
-            box-shadow: 
+            box-shadow:
                 0 0 10px var(--neon-magenta),
                 0 0 20px var(--neon-magenta),
                 inset 0 0 10px var(--neon-magenta);
@@ -149,7 +150,7 @@
         }
 
         .avatar {
-            filter: 
+            filter:
                 sepia(100%)
                 hue-rotate(180deg)
                 saturate(500%)
@@ -158,7 +159,7 @@
         }
 
         .fractal-bg {
-            background: 
+            background:
                 radial-gradient(circle at 20% 30%, var(--electric-blue), transparent 50%),
                 radial-gradient(circle at 80% 70%, var(--glitch-pink), transparent 50%),
                 linear-gradient(45deg, var(--dark-matter), #1a0538);
@@ -193,7 +194,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
                 linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             background-size: 100% 2px, 3px 100%;
@@ -227,6 +228,7 @@
             100% { box-shadow: 0 0 20px var(--deep-purple); }
         }
 
+        /* .post-fadeout and fadeOut are no longer actively used but kept for style consistency if needed later */
         .post-fadeout {
             animation: fadeOut 1s forwards;
         }
@@ -298,16 +300,7 @@
             border-color: var(--acid-green);
         }
 
-        .theme-toggle {
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(30deg);
-            box-shadow: 0 0 10px var(--neon-magenta);
-        }
-
-        /* Accesibilidad */
+        /* Accessibility */
         [aria-hidden="true"] {
             visibility: hidden;
         }
@@ -315,17 +308,6 @@
         button:focus, input:focus, textarea:focus {
             outline: 2px solid var(--acid-green);
             outline-offset: 2px;
-        }
-
-        /* Contraste mejorado para modo claro */
-        body.light .neon-text {
-            text-shadow: none;
-            color: var(--electric-blue);
-        }
-
-        body.light .neon-border {
-            box-shadow: none;
-            border-color: var(--electric-blue);
         }
 
         /* Emoji picker */
@@ -491,7 +473,6 @@
 </head>
 <body class="min-h-screen crt-effect">
     <div class="container mx-auto px-4 py-8 fractal-bg">
-        <!-- Header -->
         <header class="text-center mb-10">
             <h1 class="glitch text-6xl md:text-8xl font-bold mb-4" data-text="🧠 NeuroChan">
                 <span class="neon-text">🧠 NeuroChan</span>
@@ -500,7 +481,6 @@
             <div class="h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 my-4 opacity-50"></div>
         </header>
 
-        <!-- Board Navigation -->
         <div class="flex flex-wrap gap-2 mb-6 justify-center">
             <button class="board-selector active px-4 py-2 rounded border border-cyan-500 text-cyan-400" data-board="meta" aria-label="Tablero meta">
                 /meta/
@@ -516,17 +496,15 @@
             </button>
         </div>
 
-        <!-- Board Info -->
         <div class="neon-border p-4 mb-8 bg-black bg-opacity-70" id="boardInfo">
             <h2 class="text-2xl mb-2 neon-text">/meta/ - Metaprogramación y Viaje Dimensional</h2>
             <p class="mb-2">Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime</p>
-            <p>Todos los posts son efímeros. Nada se guarda. La realidad es temporal.</p>
+            <p>Las transmisiones son persistentes. La mente es el archivo.</p>
         </div>
 
-        <!-- Post Form -->
         <div class="neon-border p-4 mb-8 bg-black bg-opacity-70 relative">
             <div class="mb-4">
-                <input 
+                <input
                     id="postName"
                     class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
                     placeholder="Nombre (opcional)"
@@ -536,8 +514,7 @@
                 <div class="relative">
                     <button id="emojiToggle" class="absolute right-2 top-2 text-xl" aria-label="Abrir selector de emojis">😊</button>
                     <div id="emojiPicker" class="emoji-picker">
-                        <!-- Emojis will be added by JS -->
-                    </div>
+                        </div>
                     <textarea
                         id="postContent"
                         class="w-full p-3 bg-black bg-opacity-50 text-green-400 border border-cyan-500 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -549,7 +526,7 @@
                 <input
                     id="postPassword"
                     class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
-                    placeholder="Contraseña (opcional)"
+                    placeholder="Contraseña (opcional para borrado)"
                     type="password"
                     aria-label="Contraseña para borrado">
 
@@ -561,7 +538,7 @@
                     <span id="fileName" class="text-xs text-gray-400 ml-2"></span>
                     <label class="flex items-center ml-4 text-xs">
                         <input type="checkbox" id="ephemeralMode" class="mr-2">
-                        Modo efímero
+                        Modo efímero (actualmente sin efecto de borrado automático)
                     </label>
                 </div>
             </div>
@@ -572,57 +549,39 @@
                     aria-label="Enviar post">
                     ENVIAR
                 </button>
-                <button
-                    id="clearPage"
-                    class="neon-button px-6 py-2 bg-black bg-opacity-70 border border-purple-500 text-purple-400 font-bold hover:border-red-500 hover:text-red-400"
-                    aria-label="Borrar todos los posts">
-                    PURGAR REALIDAD
-                </button>
-                <button
-                    id="themeToggle"
-                    class="theme-toggle px-4 py-2 bg-black bg-opacity-70 border border-pink-500 text-pink-400 font-bold"
-                    aria-label="Cambiar tema claro/oscuro">
-                    🌓 CAMBIAR TEMA
-                </button>
-            </div>
+                </div>
             <div id="typingPreview" class="mt-4 p-3 bg-black bg-opacity-30 border border-gray-700 hidden">
                 <p id="typingText" class="typing-effect text-green-400"></p>
             </div>
         </div>
 
-        <!-- Posts Container -->
         <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Posts will be dynamically inserted here -->
-        </div>
+            </div>
 
-        <!-- Admin Toggle -->
         <div class="admin-panel">
             <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
                 ⚙️
             </button>
         </div>
 
-        <!-- Audio Toggle -->
         <div class="fixed bottom-4 right-4">
             <button id="audioToggle" class="neon-button w-12 h-12 rounded-full bg-black bg-opacity-70 border border-cyan-500 flex items-center justify-center" aria-label="Alternar audio">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" />
                 </svg>
             </button>
         </div>
     </div>
 
-    <!-- Audio Element -->
     <audio id="bgAudio" loop>
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-1699.mp3" type="audio/mpeg">
+        <source src="[https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-1699.mp3](https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-1699.mp3)" type="audio/mpeg">
     </audio>
 
-    <!-- Delete Post Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h3 class="text-xl mb-4">Confirmar borrado</h3>
             <p class="mb-4">Introduce la contraseña para borrar este post:</p>
-            <input type="password" id="deletePassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            <input type="password" id="deletePasswordInput" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
             <div class="flex justify-end gap-2">
                 <button id="cancelDelete" class="px-4 py-2 border border-gray-500">Cancelar</button>
                 <button id="confirmDelete" class="px-4 py-2 bg-red-500 text-white">Borrar</button>
@@ -630,12 +589,11 @@
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
     <div id="adminModal" class="admin-modal">
         <div class="admin-modal-content">
             <h3 class="text-xl mb-4">Acceso de Administrador</h3>
             <p class="mb-4">Introduce la contraseña maestra:</p>
-            <input type="password" id="adminPassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+            <input type="password" id="adminPasswordInput" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
             <div class="flex justify-end gap-2">
                 <button id="cancelAdmin" class="px-4 py-2 border border-gray-500">Cancelar</button>
                 <button id="confirmAdmin" class="px-4 py-2 bg-green-500 text-white">Acceder</button>
@@ -644,24 +602,25 @@
     </div>
 
     <script type="module">
-// ======= Firebase imports y config =======
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+        // Firebase SDK imports
+        import { initializeApp } from "[https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js](https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js)";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy, getDocs, limit, increment } from "[https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js](https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js)";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDQ6q9KkYS0To-BJEjxQSQUyQ65C6wam6o",
-  authDomain: "neurocircuitos.firebaseapp.com",
-  projectId: "neurocircuitos",
-  storageBucket: "neurocircuitos.firebasestorage.app",
-  messagingSenderId: "988092454441",
-  appId: "1:988092454441:web:e260431acea58ada5f2e38",
-  measurementId: "G-9678SEZ792"
-};
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-const postsCol = collection(db,"Posts");
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQ6q9KkYS0To-BJEjxQSQUyQ65C6wam6o",
+            authDomain: "neurocircuitos.firebaseapp.com",
+            projectId: "neurocircuitos",
+            storageBucket: "neurocircuitos.firebasestorage.app",
+            messagingSenderId: "988092454441",
+            appId: "1:988092454441:web:e260431acea58ada5f2e38",
+            measurementId: "G-9678SEZ792"
+        };
 
-// =======================================
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const postsCollection = collection(db, 'Posts');
 
         // Módulo principal encapsulado en IIFE
         (function() {
@@ -672,9 +631,8 @@ const postsCol = collection(db,"Posts");
 
             // Estado de la aplicación
             let state = {
-                posts: [],
+                allPosts: [], // Stores all posts from Firestore
                 currentBoard: 'meta',
-                darkMode: localStorage.getItem('neurochan_theme') !== 'light',
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
                 replyTo: null,
@@ -702,7 +660,7 @@ const postsCol = collection(db,"Posts");
                 meta: {
                     title: "/meta/ - Metaprogramación y Viaje Dimensional",
                     description: "Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime",
-                    footer: "Todos los posts son efímeros. Nada se guarda. La realidad es temporal."
+                    footer: "Las transmisiones son persistentes. La mente es el archivo."
                 },
                 dreams: {
                     title: "/sueños/ - Exploración Lúcida y Oneironáutica",
@@ -722,65 +680,52 @@ const postsCol = collection(db,"Posts");
             };
 
             // Inicialización cuando el DOM está listo
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', async function() {
                 setupEventListeners();
-                renderPosts();
                 setupEmojiPicker();
+                loadPostsFromFirestore(); // Load posts and listen for real-time updates
 
-                // Agregar posts de ejemplo si no hay ninguno
+                // Check if sample posts are needed (only on first load if DB is empty)
+                const q = query(postsCollection, limit(1));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    addSamplePostsToFirestore();
                 }
-
-                // Cargar preferencia de tema
-                updateTheme();
-                subscribeRealtimePosts();
 
                 // Configurar admin panel si es admin
                 if (state.isAdmin) {
                     setupAdminPanel();
                 }
+                // Ensure dark theme is set (it's default by CSS)
+                document.getElementById('themeColorMeta').content = '#0d0221';
             });
 
             // Configurar todos los event listeners
             function setupEventListeners() {
-                // Botón de enviar post
                 document.getElementById('submitPost').addEventListener('click', createPost);
-
-                // Botón de limpiar posts
-                document.getElementById('clearPage').addEventListener('click', clearPosts);
-
-                // Botón de cambiar tema
-                document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-                // Configurar audio toggle
+                // No clearPage listener
+                // No themeToggle listener
                 setupAudioToggle();
-
-                // Configurar subida de archivos
                 setupFileUpload();
 
-                // Configurar selectores de tablero
                 document.querySelectorAll('.board-selector').forEach(btn => {
                     btn.addEventListener('click', function() {
                         changeBoard(btn.dataset.board);
                     });
                 });
 
-                // Configurar modal de borrado
                 document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
                 document.getElementById('confirmDelete').addEventListener('click', deletePostWithPassword);
-
-                // Configurar admin panel
                 document.getElementById('adminToggle').addEventListener('click', toggleAdminModal);
                 document.getElementById('cancelAdmin').addEventListener('click', closeAdminModal);
                 document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
             }
 
-            // Configurar el selector de emojis
             function setupEmojiPicker() {
                 const emojiToggle = document.getElementById('emojiToggle');
                 const emojiPicker = document.getElementById('emojiPicker');
                 const textarea = document.getElementById('postContent');
 
-                // Llenar el picker con emojis
                 EMOJIS.forEach(emoji => {
                     const emojiBtn = document.createElement('button');
                     emojiBtn.className = 'emoji-option';
@@ -792,13 +737,11 @@ const postsCol = collection(db,"Posts");
                     emojiPicker.appendChild(emojiBtn);
                 });
 
-                // Alternar visibilidad del picker
                 emojiToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
                     emojiPicker.classList.toggle('active');
                 });
 
-                // Cerrar picker al hacer clic fuera
                 document.addEventListener('click', function(e) {
                     if (!emojiPicker.contains(e.target) && e.target !== emojiToggle) {
                         emojiPicker.classList.remove('active');
@@ -806,32 +749,41 @@ const postsCol = collection(db,"Posts");
                 });
             }
 
-            // Insertar texto en la posición del cursor
             function insertAtCursor(textarea, text) {
                 const startPos = textarea.selectionStart;
                 const endPos = textarea.selectionEnd;
                 const currentText = textarea.value;
-                
                 textarea.value = currentText.substring(0, startPos) + text + currentText.substring(endPos);
                 textarea.selectionStart = textarea.selectionEnd = startPos + text.length;
                 textarea.focus();
             }
 
-            // Crear un nuevo post
-async function createPost() {
-                const contentInput = document.getElementById('postContent');
-                const nameInput    = document.getElementById('postName');
-                const passInput    = document.getElementById('postPassword');
-                const fileInput    = document.getElementById('fileUpload');
+            async function createPost() {
+                const contentInput = document.getElementById('postContent').value.trim();
+                const name = document.getElementById('postName').value.trim() || "Anónimo";
+                const password = document.getElementById('postPassword').value.trim();
+                const ephemeral = document.getElementById('ephemeralMode').checked; // Saved but not acted upon for deletion
+                const fileInput = document.getElementById('fileUpload');
+                let isImagePost = false;
+                let finalContent = DOMPurify.sanitize(contentInput);
 
-                const rawContent = contentInput.value.trim();
-                const userName   = nameInput.value.trim() || "Anónimo";
-                const password   = passInput.value.trim();
+                if (!finalContent && !fileInput.files[0]) return;
 
-                if (!rawContent && !fileInput.files[0]) return;
+                const postData = {
+                    name: name,
+                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
+                    color: postColors[Math.floor(Math.random() * postColors.length)],
+                    board: state.currentBoard,
+                    resonateCount: 0,
+                    replyTo: state.replyTo,
+                    passwordHash: password ? bcrypt.hashSync(password, 10) : null,
+                    ephemeral: ephemeral,
+                    timestamp: serverTimestamp() // Firestore server timestamp
+                };
 
-                let finalContent = rawContent;
-                let isImage = false;
+                // Reset replyTo
+                state.replyTo = null;
+                document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
 
                 if (fileInput.files[0]) {
                     const file = fileInput.files[0];
@@ -839,65 +791,402 @@ async function createPost() {
                         alert("Imagen demasiado grande. Máximo 2MB permitidos.");
                         return;
                     }
-                    finalContent = await readFileAsDataURL(file);
-                    isImage = true;
+                    try {
+                        const compressedImageData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => compressImage(e.target.result, resolve, reject);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        });
+                        postData.content = compressedImageData; // Already sanitized if it's data URL
+                        postData.isImage = true;
+                    } catch (error) {
+                        console.error("Error processing image:", error);
+                        alert("Error al procesar la imagen.");
+                        return;
+                    }
+                } else {
+                    postData.content = finalContent;
+                    postData.isImage = isImageUrl(finalContent); // Check if text content is an image URL
+                }
+                
+                if (!postData.content) { // Ensure content is present after potential image processing failure or empty text
+                     alert("El contenido no puede estar vacío.");
+                     return;
                 }
 
-                const postObj = {
-                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
-                    board: state.currentBoard,
-                    color: postColors[Math.floor(Math.random() * postColors.length)],
-                    content: DOMPurify.sanitize(finalContent),
-                    isImage,
-                    name: userName,
-                    passwordHash: password ? bcrypt.hashSync(password, 10) : null,
-                    resonateCount: 0,
-                    timestamp: serverTimestamp(),
-                    replyTo: state.replyTo
+
+                try {
+                    await addDoc(postsCollection, postData);
+                    // UI reset and confirmation
+                    document.getElementById('postContent').value = '';
+                    document.getElementById('postName').value = '';
+                    document.getElementById('postPassword').value = '';
+                    fileInput.value = '';
+                    document.getElementById('fileName').textContent = '';
+                    document.getElementById('ephemeralMode').checked = false;
+                    document.getElementById('typingPreview').classList.add('hidden');
+
+                    const button = document.getElementById('submitPost');
+                    button.classList.add('bg-pink-500', 'text-white');
+                    setTimeout(() => button.classList.remove('bg-pink-500', 'text-white'), 300);
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert("Error al enviar el post. Intenta de nuevo.");
+                }
+            }
+            
+            function compressImage(imageData, callback, errorCallback) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxWidth = 800;
+                    const maxHeight = 800;
+                    let { width, height } = img;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.8));
                 };
-
-                await addDoc(postsCol, postObj);
-
-                // limpiar UI
-                state.replyTo = null;
-                contentInput.value = '';
-                nameInput.value = '';
-                passInput.value = '';
-                fileInput.value = '';
-                document.getElementById('fileName').textContent = '';
-                document.getElementById('ephemeralMode').checked = false;
-
-                // efecto visual
-                const button = document.getElementById('submitPost');
-                button.classList.add('bg-pink-500', 'text-white');
-                setTimeout(() => button.classList.remove('bg-pink-500', 'text-white'), 300);
+                img.onerror = function() {
+                    errorCallback(new Error("Failed to load image for compression."));
+                };
+                img.src = imageData;
             }
 
-const readFileAsDataURL = (file) => new Promise(res => {
-                const reader = new FileReader();
-                reader.onload = e => res(e.target.result);
-                reader.readAsDataURL(file);
-            });
-            // Comprimir imagen usando canvas
 
-    
-async function resonatePost(postId) {
-                const post = state.posts.find(p => p.id === postId);
+            function loadPostsFromFirestore() {
+                const q = query(postsCollection, orderBy('timestamp', 'desc'));
+                onSnapshot(q, (querySnapshot) => {
+                    const postsArray = [];
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        postsArray.push({
+                            id: doc.id, // Firestore document ID
+                            ...data,
+                            // Convert Firestore Timestamp to ISO string for consistency
+                            timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()
+                        });
+                    });
+                    state.allPosts = postsArray;
+                    renderPosts(); // Re-render with all posts for the current board
+                }, (error) => {
+                    console.error("Error fetching posts: ", error);
+                    // Optionally, display an error message to the user
+                });
+            }
+
+            function renderPosts() {
+                const container = document.getElementById('postsContainer');
+                container.innerHTML = '';
+                const boardPosts = state.allPosts.filter(post => post.board === state.currentBoard);
+
+                boardPosts.forEach(post => {
+                    const postElement = createPostElement(post);
+                    container.appendChild(postElement);
+                    applyPostEffects(post, postElement);
+                });
+            }
+
+            function applyPostEffects(post, element) {
+                const content = (post.content || "").toLowerCase();
+                if (content.includes('sueño') || content.includes('dream')) element.classList.add('dream-glow');
+                if (content.includes('tecno') || content.includes('tech') || content.includes('ciber')) element.classList.add('tech-glow');
+                if (content.includes('dimensión') || content.includes('realidad')) element.classList.add('dimension-glow');
+            }
+
+            function createPostElement(post) {
+                const postElement = document.createElement('div');
+                postElement.className = `post ${post.color || postColors[0]} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
+                postElement.dataset.id = post.id;
+
+                const date = new Date(post.timestamp);
+                const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const contentHtml = getPostContentHtml(post);
+
+                const replyIndicator = post.replyTo ?
+                    `<div class="reply-indicator mb-2">
+                        <span class="text-xs text-gray-400">Respondiendo a </span>
+                        <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.toString().slice(-4)}</span>
+                    </div>` : '';
+
+                postElement.innerHTML = `
+                    <div class="flex items-start mb-2">
+                        <span class="avatar text-3xl mr-3">${post.avatar}</span>
+                        <div>
+                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
+                            <span class="text-xs text-gray-400 ml-2">${timeString}</span>
+                        </div>
+                    </div>
+                    ${replyIndicator}
+                    <div class="post-content text-sm mb-2">${contentHtml}</div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex gap-2">
+                            <button class="resonate-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Resonar con este post">
+                                💡 Resonar (${post.resonateCount || 0})
+                            </button>
+                            <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
+                                ↩ Responder
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            ${state.isAdmin || post.passwordHash ? `<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>` : ''}
+                            <span class="text-xs text-gray-500 ml-2">ID: ${post.id.toString().slice(-4)}</span>
+                        </div>
+                    </div>
+                `;
+
+                postElement.querySelector('.resonate-button').addEventListener('click', () => resonatePost(post.id, post.resonateCount || 0));
+                postElement.querySelector('.reply-button').addEventListener('click', () => replyToPost(post.id));
+                const deleteBtn = postElement.querySelector('.delete-button');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        if (state.isAdmin) deletePostFromFirestore(post.id);
+                        else openDeleteModal(post.id);
+                    });
+                }
+                postElement.querySelectorAll('.reply-link').forEach(link => {
+                    link.addEventListener('mouseenter', () => showReplyPreview(link.dataset.postId, link));
+                });
+                return postElement;
+            }
+            
+            function showReplyPreview(postId, element) {
+                const post = state.allPosts.find(p => p.id === postId); // Search in allPosts
                 if (!post) return;
-                await updateDoc(doc(db,"Posts",postId), { resonateCount: post.resonateCount + 1 });
-            }
 
-async function deletePost(postId) {
-                await deleteDoc(doc(db,"Posts",postId));
-            }
-
-async function clearPosts() {
-                if (!confirm("Esto borrará todas las transmisiones del tablero actual. ¿Continuar?")) return;
-                const boardPosts = state.posts.filter(p => p.board === state.currentBoard);
-                for (const p of boardPosts) {
-                    await deletePost(p.id);
+                let tooltip = element.querySelector('.tooltip-text');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip-text text-xs p-2';
+                    let previewContent = post.isImage ? "[Imagen]" : (post.content || "");
+                    if (!post.isImage && previewContent.length > 100) {
+                        previewContent = previewContent.substring(0, 100) + '...';
+                    }
+                    tooltip.innerHTML = `
+                        <div class="flex items-center mb-1">
+                            <span class="text-xs mr-2">${post.avatar}</span>
+                            <span class="text-xs">${DOMPurify.sanitize(post.name)}</span>
+                        </div>
+                        <div class="text-xs">${DOMPurify.sanitize(previewContent)}</div>`;
+                    element.classList.add('tooltip'); // Ensure parent has .tooltip class
+                    element.appendChild(tooltip);
                 }
             }
-</script>
+
+
+            function replyToPost(postId) {
+                state.replyTo = postId;
+                document.getElementById('postContent').placeholder = `>>${postId.toString().slice(-4)} `;
+                document.getElementById('postContent').focus();
+            }
+
+            function getPostContentHtml(post) {
+                // Content is already sanitized when stored or will be image data URL
+                let content = post.content || "";
+
+                if (post.isImage) { // Prioritize isImage flag from Firestore
+                     return `<img src="${content}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
+                } else if (isImageUrl(content)) { // Fallback for URLs not marked as isImage
+                     return `<img src="${content}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
+                }
+
+
+                if (isUrl(content)) {
+                    if (isYoutubeUrl(content)) {
+                        const videoId = extractYoutubeId(content);
+                        return videoId ? `<div class="mb-2"><iframe class="w-full h-48" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>` : `<a href="${content}" target="_blank" class="text-cyan-400 hover:text-pink-400 underline">${content}</a>`;
+                    } else if (isSoundcloudUrl(content)) {
+                        return `<div class="mb-2"><iframe class="w-full h-48" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(content)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe></div>`;
+                    } else {
+                        return `<a href="${content}" target="_blank" class="text-cyan-400 hover:text-pink-400 underline">${content}</a>`;
+                    }
+                }
+                // Already sanitized, handle line breaks and reply links
+                let formattedContent = content.replace(/>>&gt;(\w+)/g, (match, id) => { // Handle &gt; if DOMPurify encoded >
+                     const fullId = state.allPosts.find(p => p.id.slice(-id.length) === id)?.id || id;
+                     return `<a href="#" class="reply-link text-cyan-400" data-post-id="${fullId}">${match}</a>`;
+                });
+                formattedContent = formattedContent.replace(/>>(\w+)/g, (match, id) => {
+                    const fullId = state.allPosts.find(p => p.id.slice(-id.length) === id)?.id || id;
+                    return `<a href="#" class="reply-link text-cyan-400" data-post-id="${fullId}">${match}</a>`;
+                });
+                return formattedContent.replace(/\n/g, '<br>');
+            }
+
+
+            const isUrl = (str) => { try { new URL(str); return true; } catch (_) { return false; } };
+            const isImageUrl = (url) => typeof url === 'string' && isUrl(url) && /\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(url);
+            const isYoutubeUrl = (url) => typeof url === 'string' && isUrl(url) && (url.includes('[youtube.com/watch](https://youtube.com/watch)') || url.includes('youtu.be/'));
+            const extractYoutubeId = (url) => {
+                const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            };
+            const isSoundcloudUrl = (url) => typeof url === 'string' && isUrl(url) && url.includes('soundcloud.com');
+
+            function updateTypingEffect(text) { /* Unchanged, assuming it's for a different feature or can be removed */ }
+
+            function setupAudioToggle() {
+                const audio = document.getElementById('bgAudio');
+                const toggle = document.getElementById('audioToggle');
+                toggle.addEventListener('click', () => {
+                    state.audioEnabled = !state.audioEnabled;
+                    if (state.audioEnabled) {
+                        audio.play().catch(e => console.warn("Audio play failed:", e));
+                        toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14a2 2 0 100-4 2 2 0 000 4z" /></svg>`;
+                        toggle.classList.add('border-pink-500'); toggle.classList.remove('border-cyan-500');
+                    } else {
+                        audio.pause();
+                        toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" /></svg>`;
+                        toggle.classList.add('border-cyan-500'); toggle.classList.remove('border-pink-500');
+                    }
+                });
+            }
+
+            function setupFileUpload() {
+                const fileInput = document.getElementById('fileUpload');
+                const fileName = document.getElementById('fileName');
+                fileInput.addEventListener('change', () => {
+                    fileName.textContent = fileInput.files[0] ? fileInput.files[0].name : '';
+                });
+            }
+            
+            async function addSamplePostsToFirestore() {
+                const samplePostsData = [
+                    { content: "El ego es solo una construcción temporal...", name: "Anónimo", avatar: "🧠", board: "meta", resonateCount: 3, isImage: false },
+                    { content: "[https://i.imgur.com/J5COECB.png](https://i.imgur.com/J5COECB.png)", name: "Fantasma", avatar: "👁️", board: "meta", resonateCount: 1, isImage: true },
+                    { content: "¿Alguien más ha experimentado deslizamiento dimensional...?", name: "Soñador", avatar: "🌀", board: "dreams", resonateCount: 5, isImage: false },
+                    { content: "La estética de Ghost in the Shell (1995)...", name: "Shell", avatar: "🤖", board: "retro", resonateCount: 7, isImage: false },
+                    { content: "La realidad es una alucinación compartida...", name: "Viajero", avatar: "👽", board: "meta", resonateCount: 2, isImage: false },
+                    { content: "[https://i.imgur.com/3ZQ3Z9J.jpg](https://i.imgur.com/3ZQ3Z9J.jpg)", name: "Neon", avatar: "🌌", board: "retro", resonateCount: 4, isImage: true },
+                    { content: "El primer aumento cibernético debería ser...", name: "Aumento", avatar: "🦾", board: "techno", resonateCount: 6, isImage: false },
+                    { content: "[https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)", name: "Probador", avatar: "🎮", board: "retro", resonateCount: 0, isImage: false } // Example YouTube link
+                ];
+
+                for (const sample of samplePostsData) {
+                    try {
+                        await addDoc(postsCollection, {
+                            ...sample,
+                            color: postColors[Math.floor(Math.random() * postColors.length)],
+                            passwordHash: null,
+                            replyTo: null,
+                            ephemeral: false,
+                            timestamp: serverTimestamp()
+                        });
+                    } catch (e) {
+                        console.error("Error adding sample post: ", sample.name, e);
+                    }
+                }
+            }
+
+
+            function changeBoard(board) {
+                state.currentBoard = board;
+                document.querySelectorAll('.board-selector').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.board === board);
+                });
+                const boardData = boards[board];
+                document.getElementById('boardInfo').innerHTML = `
+                    <h2 class="text-2xl mb-2 neon-text">${DOMPurify.sanitize(boardData.title)}</h2>
+                    <p class="mb-2">${DOMPurify.sanitize(boardData.description)}</p>
+                    <p>${DOMPurify.sanitize(boardData.footer)}</p>`;
+                document.getElementById('boardTitle').textContent = board === 'meta' ? "/meta/ Tableros de la Mente" : `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
+                renderPosts(); // Re-filter and render posts for the new board
+            }
+
+            async function resonatePost(postId, currentResonates) {
+                const postRef = doc(db, "Posts", postId);
+                try {
+                    await updateDoc(postRef, { resonateCount: increment(1) });
+                    // UI will update via onSnapshot, but for immediate feedback:
+                    const button = document.querySelector(`[data-id="${postId}"] .resonate-button`);
+                    if (button) {
+                        button.textContent = `💡 Resonar (${currentResonates + 1})`;
+                        button.classList.add('active', 'pulse');
+                        setTimeout(() => button.classList.remove('active'), 1000);
+                        setTimeout(() => button.classList.remove('pulse'), 500);
+                    }
+                } catch (e) {
+                    console.error("Error resonating post: ", e);
+                }
+            }
+            
+            async function deletePostFromFirestore(postId) {
+                try {
+                    await deleteDoc(doc(db, "Posts", postId));
+                    // UI updates via onSnapshot
+                } catch (e) {
+                    console.error("Error deleting post: ", e);
+                }
+            }
+
+            function openDeleteModal(postId) {
+                state.currentDeletePostId = postId;
+                document.getElementById('deleteModal').style.display = 'flex';
+                document.getElementById('deletePasswordInput').focus();
+            }
+
+            function closeDeleteModal() {
+                state.currentDeletePostId = null;
+                document.getElementById('deleteModal').style.display = 'none';
+                document.getElementById('deletePasswordInput').value = '';
+            }
+
+            async function deletePostWithPassword() {
+                const password = document.getElementById('deletePasswordInput').value;
+                const post = state.allPosts.find(p => p.id === state.currentDeletePostId);
+                if (!post || !post.passwordHash) {
+                     alert("Este post no tiene contraseña o no se encontró.");
+                     closeDeleteModal();
+                     return;
+                }
+                if (bcrypt.compareSync(password, post.passwordHash)) {
+                    await deletePostFromFirestore(post.id);
+                    closeDeleteModal();
+                } else {
+                    alert("Contraseña incorrecta");
+                }
+            }
+
+            function setupAdminPanel() { document.getElementById('adminToggle').classList.add('bg-green-500'); }
+            function toggleAdminModal() {
+                if (state.isAdmin) alert("Ya estás logueado como administrador");
+                else {
+                    document.getElementById('adminModal').style.display = 'flex';
+                    document.getElementById('adminPasswordInput').focus();
+                }
+            }
+            function closeAdminModal() {
+                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('adminPasswordInput').value = '';
+            }
+            function verifyAdminPassword() {
+                const password = document.getElementById('adminPasswordInput').value;
+                if (bcrypt.compareSync(password, ADMIN_HASH)) {
+                    state.isAdmin = true;
+                    localStorage.setItem('neurochan_admin', 'true');
+                    closeAdminModal();
+                    setupAdminPanel();
+                    renderPosts(); // Re-render to show admin delete buttons
+                } else {
+                    alert("Contraseña incorrecta");
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
