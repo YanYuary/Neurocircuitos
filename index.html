@@ -842,8 +842,8 @@
                             });
                         };
                         reader.readAsDataURL(file);
-                    } else {
-                        newPostData.content = DOMPurify.sanitize(newPostData.content); 
+                    } else { 
+                           // nada que hacer: newPostData.text ya está sanitizado
                         await completePostCreationFirestore(newPostData);
                     }
                 } catch (error) {
@@ -957,7 +957,7 @@
             }
 
             function applyPostEffects(post, element) {
-                const content = (post.content || "").toLowerCase();
+                const content = ((post.text ?? '')).toLowerCase();
                 if (content.includes('sueño') || content.includes('dream')) element.classList.add('dream-glow');
                 if (content.includes('tecno') || content.includes('tech') || content.includes('ciber')) element.classList.add('tech-glow');
                 if (content.includes('dimensión') || content.includes('realidad')) element.classList.add('dimension-glow');
@@ -1025,7 +1025,7 @@
                 if (!tooltip) {
                     tooltip = document.createElement('div');
                     tooltip.className = 'tooltip-text text-xs p-2';
-                    let previewContent = post.isImage ? "[Imagen]" : post.content;
+                    let previewContent = post.image ? "[Imagen]" : (post.text ?? '');
                     if (previewContent.length > 100) previewContent = previewContent.substring(0, 100) + '...';
                     tooltip.innerHTML = `
                         <div class="flex items-center mb-1">
@@ -1044,21 +1044,16 @@
             }
 
             function getPostContentHtml(post) {
-                const sanitizedContent = DOMPurify.sanitize(post.content);
-
                 let html = '';
                 if (post.image) {
-                    html += `<img src="${post.image}" alt="Imagen" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border"
-                    onerror="this.parentNode.innerHTML='<p class=\'text-red-400\'>Error al cargar imagen</p>'">`;
+                    html += `<img src="${post.image}" alt="Imagen" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border"onerror="this.parentNode.innerHTML='<p class=\'text-red-400\'>Error al cargar imagen</p>'">`;
                 }
                 if (post.text) {
-                    const textSanitized = DOMPurify.sanitize(post.text).replace(/\n/g,'<br>');
-                    html += `<p>${textSanitized}</p>`;
+                    html += `<p>${DOMPurify.sanitize(post.text).replace(/\n/g,'<br>')}</p>`;
                 }
                 return html || '[sin contenido]';
+            }
 
-
-                
                 
                 if (isImageUrl(sanitizedContent)) {
                      return `<img src="${sanitizedContent}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
@@ -1091,10 +1086,37 @@
             const extractYoutubeId = (url) => { const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; };
             const isSoundcloudUrl = (url) => { if (!isUrl(url)) return false; return url.includes('soundcloud.com'); };
             
-            function updateTypingEffect(text) { /* ... (mantener como estaba) ... */ }
-            function setupAudioToggle() { /* ... (mantener como estaba) ... */ }
-            function setupFileUpload() { /* ... (mantener como estaba) ... */ }
-
+            /* ---------- Vista previa mientras escribes ---------- */
+            function updateTypingEffect(text) {
+                const preview = document.getElementById('typingPreview');
+                const typingText = document.getElementById('typingText');
+                if (text.trim().length) {
+                    typingText.textContent = text.slice(0, 140);
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            }
+            document.getElementById('postContent').addEventListener('input', e => updateTypingEffect(e.target.value));
+            
+            /* ---------- Audio retro ---------- */
+            function setupAudioToggle() {
+                const audio = document.getElementById('bgAudio');
+                document.getElementById('audioToggle').addEventListener('click', () => {
+                    state.audioEnabled = !state.audioEnabled;
+                    state.audioEnabled ? audio.play() : audio.pause();
+                });
+            }
+            
+            /* ---------- Nombre del archivo seleccionado ---------- */
+            function setupFileUpload() {
+                const fileInput = document.getElementById('fileUpload');
+                fileInput.addEventListener('change', () => {
+                    const span = document.getElementById('fileName');
+                    span.textContent = fileInput.files[0] ? fileInput.files[0].name : '';
+                });
+            }
+        
             function changeBoard(board) {
                 state.currentBoard = board;
                 document.querySelectorAll('.board-selector').forEach(btn => {
@@ -1138,9 +1160,29 @@
                 }
             }
 
-            function toggleTheme() { /* ... (mantener como estaba) ... */ }
-            function saveThemePreference() { /* ... (mantener como estaba) ... */ }
-            function updateTheme() { /* ... (mantener como estaba) ... */ }
+            function toggleTheme() {
+                state.darkMode = !state.darkMode;
+                updateTheme();
+                saveThemePreference();
+            }
+            
+            function saveThemePreference() {
+                localStorage.setItem('neurochan_theme', state.darkMode ? 'dark' : 'light');
+            }
+            
+            function updateTheme() {
+                if (state.darkMode) {
+                    document.body.classList.remove('light');
+                    document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
+                } else {
+                    document.body.classList.add('light');
+                    document.getElementById('themeColorMeta').setAttribute('content', '#f0f4f8');
+                }
+            }
+
+
+
+        
 
             async function deletePostFirestore(postId) {
                  if (!auth.currentUser) {
