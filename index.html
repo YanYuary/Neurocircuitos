@@ -389,16 +389,20 @@
         }
 
         .modal {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            z-index: 1000; /* Ensure it's on top */
             justify-content: center;
             align-items: center;
+        }
+        
+        .modal.flex { /* Use a class to show the modal */
+            display: flex;
         }
 
         .modal-content {
@@ -436,16 +440,19 @@
         }
 
         .admin-modal {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            z-index: 100;
+            z-index: 1000; /* Ensure it's on top */
             justify-content: center;
             align-items: center;
+        }
+        .admin-modal.flex { /* Use a class to show the modal */
+            display: flex;
         }
 
         .admin-modal-content {
@@ -477,8 +484,7 @@
 </head>
 <body class="min-h-screen crt-effect">
     <div class="container mx-auto px-4 py-8 fractal-bg">
-        <header class="text-center mb-10 relative z-10"> <!-- Añadido relative z-10 -->
-            <h1 class="glitch text-6xl md:text-8xl font-bold mb-4 neon-text" data-text="🧠 NeuroChan">
+        <header class="text-center mb-10 relative z-10"> <h1 class="glitch text-6xl md:text-8xl font-bold mb-4 neon-text" data-text="🧠 NeuroChan">
                 🧠 NeuroChan
             </h1>
             <p class="text-xl md:text-2xl neon-text" id="boardTitle">/meta/ Tableros de la Mente</p>
@@ -576,6 +582,9 @@
         <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
 
+        <div id="threadContainer" class="hidden mt-8">
+            </div>
+
         <div class="admin-panel flex items-center gap-2">
             <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
                 ⚙️
@@ -625,6 +634,9 @@
 
             <label for="editPostName" class="block mb-1 text-sm">Nombre:</label>
             <input id="editPostName" class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500" maxlength="30">
+
+            <label for="editPostTitle" class="block mb-1 text-sm">Título:</label>
+            <input id="editPostTitle" class="w-full p-2 mb-2 bg-black bg-opacity-50 text-yellow-400 border border-purple-500" maxlength="100">
 
             <label for="editPostContent" class="block mb-1 text-sm">Contenido:</label>
             <textarea id="editPostContent" class="w-full p-3 mb-2 bg-black bg-opacity-50 text-green-400 border border-cyan-500" rows="4"></textarea>
@@ -690,7 +702,6 @@
             <h3 id="genericModalTitle" class="text-xl mb-4 neon-text">Mensaje</h3>
             <p id="genericModalMessage" class="mb-4">Este es un mensaje de ejemplo.</p>
             <div id="genericModalButtons" class="flex justify-end gap-2">
-                <!-- Botones se añadirán aquí dinámicamente -->
                 <button class="px-4 py-2 border border-gray-500 generic-modal-close-button">Cerrar</button>
             </div>
         </div>
@@ -702,7 +713,7 @@
         import { 
             getFirestore, collection, addDoc, onSnapshot, 
             doc, deleteDoc, updateDoc, query, where, orderBy,
-            increment, serverTimestamp, getDoc // <--- AÑADIR getDoc AQUÍ
+            increment, serverTimestamp, getDoc, getDocs 
             } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { 
@@ -740,21 +751,22 @@
         // Módulo principal encapsulado en IIFE
         (function() {
             // Constantes y configuraciones
-            const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
-            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vFYAcnVe';
+            const MAX_IMAGE_SIZE = 2 * 1024 * 1024; 
+            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vFYAcnVe'; // Asegúrate que este hash sea correcto
 
             const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
             let state = {
                 currentBoard: 'meta',
-                currentTheme: localStorage.getItem('neurochan_theme') || 'dark', // 'dark' (azul), 'pink'
+                currentTheme: localStorage.getItem('neurochan_theme') || 'dark', 
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
-                replyTo: null,
+                replyTo: null, // Stores the ID of the post the user clicked "reply" on (for UI mention >>ID)
                 currentDeletePostId: null,
-                allPosts: [],
-                currentEditPostId: null, // Para la edición
-                currentEditPostData: null // Para almacenar datos del post a editar
+                allPosts: [], 
+                currentEditPostId: null, 
+                currentEditPostData: null, 
+                viewingThreadId: null // Stores the ID of the parent thread being viewed
             };
 
             const avatars = [
@@ -808,9 +820,9 @@
                 if (state.isAdmin) setupAdminPanel();
 
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        console.log("Usuario autenticado anónimamente:", user.uid);
-                        loadAndRenderPostsRealtime(); 
+                    if (user) { 
+                        console.log("Usuario autenticado anónimamente:", user.uid); 
+                        handleHashChange(); 
                     } else {
                         console.log("Usuario no autenticado, intentando autenticación anónima...");
                         signInAnonymously(auth).catch((error) => {
@@ -819,9 +831,9 @@
                             const loadingMessageElement = document.getElementById('loadingMessage');
 
                             if (loadingMessageElement) {
-                                loadingMessageElement.classList.remove('hidden'); // Asegurar que el mensaje sea visible
+                                loadingMessageElement.classList.remove('hidden'); 
                                 if (error.code === 'auth/configuration-not-found') {
-                                    userMessage = 'ERROR DE CONFIGURACIÓN DE FIREBASE: El inicio de sesión anónimo no está habilitado. Por favor, ve a tu consola de Firebase -> Authentication -> Sign-in method y habilita el proveedor "Anónimo".';
+                                     userMessage = 'ERROR DE CONFIGURACIÓN DE FIREBASE: El inicio de sesión anónimo no está habilitado. Por favor, ve a tu consola de Firebase -> Authentication -> Sign-in method y habilita el proveedor "Anónimo".';
                                     console.error("ACCIÓN REQUERIDA: Habilita el proveedor de inicio de sesión 'Anónimo' en la sección 'Authentication' -> 'Sign-in method' de tu Firebase console.");
                                 }
                                 loadingMessageElement.textContent = userMessage;
@@ -829,7 +841,44 @@
                         });
                     }
                 });
+
+                window.addEventListener('hashchange', handleHashChange);
             });
+            
+            function handleHashChange() {
+                const hash = window.location.hash.substring(1); 
+                const params = new URLSearchParams(hash);
+                const postIdFromUrl = params.get('post');
+                const boardFromUrl = params.get('board');
+
+                let boardActuallyChanged = false;
+                if (boardFromUrl && boardFromUrl !== state.currentBoard) {
+                    state.currentBoard = boardFromUrl; 
+                    boardActuallyChanged = true;
+                    document.querySelectorAll('.board-selector').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.board === state.currentBoard);
+                    });
+                    const boardData = boards[state.currentBoard] || boards.meta;
+                    document.getElementById('boardInfo').innerHTML = `
+                        <h2 class="text-2xl mb-2 neon-text">${boardData.title}</h2>
+                        <p class="mb-2">${boardData.description}</p>
+                        <p>${boardData.footer}</p>`;
+                    document.getElementById('boardTitle').textContent = state.currentBoard === 'meta' ? 
+                        "/meta/ Tableros de la Mente" : 
+                        `/${state.currentBoard}/ ${state.currentBoard.charAt(0).toUpperCase() + state.currentBoard.slice(1).replace('-', ' ')}`;
+                }
+                
+                const previousViewingThreadId = state.viewingThreadId;
+                state.viewingThreadId = postIdFromUrl || null;
+                
+                if (boardActuallyChanged || state.viewingThreadId !== previousViewingThreadId) {
+                    loadAndRenderPostsRealtime();
+                } else if (!state.viewingThreadId && !boardActuallyChanged) {
+                    loadAndRenderPostsRealtime(); 
+                }
+                 updateUiForView(); 
+            }
+
 
             function setupEventListeners() {
                 document.getElementById('submitPost').addEventListener('click', createPost);
@@ -851,7 +900,7 @@
                 document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
                 document.getElementById('infoToggle').addEventListener('click', openInfoModal);
                 document.getElementById('closeInfoModal').addEventListener('click', closeInfoModal);
-                document.getElementById('confirmEdit').addEventListener('click', () => confirmEdit());
+                document.getElementById('confirmEdit').addEventListener('click', () => confirmEdit()); 
                 document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
             }
 
@@ -892,7 +941,7 @@
             async function createPost() {
                 const contentInput = document.getElementById('postContent').value.trim();
                 const name = document.getElementById('postName').value.trim() || "Anónimo";
-                const title = document.getElementById('postTitle').value.trim(); // Obtener el título
+                const title = document.getElementById('postTitle').value.trim(); 
                 const password = document.getElementById('postPassword').value.trim();
                 const fileInput = document.getElementById('fileUpload');
 
@@ -908,24 +957,29 @@
                 }
 
                 const newPostData = {
-                    authorUID: auth.currentUser.uid, // Guardar el UID del autor anónimo
+                    authorUID: auth.currentUser.uid, 
                     avatar: avatars[Math.floor(Math.random() * avatars.length)],
                     board: state.currentBoard,
                     color: postColors[Math.floor(Math.random() * postColors.length)],
                     text: DOMPurify.sanitize(contentInput),
-                    title: title ? DOMPurify.sanitize(title) : null, // Guardar el título sanitizado o null
+                    title: title ? DOMPurify.sanitize(title) : null, 
                     image: null,
                     name: name,
                     passwordHash: password && bcryptInstance ? bcryptInstance.hashSync(password, 10) : null,
                     heartCount: 0,
                     funnyCount: 0,
                     angryCount: 0,
-                    reactedBy: {}, // Para rastrear quién ha reaccionado y cómo
+                    reactedBy: {}, 
                     timestamp: serverTimestamp(), 
-                    replyTo: state.replyTo, 
+                    // Corrected replyTo logic:
+                    // If viewing a thread, new posts are replies to that thread's OP.
+                    // Otherwise (on main board), it's a new parent post (replyTo is null).
+                    replyTo: state.viewingThreadId, 
                 };
+                
+                // The state.replyTo (for >>ID mentions) is handled by placeholder and user input.
+                // It does not directly set the structural replyTo field here.
 
-                state.replyTo = null;
                 document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
                 
                 const submitButton = document.getElementById('submitPost');
@@ -938,7 +992,7 @@
                         if (file.size > MAX_IMAGE_SIZE) {
                             showGenericModal("Error de Archivo", "La imagen es demasiado grande. El tamaño máximo permitido es 2MB.", [{ text: 'Entendido', action: closeGenericModal }]);
                             submitButton.disabled = false;
-                            submitButton.textContent = 'ENVIAR';
+                            submitButton.textContent = '🚀 ENVIAR';
                             return;
                         }
                         const reader = new FileReader();
@@ -950,41 +1004,48 @@
                         };
                         reader.readAsDataURL(file);
                     } else { 
-                           // nada que hacer: newPostData.text ya está sanitizado
                         await completePostCreationFirestore(newPostData);
                     }
                 } catch (error) {
                     console.error("Error creando post:", error);
                     showGenericModal("Error", "Ocurrió un error al enviar el post. Por favor, inténtalo de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                     submitButton.disabled = false;
-                    submitButton.textContent = 'ENVIAR';
+                    submitButton.textContent = '🚀 ENVIAR';
                 }
             }
             
             async function completePostCreationFirestore(postData) {
                 try {
-                    await addDoc(postsCollectionRef, postData);
+                    const docRef = await addDoc(postsCollectionRef, postData);
+                    console.log("Post creado con ID: ", docRef.id);
                     
                     document.getElementById('postContent').value = '';
                     document.getElementById('postName').value = '';
-                    document.getElementById('postTitle').value = ''; // Limpiar el campo de título
+                    document.getElementById('postTitle').value = ''; 
                     document.getElementById('postPassword').value = '';
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('fileName').textContent = '';
                     document.getElementById('typingPreview').classList.add('hidden');
+                    
+                    state.replyTo = null; // Clear the UI mention state
+                    // Update placeholder based on current view (thread or board)
+                    document.getElementById('postContent').placeholder = state.viewingThreadId 
+                        ? `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}` 
+                        : "Transmite tus pensamientos...";
 
                     const button = document.getElementById('submitPost');
                     button.classList.add('bg-pink-500', 'text-white');
                     setTimeout(() => {
                         button.classList.remove('bg-pink-500', 'text-white');
                     }, 300);
+
                 } catch (error) {
                     console.error("Error guardando post en Firestore:", error);
                     showGenericModal("Error de Guardado", "No se pudo guardar el post en la base de datos. Intenta de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                 } finally {
                     const submitButton = document.getElementById('submitPost');
                     submitButton.disabled = false;
-                    submitButton.textContent = 'ENVIAR';
+                    submitButton.textContent = '🚀 ENVIAR';
                 }
             }
 
@@ -1004,105 +1065,186 @@
                 img.src = imageData;
             }
             
+            function updateUiForView() {
+                const postsContainer = document.getElementById('postsContainer');
+                const threadContainer = document.getElementById('threadContainer');
+                const postFormSection = document.querySelector('.neon-border.p-4.mb-8'); 
+                const boardInfoSection = document.getElementById('boardInfo');
+
+                if (state.viewingThreadId) {
+                    postsContainer.classList.add('hidden');
+                    threadContainer.classList.remove('hidden');
+                    if (boardInfoSection) boardInfoSection.classList.add('hidden');
+                    if (postFormSection) {
+                        document.getElementById('postContent').placeholder = `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}`;
+                    }
+                } else {
+                    postsContainer.classList.remove('hidden');
+                    threadContainer.classList.add('hidden');
+                    threadContainer.innerHTML = ''; 
+                    if (boardInfoSection) boardInfoSection.classList.remove('hidden');
+                     if (postFormSection) {
+                        document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
+                    }
+                }
+            }
+
             function loadAndRenderPostsRealtime() {
                 const loadingMessage = document.getElementById('loadingMessage');
-                if (loadingMessage) { 
+                if (loadingMessage) {
                     loadingMessage.classList.remove('hidden');
-                    loadingMessage.textContent = 'Cargando transmisiones...'; // Reset message
+                    loadingMessage.textContent = 'Cargando transmisiones...'; 
                 }
 
                 if (unsubscribePosts) {
-                    unsubscribePosts(); 
+                    unsubscribePosts();
+                    unsubscribePosts = null; 
                 }
 
                 if (!auth.currentUser) {
                     console.log("Esperando autenticación para cargar posts...");
-                    // El listener onAuthStateChanged se encargará de llamar a esta función de nuevo.
-                    // Opcionalmente, mostrar un mensaje si loadingMessage existe.
-                     if (loadingMessage) {
+                    if (loadingMessage) {
                         loadingMessage.textContent = 'Esperando conexión segura...';
-                     }
-                    return;
-                }
-
-
-                const q = query(postsCollectionRef, where("board", "==", state.currentBoard), orderBy("timestamp", "desc"));
-                let initialLoadComplete = false;
-                
-                unsubscribePosts = onSnapshot(q, (snapshot) => {
-                    const container = document.getElementById('postsContainer');
-                    const newPostsForInitialLoad = [];
-
-                    snapshot.docChanges().forEach((change) => {
-                        const postData = { id: change.doc.id, ...change.doc.data() };
-                        const existingPostElement = document.querySelector(`[data-id="${change.doc.id}"]`);
-
-                        if (change.type === "added") {
-                            if (!existingPostElement) { // Evitar duplicados si ya existe por alguna razón
-                                if (!initialLoadComplete) {
-                                    newPostsForInitialLoad.push(postData);
-                                } else {
-                                    // Para posts añadidos después de la carga inicial, insertar al principio
-                                    const newPostElement = createPostElement(postData);
-                                    container.insertBefore(newPostElement, container.firstChild); 
-                                    applyPostEffects(postData, newPostElement);
-                                    state.allPosts.unshift(postData); 
-                                }
-                            } else {
-                                // Si ya existe (raro en 'added'), actualizarlo por si acaso
-                                updatePostElementDOM(existingPostElement, postData);
-                            }
-                        }
-                        if (change.type === "modified") {
-                            if (existingPostElement) {
-                                updatePostElementDOM(existingPostElement, postData);
-                                // Actualizar el post en el array local
-                                const postIndex = state.allPosts.findIndex(p => p.id === postData.id);
-                                if (postIndex > -1) {
-                                    state.allPosts[postIndex] = postData;
-                                }
-                            } else {
-                                // Si se modificó pero no está en el DOM (podría pasar si se añadió y modificó rápidamente)
-                                const newPostElement = createPostElement(postData);
-                                container.insertBefore(newPostElement, container.firstChild);
-                                applyPostEffects(postData, newPostElement);
-                                state.allPosts.unshift(postData);
-                            }
-                        }
-                        if (change.type === "removed") {
-                            if (existingPostElement) {
-                                existingPostElement.remove();
-                                state.allPosts = state.allPosts.filter(p => p.id !== postData.id); // Eliminar del array local
-                            }
-                        }
-                    });
-
-                    if (!initialLoadComplete && newPostsForInitialLoad.length > 0) {
-                        // Procesar la carga inicial
-                        // El query ya está ordenado por timestamp desc, así que newPostsForInitialLoad debería estar en el orden correcto
-                        // pero docChanges() no garantiza el orden de los eventos 'added' para la carga inicial.
-                        // Por si acaso, re-ordenamos aquí basado en el timestamp del cliente si es necesario,
-                        // aunque lo ideal es que Firestore entregue en orden.
-                        // Para simplificar, asumimos que Firestore entrega en el orden de la query.
-                        newPostsForInitialLoad.forEach(postData => {
-                            const newPostElement = createPostElement(postData);
-                            container.appendChild(newPostElement); // Añadir al final, pero como vienen ordenados desc, se mostrarán bien.
-                            applyPostEffects(postData, newPostElement);
-                        });
-                        state.allPosts = newPostsForInitialLoad.concat(state.allPosts.filter(p => !newPostsForInitialLoad.find(np => np.id === p.id)));
-                    }
-                    initialLoadComplete = true;
-
-                    if (loadingMessage) {  // Mover esto fuera del forEach
-                        loadingMessage.classList.add('hidden');
-                    }
-                }, (error) => {
-                    console.error("Error obteniendo posts:", error);
-                    if (loadingMessage) { 
-                         loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
                          loadingMessage.classList.remove('hidden');
                     }
-                });
+                    return;
+                }
+                
+                updateUiForView(); 
+
+                if (state.viewingThreadId) {
+                    const docRef = doc(db, "Posts", state.viewingThreadId);
+                    unsubscribePosts = onSnapshot(docRef, (docSnap) => {
+                        const threadContainer = document.getElementById('threadContainer');
+                        threadContainer.innerHTML = ''; 
+
+                        if (docSnap.exists()) {
+                            const postData = { id: docSnap.id, ...docSnap.data() };
+                            const postElement = createPostElement(postData, true); 
+                            threadContainer.appendChild(postElement);
+                            applyPostEffects(postData, postElement);
+                            loadAndRenderReplies(postData.id, threadContainer); 
+                            state.allPosts = [postData]; 
+                        } else {
+                            threadContainer.innerHTML = '<p class="text-center text-red-400">Este post no existe o fue eliminado.</p>';
+                            console.warn(`Post con ID ${state.viewingThreadId} no encontrado.`);
+                        }
+                        if (loadingMessage) loadingMessage.classList.add('hidden');
+                    }, (error) => {
+                        console.error(`Error obteniendo post del hilo ${state.viewingThreadId}:`, error);
+                        if (loadingMessage) {
+                            loadingMessage.textContent = 'Error al cargar el hilo. Revisa la consola.';
+                            loadingMessage.classList.remove('hidden');
+                        }
+                    });
+                } else {
+                    // Simplified query for board view: only filter by board
+                    const q = query(postsCollectionRef, where("board", "==", state.currentBoard));
+                    unsubscribePosts = onSnapshot(q, (querySnapshot) => {
+                        const postsContainer = document.getElementById('postsContainer');
+                        let fetchedPosts = [];
+                        querySnapshot.forEach(docSnap => {
+                            fetchedPosts.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+
+                        // Client-side filtering for top-level posts and sorting
+                        const topLevelPosts = fetchedPosts
+                            .filter(p => p.replyTo === null) // Show only parent posts
+                            .sort((a, b) => {
+                                const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+                                const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+                                return timeB - timeA; // Descending for board view (newest first)
+                            });
+
+                        state.allPosts = topLevelPosts; // Store only top-level posts for board view
+
+                        postsContainer.innerHTML = ''; 
+                        if (topLevelPosts.length === 0) {
+                            postsContainer.innerHTML = '<p class="text-center col-span-full neon-text">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
+                        } else {
+                            topLevelPosts.forEach(postData => {
+                                const postElement = createPostElement(postData, false);
+                                postsContainer.appendChild(postElement);
+                                applyPostEffects(postData, postElement);
+                            });
+                        }
+                        
+                        if (loadingMessage) loadingMessage.classList.add('hidden');
+                    }, (error) => {
+                        console.error("Error obteniendo posts del tablero:", error);
+                        // The user provided the error message, so we can assume this part is being hit.
+                        // The error is "The query requires an index".
+                        // This means the simplified query `where("board", "==", state.currentBoard)`
+                        // combined with onSnapshot's internal mechanisms might still be attempting
+                        // an implicit sort or operation that needs an index on just "board".
+                        // Or, the error is from a *previous* version of the query if the page wasn't fully reloaded.
+                        // For now, we keep the client-side filtering. If the error persists with just `where("board")`,
+                        // then an index on "board" (single field) would be needed.
+                        if (loadingMessage) {
+                            loadingMessage.textContent = 'Error al cargar posts. Firestore podría requerir un índice. Revisa la consola.';
+                            loadingMessage.classList.remove('hidden');
+                        }
+                    });
+                }
+            }
+
+            async function loadAndRenderReplies(postId, threadContainerElement) {
+                // Simplified query for replies: only filter by replyTo
+                const repliesQuery = query(postsCollectionRef, where("replyTo", "==", postId));
+                
+                const oldRepliesContainer = threadContainerElement.querySelector('.replies-container');
+                if (oldRepliesContainer) {
+                    oldRepliesContainer.remove();
+                }
+
+                const repliesContainer = document.createElement('div');
+                repliesContainer.className = 'replies-container ml-4 md:ml-8 mt-4 space-y-4 border-l-2 border-cyan-700 pl-4';
+                
+                try {
+                    const querySnapshot = await getDocs(repliesQuery);
+                    const repliesData = [];
+                
+                    querySnapshot.forEach(function(doc) { 
+                        const replyData = { id: doc.id, ...doc.data() };
+                        repliesData.push(replyData);
+                    });
+
+                    // Client-side sorting for replies
+                    repliesData.sort((a,b) => {
+                        const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+                        const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+                        return timeA - timeB; // Ascending for replies
+                    });
+
+                    repliesData.forEach(replyData => {
+                        const replyElement = createPostElement(replyData, false); 
+                        repliesContainer.appendChild(replyElement);
+                        applyPostEffects(replyData, replyElement);
+                    });
+
+                    // Update state.allPosts to include these replies for preview functionality within the thread
+                    const parentPostIndex = state.allPosts.findIndex(p => p.id === postId);
+                    if (parentPostIndex !== -1) {
+                        // Remove old replies for this parent, then add new ones
+                        state.allPosts = state.allPosts.filter(p => p.replyTo !== postId);
+                        state.allPosts.push(...repliesData);
+                    }
+
+
+                    if (repliesData.length > 0) {
+                         threadContainerElement.appendChild(repliesContainer);
+                    } else {
+                        const noRepliesMessage = document.createElement('p');
+                        noRepliesMessage.className = 'text-sm text-gray-400 pl-4 mt-2';
+                        noRepliesMessage.textContent = 'Aún no hay respuestas en este hilo.';
+                        repliesContainer.appendChild(noRepliesMessage);
+                        threadContainerElement.appendChild(repliesContainer); 
+                    }
+                } catch (e) {
+                    console.error("Error cargando respuestas: ", e);
+                    repliesContainer.innerHTML = '<p class="text-red-400">Error al cargar respuestas.</p>';
+                    threadContainerElement.appendChild(repliesContainer);
+                }
             }
 
             function applyPostEffects(post, element) {
@@ -1112,23 +1254,30 @@
                 if (content.includes('dimensión') || content.includes('realidad')) element.classList.add('dimension-glow');
             }
 
-            function createPostElement(post) {
+            function createPostElement(post, isThreadParent = false) {
                 const postElement = document.createElement('div');
                 postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
                 postElement.dataset.id = post.id; 
 
+                if (isThreadParent) {
+                    postElement.classList.add('mb-6', 'border-2', 'border-acid-green'); 
+                }
+
                 const postTimestamp = post.timestamp?.toDate ? post.timestamp.toDate() : new Date(post.timestamp);
                 const timeString = postTimestamp.toLocaleTimeString ? postTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
                 const contentHtml = getPostContentHtml(post);
-                const replyIndicator = post.replyTo ? 
+                const replyIndicator = post.replyTo && !isThreadParent ? 
                     `<div class="reply-indicator mb-2">
                         <span class="text-xs text-gray-400">Respondiendo a </span>
                         <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.slice(-4)}</span>
                     </div>` : '';
                 const titleHtml = post.title ? `<h4 class="text-lg font-bold mb-1 neon-text">${DOMPurify.sanitize(post.title)}</h4>` : '';
 
-                // Determinar si el usuario actual es el autor del post (para el botón de editar)
-                const canShowEditButton = state.isAdmin || post.passwordHash;
+                const canShowEditButton = state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid);
+                
+                const threadViewButtonHtml = !state.viewingThreadId && !post.replyTo ? 
+                    `<button class="view-thread-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Ver hilo">Ver Hilo</button>` :
+                    (isThreadParent ? `<button class="back-to-board-button text-xs px-2 py-1 border border-gray-500 text-gray-400" aria-label="Volver al tablero">Volver al Tablero</button>` : '');
 
                 postElement.innerHTML = `
                     <div class="flex items-start mb-2">
@@ -1136,13 +1285,14 @@
                         <div>
                             <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
                             <span class="text-xs text-gray-400 ml-2">${timeString}</span>
+                            ${post.authorUID === auth.currentUser?.uid ? '<span class="text-xs text-acid-green ml-2">(Tú)</span>' : ''}
                         </div>
                     </div>
                     ${replyIndicator}
                     ${titleHtml}
                     <div class="post-content text-sm mb-2 mt-1">${contentHtml}</div> 
                     <div class="flex justify-between items-center">
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1 items-center flex-wrap"> 
                             <button class="reaction-button heart-reaction-button text-xs px-2 py-1 border border-pink-500 text-pink-400 flex items-center gap-1" aria-label="Reaccionar con Corazón">
                                 ❤️ <span class="count">${post.heartCount || 0}</span>
                             </button>
@@ -1155,9 +1305,10 @@
                             <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
                                 ↩ Responder
                             </button>
+                            ${threadViewButtonHtml}
                         </div>
                         <div class="flex items-center">
-                            ${state.isAdmin || post.passwordHash ? '<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>' : ''}
+                            ${state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid) ? '<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>' : ''}
                             ${canShowEditButton ? `<button class="edit-button text-xs px-1 ml-1" aria-label="Editar post">✏️</button>` : ''}
                             <span class="text-xs text-gray-500 ml-2">ID: ${post.id.slice(-4)}</span>
                         </div>
@@ -1183,13 +1334,29 @@
 
                 postElement.querySelectorAll('.reply-link').forEach(link => {
                     link.addEventListener('mouseenter', () => showReplyPreview(link.dataset.postId, link));
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        viewThread(link.dataset.postId);
+                    });
                 });
+
+                const viewThreadBtn = postElement.querySelector('.view-thread-button');
+                if (viewThreadBtn) {
+                    viewThreadBtn.addEventListener('click', () => viewThread(post.id));
+                }
+                const backToBoardBtn = postElement.querySelector('.back-to-board-button');
+                if (backToBoardBtn) {
+                    backToBoardBtn.addEventListener('click', () => window.location.hash = `board=${state.currentBoard}`);
+                }
                 return postElement;
             }
 
             function showReplyPreview(postId, element) {
                 const post = state.allPosts.find(p => p.id === postId); 
-                if (!post) return;
+                if (!post) {
+                    console.warn(`Post ${postId} no encontrado para preview.`);
+                    return;
+                }
                 let tooltip = element.querySelector('.tooltip-text');
                 if (!tooltip) {
                     tooltip = document.createElement('div');
@@ -1207,18 +1374,20 @@
             }
 
             function replyToPost(postId) {
-                state.replyTo = postId; 
-                document.getElementById('postContent').placeholder = `>>${postId.slice(-4)} `;
+                state.replyTo = postId; // Store the ID of the post the user *clicked* reply on
+                document.getElementById('postContent').placeholder = `Respondiendo a >>${postId.slice(-4)}... `;
                 document.getElementById('postContent').focus();
             }
 
+            function viewThread(postId) {
+                window.location.hash = `board=${state.currentBoard}&post=${postId}`;
+            }
+
             function updatePostElementDOM(postElement, postData) {
-                // Actualizar contadores de reacción
                 postElement.querySelector('.heart-reaction-button .count').textContent = postData.heartCount || 0;
                 postElement.querySelector('.funny-reaction-button .count').textContent = postData.funnyCount || 0;
                 postElement.querySelector('.angry-reaction-button .count').textContent = postData.angryCount || 0;
 
-                // Actualizar estado 'active' de los botones de reacción
                 const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
                 const userReactions = (currentUserUID && postData.reactedBy && postData.reactedBy[currentUserUID]) ? postData.reactedBy[currentUserUID] : [];
 
@@ -1226,29 +1395,30 @@
                 const funnyButton = postElement.querySelector('.funny-reaction-button');
                 const angryButton = postElement.querySelector('.angry-reaction-button');
 
-                userReactions.includes('corazón') ? heartButton.classList.add('active') : heartButton.classList.remove('active');
-                userReactions.includes('me diverte') ? funnyButton.classList.add('active') : funnyButton.classList.remove('active');
-                userReactions.includes('me enoja') ? angryButton.classList.add('active') : angryButton.classList.remove('active');
+                if (heartButton) heartButton.classList.toggle('active', userReactions.includes('corazón'));
+                if (funnyButton) funnyButton.classList.toggle('active', userReactions.includes('me diverte'));
+                if (angryButton) angryButton.classList.toggle('active', userReactions.includes('me enoja'));
                 
-                // Actualizar nombre si cambió
                 const nameSpan = postElement.querySelector('.flex.items-start.mb-2 > div > span:first-child');
                 if (nameSpan && nameSpan.textContent !== DOMPurify.sanitize(postData.name)) {
                     nameSpan.textContent = DOMPurify.sanitize(postData.name);
                 }
-                // Actualizar contenido del post si cambió (texto e imagen)
                 const contentDiv = postElement.querySelector('.post-content');
                 if (contentDiv) contentDiv.innerHTML = getPostContentHtml(postData);
 
-                // Actualizar título si cambió
                 let titleElement = postElement.querySelector('h4.neon-text');
                 if (postData.title) {
-                    if (!titleElement) { // Si no existía el título y ahora sí, hay que crearlo e insertarlo
+                    if (!titleElement) { 
                         titleElement = document.createElement('h4');
                         titleElement.className = 'text-lg font-bold mb-1 neon-text';
-                        contentDiv.parentNode.insertBefore(titleElement, contentDiv);
+                        if (contentDiv && contentDiv.parentNode) { 
+                           contentDiv.parentNode.insertBefore(titleElement, contentDiv);
+                        } else if (postElement.querySelector('.flex.items-start.mb-2').nextSibling) { 
+                           postElement.querySelector('.flex.items-start.mb-2').parentNode.insertBefore(titleElement, postElement.querySelector('.flex.items-start.mb-2').nextSibling);
+                        }
                     }
                     titleElement.innerHTML = DOMPurify.sanitize(postData.title);
-                } else if (titleElement) { // Si existía el título y ahora no, hay que removerlo
+                } else if (titleElement) { 
                     titleElement.remove();
                 }
             }
@@ -1256,16 +1426,23 @@
             function getPostContentHtml(post) {
                 let html = '';
                 if (post.image) {
-                    html += `<img src="${post.image}" alt="Imagen" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border"onerror="this.parentNode.innerHTML='<p class=\'text-red-400\'>Error al cargar imagen</p>'">`;
+                    html += `<img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
                 }
-                if (post.text) {
-                    html += `<p>${DOMPurify.sanitize(post.text).replace(/\n/g,'<br>')}</p>`;
-                }
-                return html || '[sin contenido]';
-            }
+                
+                const textContent = typeof post.text === 'string' ? post.text : '';
+                let sanitizedText = DOMPurify.sanitize(textContent).replace(/\n/g,'<br>');
+                
+                sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, idSuffixOrFullId) => {
+                    return `<a href="#board=${post.board}&post=${idSuffixOrFullId}" class="reply-link text-cyan-400" data-post-id="${idSuffixOrFullId}">>>${idSuffixOrFullId.slice(-4)}</a>`;
+                });
 
+                if (post.text) { 
+                    html += `<p>${sanitizedText}</p>`;
+                }
+                
+                return html || (post.image ? '' : '[sin contenido]'); 
+            }
    
-            /* ---------- Vista previa mientras escribes ---------- */
             function updateTypingEffect(text) {
                 const preview = document.getElementById('typingPreview');
                 const typingText = document.getElementById('typingText');
@@ -1278,43 +1455,67 @@
             }
             document.getElementById('postContent').addEventListener('input', e => updateTypingEffect(e.target.value));
             
-            /* ---------- Audio retro ---------- */
             function setupAudioToggle() {
                 const audio = document.getElementById('bgAudio');
-                document.getElementById('audioToggle').addEventListener('click', () => {
+                const toggleButton = document.getElementById('audioToggle');
+                toggleButton.addEventListener('click', () => {
                     state.audioEnabled = !state.audioEnabled;
-                    state.audioEnabled ? audio.play() : audio.pause();
+                    if (state.audioEnabled) {
+                        audio.play().catch(e => console.log("Error al reproducir audio:", e));
+                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14a2 2 0 100-4 2 2 0 000 4z" /></svg>`;
+                    } else {
+                        audio.pause();
+                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" /></svg>`;
+                    }
                 });
             }
             
-            /* ---------- Nombre del archivo seleccionado ---------- */
             function setupFileUpload() {
                 const fileInput = document.getElementById('fileUpload');
                 fileInput.addEventListener('change', () => {
                     const span = document.getElementById('fileName');
                     span.textContent = fileInput.files[0] ? fileInput.files[0].name : '';
                 });
+                 const editFileInput = document.getElementById('editFileUpload');
+                editFileInput.addEventListener('change', () => {
+                    const span = document.getElementById('editFileName');
+                    const preview = document.getElementById('editImagePreview');
+                    if (editFileInput.files[0]) {
+                        span.textContent = editFileInput.files[0].name;
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.src = e.target.result;
+                            preview.style.display = 'block';
+                        }
+                        reader.readAsDataURL(editFileInput.files[0]);
+                        document.getElementById('removeCurrentImage').checked = false; 
+                    } else {
+                        span.textContent = '';
+                    }
+                });
             }
         
-            function changeBoard(board) {
+            function changeBoard(board, updateHash = true) {
                 state.currentBoard = board;
                 document.querySelectorAll('.board-selector').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.board === board) btn.classList.add('active');
+                    btn.classList.toggle('active', btn.dataset.board === board);
                 });
+                const boardData = boards[board] || boards.meta; 
                 const boardInfoEl = document.getElementById('boardInfo');
                 boardInfoEl.innerHTML = `
-                    <h2 class="text-2xl mb-2 neon-text">${boards[board].title}</h2>
-                    <p class="mb-2">${boards[board].description}</p>
-                    <p>${boards[board].footer}</p>`;
+                    <h2 class="text-2xl mb-2 neon-text">${boardData.title}</h2>
+                    <p class="mb-2">${boardData.description}</p>
+                    <p>${boardData.footer}</p>`;
                 document.getElementById('boardTitle').textContent = board === 'meta' ? 
                     "/meta/ Tableros de la Mente" : 
                     `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
                 
-                // Limpiar el contenedor de posts inmediatamente al cambiar de tablero
-                document.getElementById('postsContainer').innerHTML = '';
-                state.allPosts = []; // Limpiar también el array local de posts
-                loadAndRenderPostsRealtime(); 
+                if (updateHash) { 
+                    state.viewingThreadId = null; 
+                    window.location.hash = `board=${board}`;
+                } else {
+                    loadAndRenderPostsRealtime();
+                }
             }
 
             function adminLogout() {
@@ -1323,7 +1524,12 @@
                 showGenericModal("Sesión Cerrada", "Has cerrado la sesión de administrador.", [{ text: 'OK', action: closeGenericModal }]);
                 document.getElementById('adminLogoutButton').style.display = 'none';
                 document.getElementById('adminToggle')?.classList.remove('text-pink-400');
-                // No es necesario recargar todos los posts, solo actualizar la UI de admin
+                setupAdminPanel(); 
+                if (state.viewingThreadId) {
+                    loadAndRenderPostsRealtime(); 
+                } else {
+                    renderBoardPosts(state.allPosts); 
+                }
             }
 
             async function reactWith(postId, reactionType, reactionField, buttonClass) {
@@ -1336,69 +1542,41 @@
                 const postRef = doc(db, "Posts", postId);
                 
                 try {
-                    // Actualización optimista de la UI primero (como ya lo tenías)
-                    const button = document.querySelector(`[data-id="${postId}"] .${buttonClass}`);
-                    const countSpan = button ? button.querySelector('.count') : null;
-                    let currentCount = countSpan ? parseInt(countSpan.textContent) : 0;
-                    if (isNaN(currentCount)) currentCount = 0;
-
-                    const postDoc = await getDoc(postRef); // Leer estado actual para lógica de Firestore
+                    const postDoc = await getDoc(postRef);
                     if (!postDoc.exists()) {
                         console.error("El post no existe.");
                         return;
                     }
                     const postData = postDoc.data();
                     let userReactions = postData.reactedBy && postData.reactedBy[userUID] ? [...postData.reactedBy[userUID]] : [];
+                    const alreadyReacted = userReactions.includes(reactionType);
 
-                    if (userReactions.includes(reactionType)) {
-                        // Quitar reacción (UI ya actualizada optimistamente por el toggle)
+                    const updates = {};
+                    if (alreadyReacted) {
                         userReactions = userReactions.filter(r => r !== reactionType);
-                        if (countSpan) countSpan.textContent = Math.max(0, currentCount - 1); // Asegurar que la UI refleje el decremento
-                        if (button) button.classList.remove('active');
-                        
-                        await updateDoc(postRef, {
-                            [reactionField]: increment(-1),
-                            [`reactedBy.${userUID}`]: userReactions
-                        });
+                        updates[reactionField] = increment(-1);
                     } else {
-                        // Añadir reacción (UI ya actualizada optimistamente por el toggle)
                         userReactions.push(reactionType);
-                        if (countSpan) countSpan.textContent = currentCount + 1; // Asegurar que la UI refleje el incremento
-                        if (button) {
-                            button.classList.add('active', 'pulse');
-                            setTimeout(() => button.classList.remove('pulse'), 500);
-                        }
-                        
-                        await updateDoc(postRef, {
-                            [reactionField]: increment(1),
-                            [`reactedBy.${userUID}`]: userReactions
-                        });
+                        updates[reactionField] = increment(1);
                     }
-                    // No es estrictamente necesario llamar a updatePostElementDOM aquí si la UI ya se actualizó
-                    // de forma optimista y onSnapshot se encargará de la consistencia final.
+                    updates[`reactedBy.${userUID}`] = userReactions; 
+                    
+                    await updateDoc(postRef, updates);
                 } catch (error) {
                     console.error(`Error al reaccionar con ${reactionType}:`, error);
                     showGenericModal("Error de Reacción", "Ocurrió un error al procesar tu reacción.", [{ text: 'OK', action: closeGenericModal }]);
                 }
             }
 
-            function reaccionarCorazon(postId) {
-                reactWith(postId, 'corazón', 'heartCount', 'heart-reaction-button');
-            }
-
-            function reaccionarMeDiverte(postId) {
-                reactWith(postId, 'me diverte', 'funnyCount', 'funny-reaction-button');
-            }
-
-            function reaccionarMeEnoja(postId) {
-                reactWith(postId, 'me enoja', 'angryCount', 'angry-reaction-button');
-            }
+            function reaccionarCorazon(postId) { reactWith(postId, 'corazón', 'heartCount', 'heart-reaction-button'); }
+            function reaccionarMeDiverte(postId) { reactWith(postId, 'me diverte', 'funnyCount', 'funny-reaction-button'); }
+            function reaccionarMeEnoja(postId) { reactWith(postId, 'me enoja', 'angryCount', 'angry-reaction-button'); }
 
             function toggleTheme() {
                 if (state.currentTheme === 'dark') {
-                    state.currentTheme = 'pink'; // Azul -> Rosa
-                } else { // Es 'pink' (o cualquier otro caso, vuelve a dark)
-                    state.currentTheme = 'dark';  // Rosa -> Azul
+                    state.currentTheme = 'pink'; 
+                } else { 
+                    state.currentTheme = 'dark';  
                 }
                 updateTheme();
                 saveThemePreference();
@@ -1409,12 +1587,12 @@
             }
             
             function updateTheme() {
-                document.body.classList.remove('pink-theme'); // Quita la clase del tema rosa si estaba
+                document.body.classList.remove('pink-theme', 'light'); 
 
-                if (state.currentTheme === 'pink') { // Tema Rosa
+                if (state.currentTheme === 'pink') { 
                     document.body.classList.add('pink-theme');
-                    document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); // Fondo rosado oscuro
-                } else { // Tema 'dark' (Azul, por defecto)
+                    document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); 
+                } else { 
                     document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
                 }
             }
@@ -1428,15 +1606,30 @@
 
                 showGenericModal(
                     "Confirmar Borrado",
-                    "¿Seguro que quieres borrar este post permanentemente? Esta acción no se puede deshacer.",
+                    "¿Seguro que quieres borrar este post permanentemente? Esta acción también borrará todas sus respuestas y no se puede deshacer.",
                     [
                         { text: 'Cancelar', class: 'border-gray-500', action: closeGenericModal },
                         { text: 'Borrar Definitivamente', class: 'bg-red-500 text-white', action: async () => {
-                            try { await deleteDoc(doc(db, "Posts", postId)); closeGenericModal(); }
-                            catch (error) { console.error("Error borrando post:", error); showGenericModal("Error", "No se pudo borrar el post.", [{ text: 'OK', action: closeGenericModal }]); }
+                            try { 
+                                const repliesQuery = query(postsCollectionRef, where("replyTo", "==", postId));
+                                const repliesSnapshot = await getDocs(repliesQuery);
+                                const deletePromises = [];
+                                repliesSnapshot.forEach(docReply => { 
+                                    deletePromises.push(deleteDoc(docReply.ref));
+                                });
+                                await Promise.all(deletePromises);
+                                console.log(`Borradas ${deletePromises.length} respuestas para el post ${postId}`);
+
+                                await deleteDoc(doc(db, "Posts", postId)); 
+                                closeGenericModal(); 
+                                if (state.viewingThreadId === postId) {
+                                    window.location.hash = `board=${state.currentBoard}`;
+                                }
+                            }
+                            catch (error) { console.error("Error borrando post y/o respuestas:", error); showGenericModal("Error", "No se pudo borrar el post o sus respuestas.", [{ text: 'OK', action: closeGenericModal }]); }
                         }}
                     ],
-                    false // No cerrar al hacer clic fuera
+                    false 
                 );
             }
             
@@ -1445,7 +1638,7 @@
             function openDeleteModal(postId, passwordHash) {
                 state.currentDeletePostId = postId;
                 currentPostPasswordHash = passwordHash; 
-                document.getElementById('deleteModal').style.display = 'flex';
+                document.getElementById('deleteModal').classList.add('flex');
                 document.getElementById('deletePasswordInput').value = '';
                 document.getElementById('deletePasswordInput').focus();
             }
@@ -1453,7 +1646,7 @@
             function closeDeleteModal() {
                 state.currentDeletePostId = null;
                 currentPostPasswordHash = null;
-                document.getElementById('deleteModal').style.display = 'none';
+                document.getElementById('deleteModal').classList.remove('flex');
                 document.getElementById('deletePasswordInput').value = '';
             }
 
@@ -1472,39 +1665,40 @@
                 }
 
                 if (bcryptInstance && bcryptInstance.compareSync(passwordAttempt, currentPostPasswordHash)) {
-                    await deletePostFirestore(state.currentDeletePostId);
-                    closeDeleteModal(); // Cerramos el modal de contraseña
+                    await deletePostFirestore(state.currentDeletePostId); 
+                    closeDeleteModal(); 
                 } else {
-                    alert("Contraseña incorrecta.");
+                     showGenericModal("Error", "Contraseña incorrecta.", [{ text: 'Entendido', action: () => document.getElementById('deletePasswordInput').focus() }]);
                 }
             }
 
-            // --- Modal de Información ---
-            function openInfoModal() { document.getElementById('infoModal').style.display = 'flex'; }
-            function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
-
+            function openInfoModal() { document.getElementById('infoModal').classList.add('flex'); }
+            function closeInfoModal() { document.getElementById('infoModal').classList.remove('flex'); }
             
-            // Muestra u oculta iconos y paneles según state.isAdmin
             function setupAdminPanel() {
-                // Si eres admin, muestra todos los botones 🗑️ que ya existen
-                document.querySelectorAll('.delete-button').forEach(btn => btn.style.display = 'inline-block');
-                // Cambia el color del engranaje solo a modo visual
                 const adminLogoutBtn = document.getElementById('adminLogoutButton');
-                if (adminLogoutBtn) {
-                    adminLogoutBtn.style.display = 'inline-block';
+                const adminToggleBtn = document.getElementById('adminToggle');
+
+                if(state.isAdmin) {
+                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline-block';
+                    if (adminToggleBtn) adminToggleBtn.classList.add('text-pink-400'); 
+                } else {
+                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'none';
+                    if (adminToggleBtn) adminToggleBtn.classList.remove('text-pink-400');
                 }
-                document.getElementById('adminToggle')?.classList.add('text-pink-400');
+                if (state.viewingThreadId) {
+                } else {
+                    renderBoardPosts(state.allPosts); 
+                }
             }
-            // Abre el modal de contraseña
             function toggleAdminModal() {
-                document.getElementById('adminModal').style.display = 'flex';
+                document.getElementById('adminModal').classList.add('flex');
                 document.getElementById('adminPasswordInput').value = '';
                 document.getElementById('adminPasswordInput').focus();
             }
             
-            // Cierra el modal de adminssssssssssss
             function closeAdminModal() {
-                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('adminModal').classList.remove('flex');
                 document.getElementById('adminPasswordInput').value = '';
             }
          
@@ -1515,20 +1709,19 @@
                     localStorage.setItem('neurochan_admin', 'true');
                     closeAdminModal();
                     setupAdminPanel();
-                    // No es necesario recargar todos los posts, setupAdminPanel actualiza la UI
+                    showGenericModal("Acceso Concedido", "Has iniciado sesión como administrador.", [{ text: 'OK', action: closeGenericModal }]);
                 } else {
                     showGenericModal("Acceso Denegado", "La contraseña de administrador es incorrecta.", [{ text: 'Intentar de Nuevo', action: () => { document.getElementById('adminPasswordInput').focus(); document.getElementById('adminPasswordInput').value = ''; } }, { text: 'Cancelar', action: closeAdminModal }]);
                 }
             }
 
-            // --- Modal Genérico ---
             function showGenericModal(title, message, buttons = [{ text: 'OK', action: closeGenericModal }], closeModalOnClickOutside = true) {
                 const modal = document.getElementById('genericModal');
                 document.getElementById('genericModalTitle').textContent = title;
-                document.getElementById('genericModalMessage').innerHTML = DOMPurify.sanitize(message); // Permitir HTML simple como <br>
+                document.getElementById('genericModalMessage').innerHTML = DOMPurify.sanitize(message); 
 
                 const buttonsContainer = document.getElementById('genericModalButtons');
-                buttonsContainer.innerHTML = ''; // Limpiar botones anteriores
+                buttonsContainer.innerHTML = ''; 
 
                 buttons.forEach(btnConfig => {
                     const button = document.createElement('button');
@@ -1540,27 +1733,40 @@
                     buttonsContainer.appendChild(button);
                 });
 
-                modal.style.display = 'flex';
+                modal.classList.add('flex');
 
                 if (closeModalOnClickOutside) {
-                    modal.onclick = function(event) { if (event.target === modal) closeGenericModal(); };
+                    const closeModalHandler = function(event) {
+                        if (event.target === modal) {
+                            closeGenericModal();
+                            modal.removeEventListener('click', closeModalHandler); 
+                        }
+                    };
+                    modal.addEventListener('click', closeModalHandler);
                 } else {
-                    modal.onclick = null; // No cerrar al hacer clic fuera
+                    modal.onclick = null; 
                 }
+                modal.querySelectorAll('.generic-modal-close-button').forEach(btn => {
+                    btn.addEventListener('click', closeGenericModal);
+                });
             }
 
-            function closeGenericModal() { document.getElementById('genericModal').style.display = 'none'; }
+            function closeGenericModal() { document.getElementById('genericModal').classList.remove('flex'); }
 
-            // --- Funciones para Editar Post ---
             function openEditModal(postId) {
                 const postToEdit = state.allPosts.find(p => p.id === postId);
-                if (!postToEdit) { showGenericModal("Error", "Post no encontrado.", [{ text: 'OK', action: closeGenericModal }]); return; }
+                if (!postToEdit) { showGenericModal("Error", "Post no encontrado para editar.", [{ text: 'OK', action: closeGenericModal }]); return; }
+
+                if (!state.isAdmin && !(postToEdit.passwordHash && postToEdit.authorUID === auth.currentUser?.uid)) {
+                    showGenericModal("No Autorizado", "No tienes permiso para editar este post.", [{ text: 'OK', action: closeGenericModal }]);
+                    return;
+                }
 
                 state.currentEditPostId = postId;
-                state.currentEditPostData = postToEdit;
+                state.currentEditPostData = { ...postToEdit }; 
 
                 document.getElementById('editPostName').value = postToEdit.name || '';
-                document.getElementById('editPostTitle').value = postToEdit.title || ''; // Cargar el título existente
+                document.getElementById('editPostTitle').value = postToEdit.title || ''; 
                 document.getElementById('editPostContent').value = postToEdit.text || '';
                 
                 const imagePreview = document.getElementById('editImagePreview');
@@ -1568,57 +1774,76 @@
                 if (postToEdit.image) {
                     imagePreview.src = postToEdit.image;
                     imagePreview.style.display = 'block';
-                    removeCurrentImageCheckbox.parentElement.style.display = 'inline-block'; // Show remove checkbox
+                    removeCurrentImageCheckbox.parentElement.style.display = 'inline-block'; 
                     removeCurrentImageCheckbox.checked = false;
                 } else {
                     imagePreview.style.display = 'none';
-                    removeCurrentImageCheckbox.parentElement.style.display = 'none'; // Hide remove checkbox
+                    imagePreview.src = '#'; 
+                    removeCurrentImageCheckbox.parentElement.style.display = 'none'; 
                 }
-                document.getElementById('editFileUpload').value = ''; // Clear file input
+                document.getElementById('editFileUpload').value = ''; 
                 document.getElementById('editFileName').textContent = '';
-
 
                 const passwordPromptContainer = document.getElementById('editPasswordPromptContainer');
                 if (!state.isAdmin && postToEdit.passwordHash) {
                     passwordPromptContainer.style.display = 'block';
                     document.getElementById('editPostPasswordPrompt').value = '';
+                    document.getElementById('editPostPasswordPrompt').focus();
                 } else {
                     passwordPromptContainer.style.display = 'none';
                 }
                 document.getElementById('editNewPostPassword').value = '';
-                document.getElementById('editModal').style.display = 'flex';
+                document.getElementById('editModal').classList.add('flex');
             }
 
             function closeEditModal() {
-                document.getElementById('editModal').style.display = 'none';
+                document.getElementById('editModal').classList.remove('flex');
                 state.currentEditPostId = null;
                 state.currentEditPostData = null;
+                document.getElementById('editPostName').value = '';
+                document.getElementById('editPostTitle').value = '';
+                document.getElementById('editPostContent').value = '';
+                document.getElementById('editPostPasswordPrompt').value = '';
+                document.getElementById('editNewPostPassword').value = '';
+                document.getElementById('editFileUpload').value = '';
+                document.getElementById('editFileName').textContent = '';
+                document.getElementById('editImagePreview').style.display = 'none';
+                document.getElementById('removeCurrentImage').checked = false;
             }
 
             async function confirmEdit() {
-                if (!state.currentEditPostId || !state.currentEditPostData) return;
-
-                const postData = state.currentEditPostData;
-                const updateData = {};
-
-                // Autorización si no es admin y el post tiene contraseña
-                if (!state.isAdmin && postData.passwordHash) {
-                    const passwordAttempt = document.getElementById('editPostPasswordPrompt').value;
-                    if (!bcryptInstance || !bcryptInstance.compareSync(passwordAttempt, postData.passwordHash)) {
-                        showGenericModal("Error de Edición", "La contraseña del post es incorrecta.", [{ text: 'Entendido', action: closeGenericModal }]);
-                        return;
-                    }
+                if (!state.currentEditPostId || !state.currentEditPostData || !auth.currentUser) {
+                    showGenericModal("Error", "No se puede editar el post en este momento.", [{ text: 'OK', action: closeGenericModal }]);
+                    return;
                 }
 
-                updateData.name = document.getElementById('editPostName').value.trim() || "Anónimo";
-                updateData.title = DOMPurify.sanitize(document.getElementById('editPostTitle').value.trim()) || null; // Guardar título o null
+                const originalPostData = state.currentEditPostData;
+                const updateData = {};
+
+                if (!state.isAdmin && originalPostData.passwordHash && originalPostData.authorUID === auth.currentUser.uid) {
+                    const passwordAttempt = document.getElementById('editPostPasswordPrompt').value;
+                    if (!bcryptInstance || !bcryptInstance.compareSync(passwordAttempt, originalPostData.passwordHash)) {
+                        showGenericModal("Error de Edición", "La contraseña del post es incorrecta.", [{ text: 'Entendido', action: () => document.getElementById('editPostPasswordPrompt').focus() }]);
+                        return;
+                    }
+                } else if (!state.isAdmin && originalPostData.authorUID !== auth.currentUser.uid) {
+                    showGenericModal("Error de Permiso", "No puedes editar un post que no es tuyo sin ser administrador.", [{ text: 'OK', action: closeGenericModal }]);
+                    return;
+                }
+
+                updateData.name = DOMPurify.sanitize(document.getElementById('editPostName').value.trim()) || "Anónimo";
+                updateData.title = DOMPurify.sanitize(document.getElementById('editPostTitle').value.trim()) || null; 
                 updateData.text = DOMPurify.sanitize(document.getElementById('editPostContent').value.trim());
                 
                 const newPassword = document.getElementById('editNewPostPassword').value.trim();
-                if (newPassword && bcryptInstance) {
-                    updateData.passwordHash = bcryptInstance.hashSync(newPassword, 10);
-                } else if (newPassword && !bcryptInstance) {
-                    showGenericModal("Error de Contraseña", "Hubo un problema al procesar la nueva contraseña. No se pudo actualizar.", [{ text: 'OK', action: closeGenericModal }]);
+                if (newPassword) {
+                    if (bcryptInstance) {
+                        updateData.passwordHash = bcryptInstance.hashSync(newPassword, 10);
+                    } else {
+                        showGenericModal("Error de Contraseña", "Bcrypt no está disponible. No se pudo actualizar la contraseña.", [{ text: 'OK', action: closeGenericModal }]);
+                    }
+                } else {
+                    updateData.passwordHash = originalPostData.passwordHash; 
                 }
                 
                 const fileInput = document.getElementById('editFileUpload');
@@ -1645,13 +1870,18 @@
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    if (removeCurrentImage) updateData.image = null; // Keep existing if not removing and no new file
+                    if (removeCurrentImage) {
+                        updateData.image = null; 
+                    } else {
+                        updateData.image = originalPostData.image; 
+                    }
                     await finalizePostUpdate(updateData, confirmButton);
                 }
             }
 
             async function finalizePostUpdate(updateData, buttonElement) {
                 try {
+                    updateData.lastEdited = serverTimestamp();
                     await updateDoc(doc(db, "Posts", state.currentEditPostId), updateData);
                     closeEditModal();
                     showGenericModal("Éxito", "El post ha sido actualizado correctamente.", [{ text: 'OK', action: closeGenericModal }]);
@@ -1659,10 +1889,13 @@
                     console.error("Error actualizando post:", error);
                     showGenericModal("Error de Actualización", "No se pudieron guardar los cambios en el post.", [{ text: 'OK', action: closeGenericModal }]);
                 } finally {
-                    buttonElement.disabled = false;
-                    buttonElement.textContent = 'Guardar Cambios';
+                    if (buttonElement) { 
+                        buttonElement.disabled = false;
+                        buttonElement.textContent = 'Guardar Cambios';
+                    }
                 }
             }
+             console.log("Script principal IIFE ejecutado completamente.");
         })();
     </script>
 </body>
