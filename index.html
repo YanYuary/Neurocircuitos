@@ -29,15 +29,14 @@
             --bg-primary: #0d0221;
         }
 
-        /* Tema 3: Neón Rosa (con fondo rosado oscuro) */
         body.pink-theme {
-            --neon-cyan: #FF00FF;       /* Rosa Neón Principal para el brillo */
-            --neon-magenta: #FF69B4;    /* Rosa Intenso para acentos */
-            --electric-blue: #C71585;   /* Tono rosa/magenta oscuro */
-            --glitch-pink: #FF1493;     /* Rosa profundo */
-            --text-primary: #FF00FF;    /* Color del texto principal será rosa neón */
-            --bg-primary: #3D001D;      /* Fondo rosado oscuro para que el neón rosa destaque */
-            --border-color: #FF00FF;    /* Color de los bordes será rosa neón */
+            --neon-cyan: #FF00FF;      
+            --neon-magenta: #FF69B4;   
+            --electric-blue: #C71585;  
+            --glitch-pink: #FF1493;    
+            --text-primary: #FF00FF;   
+            --bg-primary: #3D001D;     
+            --border-color: #FF00FF;   
         }
 
         body {
@@ -67,7 +66,7 @@
         .post-content {
             font-family: 'Inter', sans-serif;
             max-width: 65ch;
-            word-wrap: break-word; /* Ensure long words/URLs wrap */
+            word-wrap: break-word; 
         }
 
         @keyframes scanlines {
@@ -110,15 +109,24 @@
         }
 
         .neon-text {
-            color: var(--text-primary); /* El color del texto tomará el valor de --text-primary del tema activo */
+            color: var(--text-primary); 
             text-shadow: 
                 0 0 5px var(--neon-cyan),
                 0 0 10px var(--neon-cyan),
                 0 0 20px var(--neon-cyan);
         }
+        /* Reducción del neón para títulos de posts */
+        .post .neon-text-title { 
+            color: var(--text-primary);
+            text-shadow: 
+                0 0 3px var(--neon-cyan), /* Reducido */
+                0 0 7px var(--neon-cyan),  /* Reducido */
+                0 0 15px var(--neon-cyan); /* Reducido */
+        }
+
 
         .neon-border {
-            border: 1px solid var(--border-color); /* El borde tomará el valor de --border-color del tema activo */
+            border: 1px solid var(--border-color); 
             box-shadow: 
                 0 0 5px var(--neon-cyan),
                 0 0 10px var(--neon-cyan),
@@ -300,7 +308,6 @@
         }
 
         .theme-toggle:hover {
-            /* transform: rotate(30deg); Eliminado el giro */
             box-shadow: 0 0 10px var(--neon-magenta);
         }
 
@@ -389,19 +396,19 @@
         }
 
         .modal {
-            display: none; /* Hidden by default */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-            z-index: 1000; /* Ensure it's on top */
+            background-color: rgba(0, 0, 0, 0.7); 
+            z-index: 1000; 
             justify-content: center;
             align-items: center;
         }
         
-        .modal.flex { /* Use a class to show the modal */
+        .modal.flex { 
             display: flex;
         }
 
@@ -440,18 +447,18 @@
         }
 
         .admin-modal {
-            display: none; /* Hidden by default */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000; /* Ensure it's on top */
+            z-index: 1000; 
             justify-content: center;
             align-items: center;
         }
-        .admin-modal.flex { /* Use a class to show the modal */
+        .admin-modal.flex { 
             display: flex;
         }
 
@@ -480,6 +487,102 @@
             padding: 2rem;
             color: var(--neon-cyan);
         }
+
+        /* Estilos para el juego de Tarot */
+        #tarotGameContainer {
+            /* Estilos para el contenedor principal del juego si son necesarios */
+        }
+        #tarotSpreadContainer {
+            display: flex; /* Usar flex para centrar las filas */
+            flex-direction: column; /* Apilar filas verticalmente */
+            align-items: center; /* Centrar filas horizontalmente */
+            gap: 0.5rem; /* Espacio entre filas */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .tarot-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem; /* Espacio entre cartas en una fila */
+        }
+        .tarot-card {
+            width: 80px; /* Ancho de la carta */
+            height: 120px; /* Alto de la carta */
+            background-color: var(--deep-purple); /* Color de dorso */
+            border: 2px solid var(--neon-cyan);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s, box-shadow 0.3s;
+            perspective: 1000px;
+            position: relative; /* Para el contenido superpuesto */
+        }
+        .tarot-card:hover {
+            box-shadow: 0 0 15px var(--neon-magenta);
+            transform: translateY(-5px);
+        }
+        .tarot-card .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px; /* Para que coincida con el borde de la carta */
+            overflow: hidden; /* Para que el contenido no se salga */
+        }
+        .tarot-card .card-back {
+            background-color: var(--deep-purple); /* Color del dorso */
+            /* Podrías añadir un patrón o icono al dorso aquí */
+            color: var(--neon-cyan);
+            font-size: 2rem;
+        }
+        .tarot-card .card-front {
+            background-color: var(--bg-primary); /* Fondo cuando está volteada */
+            transform: rotateY(180deg);
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .tarot-card.flipped {
+            transform: rotateY(180deg);
+        }
+        .tarot-card img.tarot-image-display {
+            max-width: 90%;
+            max-height: 60%; /* Ajusta según necesites espacio para el texto */
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .tarot-card .tarot-info-overlay {
+            font-size: 0.6rem; /* Tamaño pequeño para que quepa */
+            color: var(--text-primary);
+            text-align: center;
+            overflow-y: auto; /* Scroll si el texto es muy largo */
+            max-height: 35%; /* Espacio restante para el texto */
+            width: 100%;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+         .tarot-card .tarot-info-overlay p {
+            margin: 1px 0;
+        }
+
+        #tarotCardInfoDisplay { /* Contenedor para mostrar info de la carta seleccionada fuera del spread */
+            background-color: rgba(0,0,0,0.7);
+            border: 1px solid var(--neon-cyan);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            margin: 1rem auto;
+        }
+        #tarotCardInfoDisplay h3 { font-size: 1.5rem; margin-bottom: 0.5rem; text-align: center;}
+        #tarotCardInfoDisplay img { max-height: 200px; display:block; margin: 0.5rem auto;}
+        #tarotCardInfoDisplay p { font-size: 0.8rem; margin-bottom: 0.3rem; }
+
     </style>
 </head>
 <body class="min-h-screen crt-effect">
@@ -515,7 +618,7 @@
             <p>Todos los posts son persistentes y se sincronizan en tiempo real.</p>
         </div>
 
-        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70 relative">
+        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70 relative" id="postFormContainer">
             <div class="mb-4">
                 <input 
                     id="postName"
@@ -584,6 +687,26 @@
 
         <div id="threadContainer" class="hidden mt-8">
             </div>
+        
+        <div id="tarotGameContainer" class="hidden flex flex-col items-center p-4 neon-border bg-black bg-opacity-70">
+            <h2 class="text-3xl mb-6 neon-text">Lectura de Tarot Piramidal</h2>
+            <div class="mb-6 flex gap-4">
+                <button id="shuffleTarotButton" class="neon-button px-6 py-3 bg-purple-700 hover:bg-purple-600 border-purple-500 text-white font-bold">Barajar y Tirar Cartas</button>
+                <button id="resetTarotButton" class="neon-button px-6 py-3 bg-red-700 hover:bg-red-600 border-red-500 text-white font-bold">Resetear Tirada</button>
+            </div>
+            <div id="tarotSpreadContainer" class="grid gap-2 justify-items-center w-full">
+                </div>
+            <div id="tarotCardInfoDisplay" class="hidden mt-6 p-6 neon-border bg-black bg-opacity-80 w-full md:max-w-2xl rounded-lg">
+                <h3 id="tarotCardNameInfo" class="text-2xl neon-text-title text-center mb-3"></h3>
+                <img id="tarotCardImageInfo" src="#" alt="Carta del Tarot Seleccionada" class="mx-auto my-3 max-h-80 border-2 border-acid-green rounded"/>
+                <div class="text-sm space-y-2">
+                    <p><strong>Significado (Derecha):</strong> <span id="tarotMeaningUpInfo"></span></p>
+                    <p><strong>Significado (Invertida):</strong> <span id="tarotMeaningRevInfo"></span></p>
+                    <p><strong>Pregunta Clave:</strong> <span id="tarotQuestionInfo"></span></p>
+                </div>
+            </div>
+        </div>
+
 
         <div class="admin-panel flex items-center gap-2">
             <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
@@ -720,7 +843,6 @@
             getAuth, signInAnonymously, onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // Ensure bcrypt is loaded or provide a fallback/error
         let bcryptInstance;
         if (typeof bcrypt !== 'undefined') {
             bcryptInstance = bcrypt;
@@ -728,10 +850,8 @@
             bcryptInstance = globalThis.dcodeIO.bcrypt;
         } else {
             console.error("Bcrypt.js no está cargado. Las funciones de contraseña no funcionarán.");
-            // Podrías deshabilitar funciones o mostrar un error al usuario aquí
         }
         
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDQ6q9KkYS0To-BJEjxQSQUyQ65C6wam6o",
             authDomain: "neurocircuitos.firebaseapp.com",
@@ -742,17 +862,15 @@
             measurementId: "G-9678SEZ792"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const postsCollectionRef = collection(db, "Posts");
+        const tarotCollectionRef = collection(db, "TarotCards"); // Para el futuro, si se usa Firestore para tarot
 
-        // Módulo principal encapsulado en IIFE
         (function() {
-            // Constantes y configuraciones
             const MAX_IMAGE_SIZE = 2 * 1024 * 1024; 
-            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vFYAcnVe'; // Asegúrate que este hash sea correcto
+            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vFYAcnVe'; 
 
             const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
@@ -761,12 +879,16 @@
                 currentTheme: localStorage.getItem('neurochan_theme') || 'dark', 
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
-                replyTo: null, // Stores the ID of the post the user clicked "reply" on (for UI mention >>ID)
+                replyTo: null, 
                 currentDeletePostId: null,
-                allPosts: [], 
+                allPostsData: {}, // Almacena todos los posts cargados (OPs y respuestas) por ID para fácil acceso
+                currentBoardOPs: [], // Almacena solo los OPs del tablero actual
                 currentEditPostId: null, 
                 currentEditPostData: null, 
-                viewingThreadId: null // Stores the ID of the parent thread being viewed
+                viewingThreadId: null,
+                tarotDeck: [], // Para las cartas del tarot del juego
+                tarotSpread: [], // Para las cartas actualmente en la tirada
+                tarotCardInfoVisible: false, // Para el estado de la info de la carta de tarot
             };
 
             const avatars = [
@@ -789,27 +911,39 @@
                     description: "Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime",
                     footer: "Todos los posts son persistentes y se sincronizan en tiempo real."
                 },
-                dreams: {
-                    title: "/sueños/ - Exploración Lúcida y Oneironáutica",
-                    description: "Temas: Control de Sueños, Hipnagogia, Sueños Compartidos, Proyección Astral",
-                    footer: "El mundo de los sueños es tan real como el de la vigilia. Los límites son delgados."
-                },
-                techno: {
-                    title: "/tecnosoma/ - Conciencia Cibernética",
-                    description: "Temas: Aumento Neural, Tecnología Cyberpunk, Interfaces Mente-Máquina",
-                    footer: "La carne es débil. La máquina está dispuesta. La mente es eterna."
-                },
-                retro: {
-                    title: "/retro-anime/ - Nostalgia Neon y Delirio Cyber",
-                    description: "Temas: Anime Clásico, Retro-Futurismo, Estética Cyberpunk",
-                    footer: "Fantasmas en la máquina. Recuerdos en la estática. Sueños en los datos."
-                },
-                tarot: {
-                    title: "/tarot/ - Arcanos y Sincronicidad",
-                    description: "Temas: Lecturas de Tarot, Simbolismo Arcano, Adivinación, Conexión Espiritual",
-                    footer: "Las cartas revelan los ecos del alma y los susurros del destino."
-                }
+                dreams: { title: "/sueños/ - Exploración Lúcida y Oneironáutica", description: "Temas: Control de Sueños, Hipnagogia, Sueños Compartidos, Proyección Astral", footer: "El mundo de los sueños es tan real como el de la vigilia. Los límites son delgados." },
+                techno: { title: "/tecnosoma/ - Conciencia Cibernética", description: "Temas: Aumento Neural, Tecnología Cyberpunk, Interfaces Mente-Máquina", footer: "La carne es débil. La máquina está dispuesta. La mente es eterna." },
+                retro: { title: "/retro-anime/ - Nostalgia Neon y Delirio Cyber", description: "Temas: Anime Clásico, Retro-Futurismo, Estética Cyberpunk", footer: "Fantasmas en la máquina. Recuerdos en la estática. Sueños en los datos." },
+                tarot: { title: "/tarot/ - Arcanos y Sincronicidad", description: "Temas: Lecturas de Tarot, Simbolismo Arcano, Adivinación, Conexión Espiritual", footer: "Las cartas revelan los ecos del alma y los susurros del destino." }
             };
+            
+            // Datos del Tarot (Arcanos Mayores)
+            const tarotDeckData = [
+                // Se usarán placeholders para las URLs de las imágenes
+                { cartnumber: 0, namecart: "El Loco", significado1cart: "Nuevos comienzos, espontaneidad, fe.", significado2cart: "Potencial ilimitado, inocencia.", significado3cart: "Tomar riesgos, seguir el instinto.", significado4cart: "Libertad, aventura.", urlcart: "https://placehold.co/100x170/333/FFF?text=El+Loco" },
+                { cartnumber: 1, namecart: "El Mago", significado1cart: "Manifestación, poder, habilidad.", significado2cart: "Recursos, concentración.", significado3cart: "Voluntad, acción consciente.", significado4cart: "Creación, ingenio.", urlcart: "https://placehold.co/100x170/333/FFF?text=El+Mago" },
+                { cartnumber: 2, namecart: "La Sacerdotisa", significado1cart: "Intuición, misterio, subconsciente.", significado2cart: "Sabiduría oculta, secretos.", significado3cart: "Reflexión, pasividad.", significado4cart: "Conocimiento interior.", urlcart: "https://placehold.co/100x170/333/FFF?text=Sacerdotisa" },
+                { cartnumber: 3, namecart: "La Emperatriz", significado1cart: "Fertilidad, abundancia, nutrición.", significado2cart: "Belleza, naturaleza, sensualidad.", significado3cart: "Maternidad, creatividad.", significado4cart: "Cuidado, crecimiento.", urlcart: "https://placehold.co/100x170/333/FFF?text=Emperatriz" },
+                { cartnumber: 4, namecart: "El Emperador", significado1cart: "Autoridad, estructura, control.", significado2cart: "Liderazgo, poder terrenal.", significado3cart: "Estabilidad, paternidad.", significado4cart: "Razón, orden.", urlcart: "https://placehold.co/100x170/333/FFF?text=Emperador" },
+                { cartnumber: 5, namecart: "El Hierofante", significado1cart: "Tradición, conformidad, instituciones.", significado2cart: "Guía espiritual, enseñanza.", significado3cart: "Creencias, moralidad.", significado4cart: "Convención, ritual.", urlcart: "https://placehold.co/100x170/333/FFF?text=Hierofante" },
+                { cartnumber: 6, namecart: "Los Enamorados", significado1cart: "Amor, relaciones, elecciones.", significado2cart: "Armonía, unión, valores.", significado3cart: "Decisiones importantes, dualidad.", significado4cart: "Atracción, compromiso.", urlcart: "https://placehold.co/100x170/333/FFF?text=Enamorados" },
+                { cartnumber: 7, namecart: "El Carro", significado1cart: "Victoria, determinación, autocontrol.", significado2cart: "Voluntad, ambición, acción.", significado3cart: "Superar obstáculos, dirección.", significado4cart: "Confianza, impulso.", urlcart: "https://placehold.co/100x170/333/FFF?text=El+Carro" },
+                { cartnumber: 8, namecart: "La Fuerza", significado1cart: "Coraje, paciencia, compasión.", significado2cart: "Fuerza interior, autocontrol.", significado3cart: "Influencia sutil, dominio.", significado4cart: "Resistencia, gentileza.", urlcart: "https://placehold.co/100x170/333/FFF?text=La+Fuerza" },
+                { cartnumber: 9, namecart: "El Ermitaño", significado1cart: "Introspección, soledad, guía interior.", significado2cart: "Sabiduría, búsqueda, prudencia.", significado3cart: "Retiro, meditación.", significado4cart: "Autoconocimiento, iluminación.", urlcart: "https://placehold.co/100x170/333/FFF?text=Ermitaño" },
+                { cartnumber: 10, namecart: "La Rueda de la Fortuna", significado1cart: "Ciclos, destino, cambio.", significado2cart: "Suerte, oportunidades, karma.", significado3cart: "Puntos de inflexión, movimiento.", significado4cart: "Fluctuaciones, inevitabilidad.", urlcart: "https://placehold.co/100x170/333/FFF?text=Rueda" },
+                { cartnumber: 11, namecart: "La Justicia", significado1cart: "Equidad, verdad, ley.", significado2cart: "Balance, causa y efecto.", significado3cart: "Responsabilidad, objetividad.", significado4cart: "Decisiones justas, claridad.", urlcart: "https://placehold.co/100x170/333/FFF?text=Justicia" },
+                { cartnumber: 12, namecart: "El Colgado", significado1cart: "Sacrificio, perspectiva diferente, suspensión.", significado2cart: "Dejar ir, rendición, espera.", significado3cart: "Pausa, introspección.", significado4cart: "Nuevos ángulos, sabiduría.", urlcart: "https://placehold.co/100x170/333/FFF?text=Colgado" },
+                { cartnumber: 13, namecart: "La Muerte", significado1cart: "Finales, transformación, transición.", significado2cart: "Cambio inevitable, liberación.", significado3cart: "Dejar ir el pasado, renovación.", significado4cart: "Metamorfosis, limpieza.", urlcart: "https://placehold.co/100x170/333/FFF?text=Muerte" },
+                { cartnumber: 14, namecart: "La Templanza", significado1cart: "Balance, moderación, paciencia.", significado2cart: "Armonía, propósito, alquimia.", significado3cart: "Combinación, integración.", significado4cart: "Calma, sanación.", urlcart: "https://placehold.co/100x170/333/FFF?text=Templanza" },
+                { cartnumber: 15, namecart: "El Diablo", significado1cart: "Ataduras, adicción, materialismo.", significado2cart: "Tentación, ignorancia, negatividad.", significado3cart: "Limitaciones autoimpuestas, sombra.", significado4cart: "Poder oscuro, engaño.", urlcart: "https://placehold.co/100x170/333/FFF?text=Diablo" },
+                { cartnumber: 16, namecart: "La Torre", significado1cart: "Caos, revelación súbita, destrucción.", significado2cart: "Cambio drástico, despertar.", significado3cart: "Liberación de estructuras falsas.", significado4cart: "Crisis, catarsis.", urlcart: "https://placehold.co/100x170/333/FFF?text=La+Torre" },
+                { cartnumber: 17, namecart: "La Estrella", significado1cart: "Esperanza, inspiración, serenidad.", significado2cart: "Fe, guía espiritual, curación.", significado3cart: "Optimismo, renovación.", significado4cart: "Paz interior, claridad.", urlcart: "https://placehold.co/100x170/333/FFF?text=Estrella" },
+                { cartnumber: 18, namecart: "La Luna", significado1cart: "Ilusión, miedo, subconsciente.", significado2cart: "Ansiedad, confusión, sueños.", significado3cart: "Intuición, lo oculto.", significado4cart: "Incertidumbre, engaño.", urlcart: "https://placehold.co/100x170/333/FFF?text=La+Luna" },
+                { cartnumber: 19, namecart: "El Sol", significado1cart: "Alegría, éxito, vitalidad.", significado2cart: "Claridad, optimismo, calidez.", significado3cart: "Logro, energía positiva.", significado4cart: "Conciencia, iluminación.", urlcart: "https://placehold.co/100x170/333/FFF?text=El+Sol" },
+                { cartnumber: 20, namecart: "El Juicio", significado1cart: "Renacimiento, juicio, despertar.", significado2cart: "Absolución, llamado interior.", significado3cart: "Evaluación, reflexión.", significado4cart: "Transformación, redención.", urlcart: "https://placehold.co/100x170/333/FFF?text=Juicio" },
+                { cartnumber: 21, namecart: "El Mundo", significado1cart: "Realización, culminación, integración.", significado2cart: "Unidad, viaje, éxito.", significado3cart: "Completitud, satisfacción.", significado4cart: "Logro, armonía universal.", urlcart: "https://placehold.co/100x170/333/FFF?text=El+Mundo" }
+            ];
+
 
             let unsubscribePosts = null; 
 
@@ -849,7 +983,7 @@
                 const hash = window.location.hash.substring(1); 
                 const params = new URLSearchParams(hash);
                 const postIdFromUrl = params.get('post');
-                const boardFromUrl = params.get('board');
+                const boardFromUrl = params.get('board') || state.currentBoard; // Mantener tablero si no se especifica
 
                 let boardActuallyChanged = false;
                 if (boardFromUrl && boardFromUrl !== state.currentBoard) {
@@ -871,12 +1005,21 @@
                 const previousViewingThreadId = state.viewingThreadId;
                 state.viewingThreadId = postIdFromUrl || null;
                 
-                if (boardActuallyChanged || state.viewingThreadId !== previousViewingThreadId) {
-                    loadAndRenderPostsRealtime();
-                } else if (!state.viewingThreadId && !boardActuallyChanged) {
-                    loadAndRenderPostsRealtime(); 
+                // Siempre llama a loadContentForBoard si el tablero o el hilo cambian,
+                // o si es la carga inicial (hash puede no haber cambiado pero necesitamos cargar)
+                // o si el tablero actual es 'tarot' para asegurar que se configure el juego.
+                if (boardActuallyChanged || state.viewingThreadId !== previousViewingThreadId || !unsubscribePosts || boardFromUrl) {
+                    loadContentForBoard();
                 }
-                 updateUiForView(); 
+                updateUiForView(); // Actualizar UI después de procesar el hash
+            }
+
+            function loadContentForBoard() {
+                if (state.currentBoard === 'tarot') {
+                    setupTarotGame();
+                } else {
+                    loadAndRenderPostsRealtime();
+                }
             }
 
 
@@ -902,6 +1045,10 @@
                 document.getElementById('closeInfoModal').addEventListener('click', closeInfoModal);
                 document.getElementById('confirmEdit').addEventListener('click', () => confirmEdit()); 
                 document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
+
+                // Event listeners para el Tarot
+                document.getElementById('shuffleTarotButton').addEventListener('click', shuffleAndDealTarot);
+                document.getElementById('resetTarotButton').addEventListener('click', resetTarotSpread);
             }
 
             function setupEmojiPicker() {
@@ -956,6 +1103,19 @@
                     return;
                 }
 
+                // Lógica de replyTo:
+                // Si estamos viendo un hilo, todas las respuestas van a ese hilo OP.
+                // Si estamos en el tablero principal Y state.replyTo (del click en "responder" a un OP) está seteado,
+                // entonces es una respuesta a ese OP.
+                // Si no, es un nuevo hilo (replyTo = null).
+                let actualReplyTo = null;
+                if (state.viewingThreadId) {
+                    actualReplyTo = state.viewingThreadId;
+                } else if (state.replyTo) { // Click en "Responder" en el tablero principal
+                    actualReplyTo = state.replyTo;
+                }
+
+
                 const newPostData = {
                     authorUID: auth.currentUser.uid, 
                     avatar: avatars[Math.floor(Math.random() * avatars.length)],
@@ -971,15 +1131,9 @@
                     angryCount: 0,
                     reactedBy: {}, 
                     timestamp: serverTimestamp(), 
-                    // Corrected replyTo logic:
-                    // If viewing a thread, new posts are replies to that thread's OP.
-                    // Otherwise (on main board), it's a new parent post (replyTo is null).
-                    replyTo: state.viewingThreadId, 
+                    replyTo: actualReplyTo, // Usar la lógica determinada arriba
                 };
                 
-                // The state.replyTo (for >>ID mentions) is handled by placeholder and user input.
-                // It does not directly set the structural replyTo field here.
-
                 document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
                 
                 const submitButton = document.getElementById('submitPost');
@@ -1027,8 +1181,7 @@
                     document.getElementById('fileName').textContent = '';
                     document.getElementById('typingPreview').classList.add('hidden');
                     
-                    state.replyTo = null; // Clear the UI mention state
-                    // Update placeholder based on current view (thread or board)
+                    state.replyTo = null; 
                     document.getElementById('postContent').placeholder = state.viewingThreadId 
                         ? `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}` 
                         : "Transmite tus pensamientos...";
@@ -1068,24 +1221,31 @@
             function updateUiForView() {
                 const postsContainer = document.getElementById('postsContainer');
                 const threadContainer = document.getElementById('threadContainer');
-                const postFormSection = document.querySelector('.neon-border.p-4.mb-8'); 
+                const postFormContainer = document.getElementById('postFormContainer');
                 const boardInfoSection = document.getElementById('boardInfo');
+                const tarotGameContainer = document.getElementById('tarotGameContainer');
 
-                if (state.viewingThreadId) {
+                if (state.currentBoard === 'tarot') {
+                    postsContainer.classList.add('hidden');
+                    threadContainer.classList.add('hidden');
+                    if (postFormContainer) postFormContainer.classList.add('hidden');
+                    if (boardInfoSection) boardInfoSection.classList.remove('hidden'); // Mantener info del tablero tarot
+                    tarotGameContainer.classList.remove('hidden');
+                } else if (state.viewingThreadId) {
                     postsContainer.classList.add('hidden');
                     threadContainer.classList.remove('hidden');
+                    if (postFormContainer) postFormContainer.classList.remove('hidden'); // Mostrar form para responder
                     if (boardInfoSection) boardInfoSection.classList.add('hidden');
-                    if (postFormSection) {
-                        document.getElementById('postContent').placeholder = `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}`;
-                    }
-                } else {
+                    tarotGameContainer.classList.add('hidden');
+                    document.getElementById('postContent').placeholder = `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}`;
+                } else { // Vista de tablero general (no tarot)
                     postsContainer.classList.remove('hidden');
                     threadContainer.classList.add('hidden');
                     threadContainer.innerHTML = ''; 
+                    if (postFormContainer) postFormContainer.classList.remove('hidden');
                     if (boardInfoSection) boardInfoSection.classList.remove('hidden');
-                     if (postFormSection) {
-                        document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
-                    }
+                    tarotGameContainer.classList.add('hidden');
+                    document.getElementById('postContent').placeholder = "Transmite tus pensamientos...";
                 }
             }
 
@@ -1112,6 +1272,7 @@
                 
                 updateUiForView(); 
 
+                const postsContainer = document.getElementById('postsContainer'); // Mover aquí para acceso general
                 if (state.viewingThreadId) {
                     const docRef = doc(db, "Posts", state.viewingThreadId);
                     unsubscribePosts = onSnapshot(docRef, (docSnap) => {
@@ -1120,11 +1281,11 @@
 
                         if (docSnap.exists()) {
                             const postData = { id: docSnap.id, ...docSnap.data() };
-                            const postElement = createPostElement(postData, true); 
+                            state.allPostsData[postData.id] = postData; // Actualizar caché global
+                            const postElement = createPostElement(postData, true, 0); // replyCount 0 para OP en vista de hilo
                             threadContainer.appendChild(postElement);
                             applyPostEffects(postData, postElement);
                             loadAndRenderReplies(postData.id, threadContainer); 
-                            state.allPosts = [postData]; 
                         } else {
                             threadContainer.innerHTML = '<p class="text-center text-red-400">Este post no existe o fue eliminado.</p>';
                             console.warn(`Post con ID ${state.viewingThreadId} no encontrado.`);
@@ -1138,50 +1299,64 @@
                         }
                     });
                 } else {
-                    // Simplified query for board view: only filter by board
-                    const q = query(postsCollectionRef, where("board", "==", state.currentBoard));
+                    // Consulta para OPs del tablero actual
+                    const q = query(postsCollectionRef, 
+                                    where("board", "==", state.currentBoard), 
+                                    where("replyTo", "==", null) 
+                                    // No se puede añadir orderBy("timestamp", "desc") aquí sin un índice compuesto.
+                                    // La ordenación se hará en el cliente.
+                                  );
                     unsubscribePosts = onSnapshot(q, (querySnapshot) => {
-                        const postsContainer = document.getElementById('postsContainer');
-                        let fetchedPosts = [];
+                        // postsContainer ya está definido arriba
+                        let fetchedOPs = [];
                         querySnapshot.forEach(docSnap => {
-                            fetchedPosts.push({ id: docSnap.id, ...docSnap.data() });
+                            const opData = { id: docSnap.id, ...docSnap.data() };
+                            fetchedOPs.push(opData);
+                            state.allPostsData[opData.id] = opData; // Actualizar caché global
                         });
 
-                        // Client-side filtering for top-level posts and sorting
-                        const topLevelPosts = fetchedPosts
-                            .filter(p => p.replyTo === null) // Show only parent posts
-                            .sort((a, b) => {
-                                const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-                                const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
-                                return timeB - timeA; // Descending for board view (newest first)
-                            });
+                        // Ordenar OPs en el cliente
+                        fetchedOPs.sort((a, b) => {
+                            const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
+                            const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+                            return timeB - timeA; 
+                        });
+                        
+                        state.currentBoardOPs = fetchedOPs; // Guardar OPs para el tablero actual
 
-                        state.allPosts = topLevelPosts; // Store only top-level posts for board view
-
-                        postsContainer.innerHTML = ''; 
-                        if (topLevelPosts.length === 0) {
+                        postsContainer.innerHTML = ''; // Asegurar limpieza para vista de tablero
+                        if (fetchedOPs.length === 0) {
                             postsContainer.innerHTML = '<p class="text-center col-span-full neon-text">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
                         } else {
-                            topLevelPosts.forEach(postData => {
-                                const postElement = createPostElement(postData, false);
-                                postsContainer.appendChild(postElement);
-                                applyPostEffects(postData, postElement);
+                            // Cargar todas las respuestas para calcular conteos
+                            const allRepliesQuery = query(postsCollectionRef, where("board", "==", state.currentBoard), where("replyTo", "!=", null));
+                            getDocs(allRepliesQuery).then(repliesSnapshot => {
+                                const replyCounts = {};
+                                repliesSnapshot.forEach(replyDoc => {
+                                    const replyData = replyDoc.data();
+                                    if (replyData.replyTo) {
+                                        replyCounts[replyData.replyTo] = (replyCounts[replyData.replyTo] || 0) + 1;
+                                        state.allPostsData[replyDoc.id] = {id: replyDoc.id, ...replyData}; // Cachear respuestas también
+                                    }
+                                });
+
+                                postsContainer.innerHTML = ''; // Limpiar por si acaso
+                                fetchedOPs.forEach(opData => {
+                                    const postElement = createPostElement(opData, false, replyCounts[opData.id] || 0);
+                                    postsContainer.appendChild(postElement);
+                                    applyPostEffects(opData, postElement);
+                                });
+                                if (fetchedOPs.length === 0 && postsContainer.innerHTML === '') { // Doble chequeo por si la promesa tarda
+                                     postsContainer.innerHTML = '<p class="text-center col-span-full neon-text">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
+                                }
                             });
                         }
                         
                         if (loadingMessage) loadingMessage.classList.add('hidden');
                     }, (error) => {
                         console.error("Error obteniendo posts del tablero:", error);
-                        // The user provided the error message, so we can assume this part is being hit.
-                        // The error is "The query requires an index".
-                        // This means the simplified query `where("board", "==", state.currentBoard)`
-                        // combined with onSnapshot's internal mechanisms might still be attempting
-                        // an implicit sort or operation that needs an index on just "board".
-                        // Or, the error is from a *previous* version of the query if the page wasn't fully reloaded.
-                        // For now, we keep the client-side filtering. If the error persists with just `where("board")`,
-                        // then an index on "board" (single field) would be needed.
                         if (loadingMessage) {
-                            loadingMessage.textContent = 'Error al cargar posts. Firestore podría requerir un índice. Revisa la consola.';
+                            loadingMessage.textContent = 'Error al cargar posts. Firestore podría requerir un índice para `board` y `replyTo`. Revisa la consola.';
                             loadingMessage.classList.remove('hidden');
                         }
                     });
@@ -1189,7 +1364,6 @@
             }
 
             async function loadAndRenderReplies(postId, threadContainerElement) {
-                // Simplified query for replies: only filter by replyTo
                 const repliesQuery = query(postsCollectionRef, where("replyTo", "==", postId));
                 
                 const oldRepliesContainer = threadContainerElement.querySelector('.replies-container');
@@ -1207,27 +1381,25 @@
                     querySnapshot.forEach(function(doc) { 
                         const replyData = { id: doc.id, ...doc.data() };
                         repliesData.push(replyData);
+                        state.allPostsData[replyData.id] = replyData; // Cachear respuesta
                     });
 
-                    // Client-side sorting for replies
                     repliesData.sort((a,b) => {
                         const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
                         const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
-                        return timeA - timeB; // Ascending for replies
+                        return timeA - timeB; 
                     });
 
                     repliesData.forEach(replyData => {
-                        const replyElement = createPostElement(replyData, false); 
+                        const replyElement = createPostElement(replyData, false, 0); // Las respuestas no muestran conteo de sub-respuestas
                         repliesContainer.appendChild(replyElement);
                         applyPostEffects(replyData, replyElement);
                     });
-
-                    // Update state.allPosts to include these replies for preview functionality within the thread
-                    const parentPostIndex = state.allPosts.findIndex(p => p.id === postId);
-                    if (parentPostIndex !== -1) {
-                        // Remove old replies for this parent, then add new ones
-                        state.allPosts = state.allPosts.filter(p => p.replyTo !== postId);
-                        state.allPosts.push(...repliesData);
+                    
+                    // Actualizar contador de respuestas en el OP del hilo
+                    const opElementInThread = threadContainerElement.querySelector(`.post[data-id="${postId}"] .reply-count-display`);
+                    if (opElementInThread) {
+                        opElementInThread.textContent = repliesData.length;
                     }
 
 
@@ -1254,7 +1426,7 @@
                 if (content.includes('dimensión') || content.includes('realidad')) element.classList.add('dimension-glow');
             }
 
-            function createPostElement(post, isThreadParent = false) {
+            function createPostElement(post, isThreadParent = false, replyCount = 0) {
                 const postElement = document.createElement('div');
                 postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
                 postElement.dataset.id = post.id; 
@@ -1266,18 +1438,25 @@
                 const postTimestamp = post.timestamp?.toDate ? post.timestamp.toDate() : new Date(post.timestamp);
                 const timeString = postTimestamp.toLocaleTimeString ? postTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
                 const contentHtml = getPostContentHtml(post);
-                const replyIndicator = post.replyTo && !isThreadParent ? 
-                    `<div class="reply-indicator mb-2">
-                        <span class="text-xs text-gray-400">Respondiendo a </span>
-                        <span class="reply-link text-xs" data-post-id="${post.replyTo}">>>${post.replyTo.slice(-4)}</span>
-                    </div>` : '';
-                const titleHtml = post.title ? `<h4 class="text-lg font-bold mb-1 neon-text">${DOMPurify.sanitize(post.title)}</h4>` : '';
+                
+                // El indicador de respuesta >>ID se maneja en getPostContentHtml
+                // const replyIndicator = post.replyTo && !isThreadParent ? ... (eliminado)
+
+                // Usar neon-text-title para el título del post
+                const titleHtml = post.title ? `<h4 class="text-lg font-bold mb-1 neon-text-title">${DOMPurify.sanitize(post.title)}</h4>` : '';
 
                 const canShowEditButton = state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid);
                 
+                // Botón "Ver Hilo" solo para OPs en la vista de tablero.
+                // No mostrar "Volver al tablero".
                 const threadViewButtonHtml = !state.viewingThreadId && !post.replyTo ? 
                     `<button class="view-thread-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Ver hilo">Ver Hilo</button>` :
-                    (isThreadParent ? `<button class="back-to-board-button text-xs px-2 py-1 border border-gray-500 text-gray-400" aria-label="Volver al tablero">Volver al Tablero</button>` : '');
+                    ''; 
+                
+                // Mostrar contador de respuestas para OPs
+                const replyCountHtml = !post.replyTo ? // Solo para OPs
+                    `<span class="text-xs text-gray-400 ml-2">Respuestas: <span class="reply-count-display">${replyCount}</span></span>` : '';
+
 
                 postElement.innerHTML = `
                     <div class="flex items-start mb-2">
@@ -1286,9 +1465,9 @@
                             <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
                             <span class="text-xs text-gray-400 ml-2">${timeString}</span>
                             ${post.authorUID === auth.currentUser?.uid ? '<span class="text-xs text-acid-green ml-2">(Tú)</span>' : ''}
+                            ${replyCountHtml}
                         </div>
                     </div>
-                    ${replyIndicator}
                     ${titleHtml}
                     <div class="post-content text-sm mb-2 mt-1">${contentHtml}</div> 
                     <div class="flex justify-between items-center">
@@ -1336,7 +1515,7 @@
                     link.addEventListener('mouseenter', () => showReplyPreview(link.dataset.postId, link));
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        viewThread(link.dataset.postId);
+                        viewThread(link.dataset.postId); // El postId aquí es el ID del OP del hilo al que se hace referencia
                     });
                 });
 
@@ -1344,15 +1523,11 @@
                 if (viewThreadBtn) {
                     viewThreadBtn.addEventListener('click', () => viewThread(post.id));
                 }
-                const backToBoardBtn = postElement.querySelector('.back-to-board-button');
-                if (backToBoardBtn) {
-                    backToBoardBtn.addEventListener('click', () => window.location.hash = `board=${state.currentBoard}`);
-                }
                 return postElement;
             }
 
             function showReplyPreview(postId, element) {
-                const post = state.allPosts.find(p => p.id === postId); 
+                const post = state.allPostsData[postId]; // Buscar en el caché global
                 if (!post) {
                     console.warn(`Post ${postId} no encontrado para preview.`);
                     return;
@@ -1374,7 +1549,9 @@
             }
 
             function replyToPost(postId) {
-                state.replyTo = postId; // Store the ID of the post the user *clicked* reply on
+                // postId es el ID del post al que se hizo clic "Responder"
+                // Esto es para el feedback visual (>>ID)
+                state.replyTo = postId; 
                 document.getElementById('postContent').placeholder = `Respondiendo a >>${postId.slice(-4)}... `;
                 document.getElementById('postContent').focus();
             }
@@ -1406,11 +1583,11 @@
                 const contentDiv = postElement.querySelector('.post-content');
                 if (contentDiv) contentDiv.innerHTML = getPostContentHtml(postData);
 
-                let titleElement = postElement.querySelector('h4.neon-text');
+                let titleElement = postElement.querySelector('h4.neon-text-title');
                 if (postData.title) {
                     if (!titleElement) { 
                         titleElement = document.createElement('h4');
-                        titleElement.className = 'text-lg font-bold mb-1 neon-text';
+                        titleElement.className = 'text-lg font-bold mb-1 neon-text-title';
                         if (contentDiv && contentDiv.parentNode) { 
                            contentDiv.parentNode.insertBefore(titleElement, contentDiv);
                         } else if (postElement.querySelector('.flex.items-start.mb-2').nextSibling) { 
@@ -1432,9 +1609,27 @@
                 const textContent = typeof post.text === 'string' ? post.text : '';
                 let sanitizedText = DOMPurify.sanitize(textContent).replace(/\n/g,'<br>');
                 
-                sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, idSuffixOrFullId) => {
-                    return `<a href="#board=${post.board}&post=${idSuffixOrFullId}" class="reply-link text-cyan-400" data-post-id="${idSuffixOrFullId}">>>${idSuffixOrFullId.slice(-4)}</a>`;
+                // Convertir >>ID a links que apuntan al hilo del post referenciado
+                sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
+                    // Intentar encontrar el post completo para obtener su 'board' y 'replyTo' (si es una respuesta) o su propio 'id' (si es un OP)
+                    // Esta parte es compleja porque necesitaríamos saber si referencedPostIdSuffix es un OP o una respuesta
+                    // y a qué hilo pertenece para construir el enlace correctamente.
+                    // Por simplicidad, si el referencedPostIdSuffix es un OP, el enlace es directo.
+                    // Si es una respuesta, idealmente el enlace debería ir al hilo del OP de esa respuesta.
+                    // Para esta versión, enlazaremos directamente al post si lo encontramos, o al sufijo.
+                    // La navegación real al hilo se maneja al hacer clic.
+                    const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
+                    const targetPostId = fullReferencedPost ? fullReferencedPost.id : referencedPostIdSuffix;
+                    const targetBoard = fullReferencedPost ? fullReferencedPost.board : state.currentBoard; // Asumir tablero actual si no se encuentra
+                    
+                    // El enlace debe apuntar al hilo del post al que se hace referencia.
+                    // Si el post referenciado es un OP, targetPostId es el ID del hilo.
+                    // Si el post referenciado es una respuesta, su campo replyTo es el ID del hilo.
+                    const threadLinkTargetId = fullReferencedPost ? (fullReferencedPost.replyTo || fullReferencedPost.id) : targetPostId;
+
+                    return `<a href="#board=${targetBoard}&post=${threadLinkTargetId}" class="reply-link text-cyan-400" data-post-id="${targetPostId}">>>${referencedPostIdSuffix.slice(-4)}</a>`;
                 });
+
 
                 if (post.text) { 
                     html += `<p>${sanitizedText}</p>`;
@@ -1514,7 +1709,7 @@
                     state.viewingThreadId = null; 
                     window.location.hash = `board=${board}`;
                 } else {
-                    loadAndRenderPostsRealtime();
+                    loadContentForBoard(); // Cargar contenido específico del tablero (posts o tarot)
                 }
             }
 
@@ -1528,7 +1723,8 @@
                 if (state.viewingThreadId) {
                     loadAndRenderPostsRealtime(); 
                 } else {
-                    renderBoardPosts(state.allPosts); 
+                    // Re-render OPs del tablero, el contador de respuestas se recalculará
+                    loadAndRenderPostsRealtime();
                 }
             }
 
@@ -1684,11 +1880,16 @@
                     if (adminToggleBtn) adminToggleBtn.classList.add('text-pink-400'); 
                 } else {
                     if (adminLogoutBtn) adminLogoutBtn.style.display = 'none';
-                    if (adminToggleBtn) adminToggleBtn.classList.remove('text-pink-400');
+                    if (adminToggleBtn) adminToggleBtn.classList.remove('text-pink-400'); 
                 }
-                if (state.viewingThreadId) {
-                } else {
-                    renderBoardPosts(state.allPosts); 
+                // La visibilidad de los botones de admin en cada post se maneja en createPostElement.
+                // Forzar una actualización de los posts visibles para reflejar los cambios de admin.
+                if (state.currentBoard !== 'tarot' && (state.viewingThreadId || state.currentBoardOPs.length > 0)) {
+                    // Re-renderizar solo si hay posts que mostrar y no estamos en tarot.
+                    // Esto es para asegurar que los botones de admin en los posts se actualicen.
+                    // Si estamos en vista de hilo, onSnapshot se encarga.
+                    // Si estamos en vista de tablero, necesitamos re-renderizar los OPs.
+                    loadAndRenderPostsRealtime(); // Esto podría ser optimizado para solo actualizar los botones.
                 }
             }
             function toggleAdminModal() {
@@ -1754,7 +1955,7 @@
             function closeGenericModal() { document.getElementById('genericModal').classList.remove('flex'); }
 
             function openEditModal(postId) {
-                const postToEdit = state.allPosts.find(p => p.id === postId);
+                const postToEdit = state.allPostsData[postId]; // Buscar en el caché global
                 if (!postToEdit) { showGenericModal("Error", "Post no encontrado para editar.", [{ text: 'OK', action: closeGenericModal }]); return; }
 
                 if (!state.isAdmin && !(postToEdit.passwordHash && postToEdit.authorUID === auth.currentUser?.uid)) {
@@ -1895,6 +2096,105 @@
                     }
                 }
             }
+
+            // --- Funciones del Juego de Tarot ---
+            function setupTarotGame() {
+                console.log("Configurando juego de Tarot...");
+                updateUiForView(); // Asegura que se muestre el contenedor correcto
+                state.tarotDeck = [...tarotDeckData]; // Copia fresca del mazo
+                shuffleAndDealTarot(); // Barajar y repartir al entrar al tablero
+            }
+
+            function shuffleArray(array) { // Algoritmo Fisher-Yates
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function shuffleAndDealTarot() {
+                const spreadContainer = document.getElementById('tarotSpreadContainer');
+                const cardInfoDisplay = document.getElementById('tarotCardInfoDisplay');
+                spreadContainer.innerHTML = '';
+                if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
+
+
+                shuffleArray(state.tarotDeck);
+                state.tarotSpread = state.tarotDeck.slice(0, 15); // 5 + 4 + 3 + 2 + 1 = 15 cartas
+
+                let cardIndex = 0;
+                const rows = [5, 4, 3, 2, 1];
+                rows.forEach(numCardsInRow => {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'tarot-row';
+                    for (let i = 0; i < numCardsInRow; i++) {
+                        if (cardIndex < state.tarotSpread.length) {
+                            const cardData = state.tarotSpread[cardIndex];
+                            const cardElement = document.createElement('div');
+                            cardElement.className = 'tarot-card';
+                            cardElement.dataset.cardIndex = cardIndex; // Guardar el índice en la tirada actual
+                            
+                            cardElement.innerHTML = `
+                                <div class="card-face card-back">🔮</div>
+                                <div class="card-face card-front">
+                                    <img src="${cardData.urlcart}" alt="${cardData.namecart}" class="tarot-image-display"/>
+                                    <div class="tarot-info-overlay">
+                                        <p style="font-weight: bold; font-size: 0.7rem;">${cardData.namecart}</p>
+                                    </div>
+                                </div>`;
+                            
+                            cardElement.addEventListener('click', () => flipTarotCard(cardElement, cardData));
+                            rowDiv.appendChild(cardElement);
+                            cardIndex++;
+                        }
+                    }
+                    spreadContainer.appendChild(rowDiv);
+                });
+            }
+
+            function flipTarotCard(cardElement, cardData) {
+                const isFlipped = cardElement.classList.toggle('flipped');
+                const cardInfoDisplay = document.getElementById('tarotCardInfoDisplay');
+
+                if (isFlipped) {
+                    // Mostrar información detallada en el contenedor separado
+                    document.getElementById('tarotCardNameInfo').textContent = cardData.namecart;
+                    document.getElementById('tarotCardImageInfo').src = cardData.urlcart;
+                    document.getElementById('tarotCardImageInfo').alt = cardData.namecart;
+                    document.getElementById('tarotMeaningUpInfo').textContent = cardData.significado1cart;
+                    document.getElementById('tarotMeaningRevInfo').textContent = cardData.significado2cart; // Asumiendo que sig2 es invertida
+                    document.getElementById('tarotQuestionInfo').textContent = cardData.significado3cart; // Asumiendo que sig3 es pregunta
+                    
+                    if (cardInfoDisplay) cardInfoDisplay.classList.remove('hidden');
+                    
+                    // Des-seleccionar otras cartas si alguna estaba seleccionada
+                    document.querySelectorAll('.tarot-card.selected-for-info').forEach(c => {
+                        if (c !== cardElement) c.classList.remove('selected-for-info');
+                    });
+                    cardElement.classList.add('selected-for-info');
+
+
+                } else {
+                    // Si se vuelve a hacer clic para ocultar, o si se hace clic en otra carta
+                    if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
+                    cardElement.classList.remove('selected-for-info');
+                }
+            }
+
+            function resetTarotSpread() {
+                showGenericModal(
+                    "Resetear Tirada",
+                    "Si vas a resetear espera media hora pues la fluctuación cuántica podría mentirte. ¿Estás seguro?",
+                    [
+                        { text: 'Cancelar', action: closeGenericModal },
+                        { text: 'Sí, Resetear', class: 'bg-red-500 text-white', action: () => {
+                            shuffleAndDealTarot();
+                            closeGenericModal();
+                        }}
+                    ]
+                );
+            }
+
              console.log("Script principal IIFE ejecutado completamente.");
         })();
     </script>
