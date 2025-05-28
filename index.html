@@ -3,396 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d0221" id="themeColorMeta">
+    <meta name="theme-color" content="#FFFFFF" id="themeColorMeta">
     <title>🧠 NeuroChan: Tableros de la Mente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js" defer></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
         :root {
-            --neon-cyan: #0ff0fc;
-            --neon-magenta: #ff00ff;
-            --electric-blue: #0453fa;
-            --glitch-pink: #ff2a6d;
-            --dark-matter: #0d0221;
-            --acid-green: #00ff9d;
-            --deep-purple: #6a00f4;
-            --light-bg: #f0f4f8;
-            --light-text: #1a1a1a;
-            --border-color: #0ff0fc;
-            --text-primary: #0ff0fc;
-            --bg-primary: #0d0221;
+            --app-bg: #F0F2F5; 
+            --card-bg: #FFFFFF;
+            --text-primary-color: #050505; 
+            --text-secondary-color: #65676B; 
+            --text-tertiary-color: #8A8D91; 
+            --border-color-light: #CED0D4; 
+            --border-color-strong: #BCC0C4;
+            --divider-color: #E4E6EB;
+            /* Colores corporativos actualizados */
+            --primary-accent-color: #6a0dad; 
+            --primary-accent-hover-color: #590bb3;
+            --danger-color: #E02C4A; 
+            --success-color: #31A24C; 
+            --icon-color: #606770;
+            --icon-bg-hover: #E4E6EB;
+            --button-secondary-bg: #E4E6EB;
+            --button-secondary-text: #050505;
+            --button-secondary-hover-bg: #D8DADF;
+            --link-color: var(--primary-accent-color);
+
+            --dark-app-bg: #18191A;
+            --dark-card-bg: #242526;
+            --dark-text-primary-color: #E4E6EB;
+            --dark-text-secondary-color: #B0B3B8;
+            --dark-text-tertiary-color: #A0A3A7;
+            --dark-border-color-light: #3E4042;
+            --dark-border-color-strong: #4E4F50;
+            --dark-divider-color: #3A3B3C;
+            --dark-icon-color: #B0B3B8;
+            --dark-icon-bg-hover: #3A3B3C;
+            --dark-button-secondary-bg: #3A3B3C;
+            --dark-button-secondary-text: #E4E6EB;
+            --dark-button-secondary-hover-bg: #4E5052;
         }
 
-        body.pink-theme {
-            --neon-cyan: #FF00FF;      
-            --neon-magenta: #FF69B4;   
-            --electric-blue: #C71585;  
-            --glitch-pink: #FF1493;    
-            --text-primary: #FF00FF;   
-            --bg-primary: #3D001D;     
-            --border-color: #FF00FF;   
+        body.dark-theme {
+            --app-bg: var(--dark-app-bg);
+            --card-bg: var(--dark-card-bg);
+            --text-primary-color: var(--dark-text-primary-color);
+            --text-secondary-color: var(--dark-text-secondary-color);
+            --text-tertiary-color: var(--dark-text-tertiary-color);
+            --border-color-light: var(--dark-border-color-light);
+            --border-color-strong: var(--dark-border-color-strong);
+            --divider-color: var(--dark-divider-color);
+            --icon-color: var(--dark-icon-color);
+            --icon-bg-hover: var(--dark-icon-bg-hover);
+            --button-secondary-bg: var(--dark-button-secondary-bg);
+            --button-secondary-text: var(--dark-button-secondary-text);
+            --button-secondary-hover-bg: var(--dark-button-secondary-hover-bg);
         }
 
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            background-image: 
-                linear-gradient(rgba(9, 1, 31, 0.8), rgba(9, 1, 31, 0.8)),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="10" height="10" x="0" y="0" fill="%230ff0fc" opacity="0.1"/></svg>');
-            background-size: 20px 20px;
-            animation: scanlines 0.5s linear infinite;
-            transition: background-color 0.5s, color 0.5s;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url('https://images.unsplash.com/photo-1549921296-3ec74c52753f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-            opacity: .25;
-            mix-blend-mode: overlay;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .post-content {
             font-family: 'Inter', sans-serif;
-            max-width: 65ch;
-            word-wrap: break-word; 
+            background-color: var(--app-bg);
+            color: var(--text-primary-color);
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        @keyframes scanlines {
-            from { background-position: 0 0; }
-            to { background-position: 0 20px; }
-        }
-
-        .glitch {
-            position: relative;
-        }
-
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
+        .app-header {
+            background-color: var(--card-bg);
+            padding: 0.75rem 1rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            z-index: 100;
         }
 
-        .glitch::before {
-            color: var(--glitch-pink);
-            animation: glitch-effect 3s infinite;
-            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        .app-header h1 a {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-accent-color);
+            text-decoration: none;
+        }
+        .app-header h1 a:hover {
+            opacity: 0.8;
+        }
+        
+        .app-header #boardTitle {
+            font-size: 1rem;
+            color: var(--text-secondary-color);
         }
 
-        .glitch::after {
-            color: var(--electric-blue);
-            animation: glitch-effect 2s infinite reverse;
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-        }
-
-        @keyframes glitch-effect {
-            0% { transform: translate(0); }
-            20% { transform: translate(-3px, 3px); }
-            40% { transform: translate(-3px, -3px); }
-            60% { transform: translate(3px, 3px); }
-            80% { transform: translate(3px, -3px); }
-            100% { transform: translate(0); }
-        }
-
-        .neon-text {
-            color: var(--text-primary); 
-            text-shadow: 
-                0 0 5px var(--neon-cyan),
-                0 0 10px var(--neon-cyan),
-                0 0 20px var(--neon-cyan);
-        }
-        /* Reducción del neón para títulos de posts */
-        .post .neon-text-title { 
-            color: var(--text-primary);
-            text-shadow: 
-                0 0 3px var(--neon-cyan), /* Reducido */
-                0 0 7px var(--neon-cyan),  /* Reducido */
-                0 0 15px var(--neon-cyan); /* Reducido */
-        }
-
-
-        .neon-border {
-            border: 1px solid var(--border-color); 
-            box-shadow: 
-                0 0 5px var(--neon-cyan),
-                0 0 10px var(--neon-cyan),
-                inset 0 0 5px var(--neon-cyan),
-                inset 0 0 10px var(--neon-cyan);
-        }
-
-        .neon-button {
-            transition: all 0.3s;
-        }
-
-        .neon-button:hover {
-            box-shadow: 
-                0 0 10px var(--neon-magenta),
-                0 0 20px var(--neon-magenta),
-                inset 0 0 10px var(--neon-magenta);
-            transform: scale(1.05);
-        }
-
-        .post {
-            animation: fadeIn 0.5s ease-out, float 15s ease-in-out infinite;
-            transition: all 0.5s;
-            transform-origin: top center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(-1deg); }
-            50% { transform: translateY(-10px) rotate(1deg); }
-        }
-
-        .avatar {
-            filter: 
-                sepia(100%)
-                hue-rotate(180deg)
-                saturate(500%)
-                contrast(1.5)
-                drop-shadow(0 0 5px var(--neon-magenta));
-        }
-
-        .fractal-bg {
-            background: 
-                radial-gradient(circle at 20% 30%, var(--electric-blue), transparent 50%),
-                radial-gradient(circle at 80% 70%, var(--glitch-pink), transparent 50%),
-                linear-gradient(45deg, var(--dark-matter), #1a0538);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-            100% { background-position: 0% 0%; }
-        }
-
-        .typing-effect::after {
-            content: "|";
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink {
-            from, to { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        .crt-effect {
-            position: relative;
-        }
-
-        .crt-effect::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-
-        .dream-glow {
-            animation: dreamPulse 3s infinite alternate;
-        }
-
-        @keyframes dreamPulse {
-            0% { box-shadow: 0 0 5px var(--acid-green); }
-            100% { box-shadow: 0 0 20px var(--acid-green); }
-        }
-
-        .tech-glow {
-            animation: techPulse 3s infinite alternate;
-        }
-
-        @keyframes techPulse {
-            0% { box-shadow: 0 0 5px var(--electric-blue); }
-            100% { box-shadow: 0 0 20px var(--electric-blue); }
-        }
-
-        .dimension-glow {
-            animation: dimensionPulse 3s infinite alternate;
-        }
-
-        @keyframes dimensionPulse {
-            0% { box-shadow: 0 0 5px var(--deep-purple); }
-            100% { box-shadow: 0 0 20px var(--deep-purple); }
-        }
-
-        .transmission-effect {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .transmission-effect::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                to bottom,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            animation: transmissionScan 2s linear; 
-        }
-
-        @keyframes transmissionScan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
+        .board-selectors-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .board-selector {
-            transition: all 0.3s;
+            font-weight: 500;
+            padding: 0.625rem 1rem;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            color: var(--text-secondary-color);
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
 
         .board-selector:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+            background-color: var(--button-secondary-hover-bg);
+            color: var(--text-primary-color);
         }
 
         .board-selector.active {
-            background-color: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 10px var(--neon-cyan);
+            background-color: var(--primary-accent-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .board-selector.active:hover {
+            background-color: var(--primary-accent-hover-color);
         }
 
-        .reaction-button {
-            transition: all 0.3s;
+        #boardInfo {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        #boardInfo h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary-color);
+            margin-bottom: 0.5rem;
+        }
+        #boardInfo p {
+            color: var(--text-secondary-color);
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
-        .reaction-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px var(--neon-magenta);
+        .post-form-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
-        .reaction-button.active {
-            color: var(--neon-magenta);
-            text-shadow: 0 0 5px var(--neon-magenta);
+        .post-form-card .input-field {
+            background-color: transparent;
+            border: 1px solid var(--border-color-light);
+            color: var(--text-primary-color);
+            border-radius: 6px;
+            padding: 0.625rem 0.75rem;
+            width: 100%;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .file-upload-label {
-            transition: all 0.3s;
+        .post-form-card .input-field::placeholder {
+            color: var(--text-secondary-color);
         }
-
-        .file-upload-label:hover {
-            box-shadow: 0 0 10px var(--acid-green);
-            border-color: var(--acid-green);
-        }
-
-        .theme-toggle {
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            box-shadow: 0 0 10px var(--neon-magenta);
+        .post-form-card .input-field:focus {
+            outline: none;
+            border-color: var(--primary-accent-color);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
         }
 
-        [aria-hidden="true"] {
-            visibility: hidden;
+        .post-input-area {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .post-input-area .avatar {
+            flex-shrink: 0;
         }
 
-        button:focus, input:focus, textarea:focus {
-            outline: 2px solid var(--acid-green);
-            outline-offset: 2px;
+        .post-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--app-bg); 
+            border: 1px solid var(--border-color-light);
+            color: var(--text-primary-color);
+            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            resize: none;
+            min-height: 40px;
+            line-height: 1.3;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+        .post-input-area textarea::placeholder {
+            color: var(--text-secondary-color);
+        }
+        .post-input-area textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent-color);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+            background-color: var(--card-bg);
+        }
+        .post-input-area textarea:focus.focus\:ring-0 {
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .post-actions-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--divider-color);
+        }
+        .icon-button {
+            background-color: var(--button-secondary-bg);
+            color: var(--icon-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .icon-button:hover {
+            background-color: var(--button-secondary-hover-bg);
+            color: var(--text-primary-color);
+        }
+        .icon-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        .icon-button.submit-button {
+            background-color: var(--primary-accent-color);
+            color: #FFFFFF;
+        }
+        .icon-button.submit-button:hover {
+            background-color: var(--primary-accent-hover-color);
+        }
+        .icon-button.submit-button:disabled {
+            background-color: var(--button-secondary-bg);
+            color: var(--text-secondary-color);
+            cursor: not-allowed;
         }
 
         .emoji-picker {
             display: none;
             position: absolute;
             top: 100%;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
+            right: 0; 
+            width: 280px; 
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 0.75rem; 
             z-index: 50;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 0.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); 
+            gap: 0.25rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         .emoji-picker.active {
             display: grid;
         }
-
         .emoji-option {
-            font-size: 1.5rem;
+            font-size: 1.5rem; 
             cursor: pointer;
             text-align: center;
-            padding: 0.25rem;
-            border-radius: 0.25rem;
+            padding: 0.25rem; 
+            border-radius: 4px;
+            transition: background-color 0.2s;
         }
-
         .emoji-option:hover {
-            background-color: rgba(0, 255, 255, 0.2);
+            background-color: var(--icon-bg-hover);
         }
 
-        .reply-indicator {
-            border-left: 2px solid var(--neon-cyan);
-            padding-left: 1rem;
-            margin-left: 1rem;
+        .file-upload-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.625rem 1rem;
+            background-color: var(--button-secondary-bg);
+            color: var(--button-secondary-text);
+            border: 1px solid var(--border-color-light);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .file-upload-label:hover {
+            background-color: var(--button-secondary-hover-bg);
+            border-color: var(--border-color-strong);
+        }
+        .file-upload-label svg { 
+            margin-right: 0.5rem;
         }
 
-        .reply-link {
-            color: var(--neon-cyan);
-            text-decoration: underline;
+
+        .primary-button {
+            background-color: var(--primary-accent-color);
+            color: #FFFFFF;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            transition: background-color 0.2s;
             cursor: pointer;
         }
-
-        .reply-link:hover {
-            color: var(--neon-magenta);
+        .primary-button:hover {
+            background-color: var(--primary-accent-hover-color);
+        }
+        .primary-button svg {
+            margin-right: 0.5rem;
         }
 
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            text-align: center;
+        .secondary-button {
+            background-color: var(--button-secondary-bg);
+            color: var(--button-secondary-text);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
             border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
+            border: 1px solid var(--border-color-light);
+            transition: background-color 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .secondary-button:hover {
+            background-color: var(--button-secondary-hover-bg);
+            border-color: var(--border-color-strong);
         }
 
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
+        .post {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+            animation: fadeIn 0.5s ease-out; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .post-avatar { 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+            background-color: var(--app-bg); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem; 
+            color: var(--text-primary-color); 
+            cursor: pointer;
+        }
+        .post-userinfo {
+            display: flex;
+            flex-direction: column;
+        }
+        .post-username {
+            font-weight: 600;
+            color: var(--text-primary-color);
+            font-size: 0.95rem;
+        }
+        .post-timestamp {
+            font-size: 0.8rem;
+            color: var(--text-secondary-color);
+        }
+
+        .post .post-title { 
+            font-size: 1.15rem; 
+            font-weight: 600;
+            color: var(--text-primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+
+        .post-content { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-primary-color);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            margin-bottom: 0.75rem;
+        }
+        .post-content img { 
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            border: 1px solid var(--border-color-light);
+        }
+        .post-image-container { 
+            margin: 0.75rem 0;
+        }
+        .post-image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 500px; 
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color-light);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--divider-color);
+            margin-top: 1rem;
+        }
+        .reaction-button {
+            background: none;
+            border: none;
+            color: var(--icon-color);
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .reaction-button svg { 
+            width: 18px;
+            height: 18px;
+            margin-right: 0.375rem;
+        }
+        .reaction-button:hover {
+            background-color: var(--icon-bg-hover);
+            color: var(--text-primary-color);
+        }
+        .reaction-button.active {
+            color: var(--primary-accent-color);
+            font-weight: 600;
+        }
+        .reaction-button.delete {
+            color: var(--danger-color);
+        }
+         .reaction-button.delete:hover {
+            background-color: rgba(224, 44, 74, 0.1);
         }
 
         .modal {
@@ -402,127 +468,264 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); 
+            background-color: rgba(0, 0, 0, 0.6); 
             z-index: 1000; 
             justify-content: center;
             align-items: center;
         }
-        
         .modal.flex { 
             display: flex;
         }
-
         .modal-content {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            border-radius: 0.5rem;
-            max-width: 400px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            max-width: 450px;
             width: 90%;
+        }
+        .modal-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary-color);
+        }
+        .modal-content p {
+            font-size: 0.95rem;
+            color: var(--text-secondary-color);
+            margin-bottom: 1rem;
+        }
+        .modal-content input[type="password"],
+        .modal-content input[type="text"],
+        .modal-content textarea {
+             background-color: var(--app-bg);
+             border: 1px solid var(--border-color-light);
+             color: var(--text-primary-color);
+             border-radius: 6px;
+             padding: 0.625rem;
+             margin-bottom: 1rem;
+        }
+        .modal-content input[type="password"]:focus,
+        .modal-content input[type="text"]:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent-color);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+        .modal-content .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
         }
 
         .admin-panel {
             position: fixed;
             top: 1rem;
             right: 1rem;
-            z-index: 40;
+            z-index: 1001; 
+            display: flex; 
+            gap: 0.5rem; 
         }
-
-        .admin-toggle {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+        .admin-toggle, #audioToggle {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            color: var(--icon-color);
             padding: 0.5rem;
             border-radius: 50%;
             cursor: pointer;
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, box-shadow 0.2s;
         }
-
-        .admin-toggle:hover {
-            background-color: rgba(0, 255, 255, 0.2);
+        .admin-toggle:hover, #audioToggle:hover {
+            background-color: var(--icon-bg-hover);
+            box-shadow: 0 3px 7px rgba(0,0,0,0.15);
         }
-
-        .admin-modal {
-            display: none; 
+        #audioToggle { 
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000; 
-            justify-content: center;
-            align-items: center;
+            bottom: 1rem;
+            right: 1rem;
         }
-        .admin-modal.flex { 
-            display: flex;
-        }
-
-        .admin-modal-content {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            border-radius: 0.5rem;
-            max-width: 400px;
-            width: 90%;
+         #audioToggle svg {
+            width: 20px; height: 20px;
+            color: var(--icon-color);
+         }
+         .admin-toggle svg, #adminLogoutButton svg {
+             width: 20px; height: 20px;
+         }
+         #adminLogoutButton.admin-toggle {
+             color: var(--danger-color);
+         }
+         #adminLogoutButton.admin-toggle:hover {
+             background-color: rgba(224, 44, 74, 0.1);
+         }
+        #settingsToggle { 
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0; 
+            width: 280px; 
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 0.75rem; 
+            z-index: 50;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); 
+            gap: 0.25rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .emoji-picker.active {
+            display: grid;
+        }
+        .emoji-option {
+            font-size: 1.5rem; 
+            cursor: pointer;
+            text-align: center;
+            padding: 0.25rem; 
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .emoji-option:hover {
+            background-color: var(--icon-bg-hover);
         }
 
-        .pulse {
-            animation: pulse 0.5s ease;
+        .reply-indicator {
+            border-left: 3px solid var(--primary-accent-color);
+            padding-left: 1rem; 
+            margin-left: 0; 
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(106, 13, 173, 0.05);
+            border-radius: 0 4px 4px 0;
+        }
+        .reply-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .reply-link:hover {
+            text-decoration: underline;
+            color: var(--primary-accent-hover-color);
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: #333; 
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 6px 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.8rem; 
+            white-space: nowrap;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         #loadingMessage {
             text-align: center;
-            font-size: 1.2rem;
-            padding: 2rem;
-            color: var(--neon-cyan);
+            font-size: 1rem; 
+            padding: 2rem; 
+            color: var(--text-secondary-color);
         }
 
-        /* Estilos para el juego de Tarot */
+        /* Estilos para el juego de Tarot (modernizado) */
         #tarotGameContainer {
-            /* Estilos para el contenedor principal del juego si son necesarios */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 1.5rem; 
+            margin-top: 1.5rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
+        #tarotGameContainer h2 {
+            font-size: 1.5rem; 
+            font-weight: 600;
+            color: var(--text-primary-color);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        #tarotInitialCardContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            min-height: 150px; 
+        }
+        .tarot-initial-card {
+            width: 100px;
+            height: 150px;
+            background-color: var(--app-bg);
+            border: 2px solid var(--primary-accent-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-accent-color);
+            cursor: default; 
+            transition: transform 0.6s ease-in-out, opacity 0.3s;
+            transform-style: preserve-3d;
+        }
+        @keyframes spinAndFade {
+            0% { transform: rotateY(0deg) scale(1); opacity: 1; }
+            50% { transform: rotateY(180deg) scale(1.1); opacity: 0.8; }
+            100% { transform: rotateY(360deg) scale(0.5); opacity: 0; }
+        }
+
+
         #tarotSpreadContainer {
-            display: flex; /* Usar flex para centrar las filas */
-            flex-direction: column; /* Apilar filas verticalmente */
-            align-items: center; /* Centrar filas horizontalmente */
-            gap: 0.5rem; /* Espacio entre filas */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem; 
             margin-top: 1rem;
             margin-bottom: 1rem;
         }
         .tarot-row {
             display: flex;
             justify-content: center;
-            gap: 0.5rem; /* Espacio entre cartas en una fila */
+            gap: 0.75rem; 
         }
         .tarot-card {
-            width: 80px; /* Ancho de la carta */
-            height: 120px; /* Alto de la carta */
-            background-color: var(--deep-purple); /* Color de dorso */
-            border: 2px solid var(--neon-cyan);
+            width: 80px;
+            height: 120px;
+            border: 1px solid var(--border-color-strong);
             border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.5s, box-shadow 0.3s;
+            transition: transform 0.6s, box-shadow 0.3s;
             perspective: 1000px;
-            position: relative; /* Para el contenido superpuesto */
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transform-style: preserve-3d; 
+            opacity: 0; 
+            transform: translateY(20px); 
         }
+         .tarot-card.placed { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .tarot-card:hover {
-            box-shadow: 0 0 15px var(--neon-magenta);
-            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         .tarot-card .card-face {
             position: absolute;
@@ -533,172 +736,317 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 6px; /* Para que coincida con el borde de la carta */
-            overflow: hidden; /* Para que el contenido no se salga */
+            border-radius: 7px; 
+            overflow: hidden;
         }
         .tarot-card .card-back {
-            background-color: var(--deep-purple); /* Color del dorso */
-            /* Podrías añadir un patrón o icono al dorso aquí */
-            color: var(--neon-cyan);
+            background-color: var(--app-bg); 
+            color: var(--text-secondary-color);
             font-size: 2rem;
+            transform: rotateY(0deg); 
         }
         .tarot-card .card-front {
-            background-color: var(--bg-primary); /* Fondo cuando está volteada */
-            transform: rotateY(180deg);
+            background-color: var(--card-bg); 
+            transform: rotateY(180deg); 
             padding: 5px;
             box-sizing: border-box;
         }
-        .tarot-card.flipped {
+        .tarot-card.flipped .card-back {
             transform: rotateY(180deg);
         }
-        .tarot-card img.tarot-image-display {
-            max-width: 90%;
-            max-height: 60%; /* Ajusta según necesites espacio para el texto */
-            object-fit: contain;
-            border-radius: 4px;
-        }
-        .tarot-card .tarot-info-overlay {
-            font-size: 0.6rem; /* Tamaño pequeño para que quepa */
-            color: var(--text-primary);
-            text-align: center;
-            overflow-y: auto; /* Scroll si el texto es muy largo */
-            max-height: 35%; /* Espacio restante para el texto */
-            width: 100%;
-            padding: 2px;
-            box-sizing: border-box;
-        }
-         .tarot-card .tarot-info-overlay p {
-            margin: 1px 0;
+        .tarot-card.flipped .card-front {
+            transform: rotateY(0deg);
         }
 
-        #tarotCardInfoDisplay { /* Contenedor para mostrar info de la carta seleccionada fuera del spread */
-            background-color: rgba(0,0,0,0.7);
-            border: 1px solid var(--neon-cyan);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            max-width: 500px;
-            margin: 1rem auto;
+        .tarot-card img.tarot-image-display {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover; 
+            border-radius: 4px;
         }
-        #tarotCardInfoDisplay h3 { font-size: 1.5rem; margin-bottom: 0.5rem; text-align: center;}
-        #tarotCardInfoDisplay img { max-height: 200px; display:block; margin: 0.5rem auto;}
-        #tarotCardInfoDisplay p { font-size: 0.8rem; margin-bottom: 0.3rem; }
+        .tarot-card .tarot-info-overlay { 
+           display: none;
+        }
+
+        #tarotCardInfoDisplay {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            padding: 1.5rem; 
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 1.5rem auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #tarotCardInfoDisplay h3 { 
+            font-size: 1.3rem; 
+            margin-bottom: 0.75rem;
+            text-align: center;
+            color: var(--text-primary-color);
+        }
+        #tarotCardInfoDisplay img { 
+            max-height: 200px; 
+            display:block; 
+            margin: 0.75rem auto;
+            border-radius: 6px;
+            border: 1px solid var(--border-color-light);
+        }
+        #tarotCardInfoDisplay p { 
+            font-size: 0.9rem; 
+            margin-bottom: 0.5rem; 
+            color: var(--text-secondary-color);
+            line-height: 1.4;
+        }
+         #tarotCardInfoDisplay p strong {
+            color: var(--text-primary-color);
+         }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--divider-color);
+            font-size: 0.85rem;
+            color: var(--text-tertiary-color);
+        }
+        footer a {
+            color: var(--primary-accent-color);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Clases de utilidad y limpieza de estilos "neon" y "glitch" */
+        .glitch, .neon-text:not(.post-title), .neon-border, .neon-button, .crt-effect, .fractal-bg,
+        .dream-glow, .tech-glow, .dimension-glow, .transmission-effect {
+            animation: none !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+        
+        .neon-border {
+            border: 1px solid var(--border-color-light) !important;
+        }
+        .app-header .neon-text { 
+            color: var(--primary-accent-color) !important;
+        }
+        #boardInfo .neon-text { 
+             color: var(--text-primary-color) !important;
+             font-weight: 600;
+        }
+
+        #submitPost.neon-button { 
+            background-color: var(--primary-accent-color);
+            color: white;
+            border: none;
+            box-shadow: none;
+        }
+         #submitPost.neon-button:hover {
+             background-color: var(--primary-accent-hover-color);
+         }
+
+        #themeToggle.neon-button { 
+             background-color: var(--button-secondary-bg);
+             color: var(--button-secondary-text);
+             border: 1px solid var(--border-color-light);
+             box-shadow: none;
+        }
+         #themeToggle.neon-button:hover {
+             background-color: var(--button-secondary-hover-bg);
+             border-color: var(--border-color-strong);
+         }
+
+        body.dark-theme .post,
+        body.dark-theme .post-form-card,
+        body.dark-theme #boardInfo,
+        body.dark-theme .modal-content,
+        body.dark-theme .admin-toggle,
+        body.dark-theme #audioToggle,
+        body.dark-theme .app-header,
+        body.dark-theme .board-selectors-container,
+        body.dark-theme #tarotGameContainer,
+        body.dark-theme #tarotCardInfoDisplay {
+            border-color: var(--dark-border-color-light);
+        }
+        body.dark-theme .post-form-card .input-field,
+        body.dark-theme .post-input-area textarea,
+        body.dark-theme .modal-content input[type="password"],
+        body.dark-theme .modal-content input[type="text"],
+        body.dark-theme .modal-content textarea {
+             background-color: var(--dark-app-bg);
+             border-color: var(--dark-border-color-strong);
+        }
+        body.dark-theme .post-input-area textarea:focus {
+            background-color: var(--dark-card-bg);
+        }
+
+        body.dark-theme .board-selector:not(.active) {
+            color: var(--dark-text-secondary-color);
+        }
+        body.dark-theme .board-selector:not(.active):hover {
+             background-color: var(--dark-button-secondary-hover-bg);
+             color: var(--dark-text-primary-color);
+        }
+         body.dark-theme .file-upload-label {
+             background-color: var(--dark-button-secondary-bg);
+             color: var(--dark-button-secondary-text);
+             border-color: var(--dark-border-color-strong);
+         }
+         body.dark-theme .file-upload-label:hover {
+             background-color: var(--dark-button-secondary-hover-bg);
+         }
+
+        button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible:not([tabindex="-1"]) {
+            outline: 2px solid var(--primary-accent-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.3);
+        }
+        .post-form-card input:focus-visible, 
+        .post-form-card textarea:focus-visible,
+        .modal-content input:focus-visible,
+        .modal-content textarea:focus-visible {
+            outline: none; 
+        }
+
+        .avatar { 
+            filter: none; 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem; 
+            background-color: var(--app-bg); 
+            color: var(--text-primary-color);
+            cursor: pointer;
+        }
+        
+        #typingPreview {
+            background-color: var(--app-bg);
+            border: 1px solid var(--border-color-light);
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+        #typingText {
+            color: var(--text-secondary-color);
+            font-style: italic;
+        }
+        .typing-effect::after { 
+            content: "|";
+            animation: blink 1s step-end infinite;
+            color: var(--text-secondary-color);
+        }
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        [aria-hidden="true"] { 
+        }
 
     </style>
 </head>
-<body class="min-h-screen crt-effect">
-    <div class="container mx-auto px-4 py-8 fractal-bg">
-        <header class="text-center mb-10 relative z-10"> <h1 class="glitch text-6xl md:text-8xl font-bold mb-4 neon-text" data-text="🧠 NeuroChan">
-                🧠 NeuroChan
-            </h1>
-            <p class="text-xl md:text-2xl neon-text" id="boardTitle">/meta/ Tableros de la Mente</p>
-            <div class="h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 my-4 opacity-50"></div>
-        </header>
+<body class="min-h-screen"> 
+    <header class="app-header text-center">
+        <h1><a href="#board=meta" aria-label="Ir al tablero principal /meta/">🧠 NeuroChan</a></h1>
+        <p id="boardTitle">/meta/ Tableros de la Mente</p>
+    </header>
 
-        <div class="flex flex-wrap gap-2 mb-6 justify-center">
-            <button class="board-selector active px-4 py-2 rounded border border-cyan-500 text-cyan-400" data-board="meta" aria-label="Tablero meta">
+    <div class="container mx-auto px-4 py-2 md:py-4"> 
+        <div class="board-selectors-container flex flex-wrap gap-2 mb-6 justify-center">
+            <button class="board-selector active" data-board="meta" aria-label="Tablero meta">
                 /meta/
             </button>
-            <button class="board-selector px-4 py-2 rounded border border-purple-500 text-purple-400" data-board="dreams" aria-label="Tablero sueños">
+            <button class="board-selector" data-board="dreams" aria-label="Tablero sueños">
                 /sueños/
             </button>
-            <button class="board-selector px-4 py-2 rounded border border-pink-500 text-pink-400" data-board="techno" aria-label="Tablero tecnosoma">
+            <button class="board-selector" data-board="techno" aria-label="Tablero tecnosoma">
                 /tecnosoma/
             </button>
-            <button class="board-selector px-4 py-2 rounded border border-green-500 text-green-400" data-board="retro" aria-label="Tablero retro anime">
+            <button class="board-selector" data-board="retro" aria-label="Tablero retro anime">
                 /retro-anime/
             </button>
-            <button class="board-selector px-4 py-2 rounded border border-yellow-500 text-yellow-400" data-board="tarot" aria-label="Tablero tarot">
+            <button class="board-selector" data-board="tarot" aria-label="Tablero tarot">
                 /tarot/
             </button>
         </div>
 
-        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70" id="boardInfo">
-            <h2 class="text-2xl mb-2 neon-text">/meta/ - Metaprogramación y Viaje Dimensional</h2>
-            <p class="mb-2">Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime</p>
-            <p>Todos los posts son persistentes y se sincronizan en tiempo real.</p>
+        <div id="boardInfo" class="mb-8"> 
+            <h2 class="text-xl font-semibold mb-1">/meta/ - Metaprogramación y Viaje Dimensional</h2> 
+            <p class="text-sm mb-1">Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime</p>
+            <p class="text-xs">Todos los posts son persistentes y se sincronizan en tiempo real.</p>
         </div>
 
-        <div class="neon-border p-4 mb-8 bg-black bg-opacity-70 relative" id="postFormContainer">
-            <div class="mb-4">
-                <input 
-                    id="postName"
-                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
-                    placeholder="Nombre (opcional)"
-                    maxlength="30"
-                    aria-label="Nombre del usuario">
+        <div id="postFormContainer" class="post-form-card relative"> 
+            <input 
+                id="postName"
+                class="input-field mb-2" 
+                placeholder="Nombre (opcional)"
+                maxlength="30"
+                aria-label="Nombre del usuario">
+            <input 
+                id="postTitle"
+                class="input-field mb-3"
+                placeholder="Título del Post (opcional)"
+                maxlength="100"
+                aria-label="Título del post">
 
-                <input 
-                    id="postTitle"
-                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-yellow-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
-                    placeholder="Título del Post (opcional)"
-                    maxlength="100"
-                    aria-label="Título del post">
-
-                <div class="relative">
-                    <button id="emojiToggle" class="absolute right-2 top-2 text-xl" aria-label="Abrir selector de emojis">😊</button>
-                    <div id="emojiPicker" class="emoji-picker">
-                        </div>
+            <div class="post-input-area mb-2">
+                <div id="mainPostAvatar" class="avatar"></div>
+                <div class="relative flex-grow">
                     <textarea
                         id="postContent"
-                        class="w-full p-3 bg-black bg-opacity-50 text-green-400 border border-cyan-500 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        rows="4"
-                        placeholder="Transmite tus pensamientos... (soporta texto, imágenes por URL)"
+                        class="w-full focus:ring-0" 
+                        rows="1"
+                        placeholder="¿Qué estás pensando...?"
                         aria-label="Contenido del post"></textarea>
-                </div>
-
-                <input
-                    id="postPassword"
-                    class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500 focus:border-pink-500 focus:outline-none"
-                    placeholder="Contraseña para borrado (opcional)"
-                    type="password"
-                    aria-label="Contraseña para borrado">
-
-                <div class="flex items-center mt-2">
-                    <label for="fileUpload" class="file-upload-label px-4 py-2 bg-black bg-opacity-50 border border-cyan-500 text-cyan-400 cursor-pointer rounded mr-2">
-                        📁 Subir Imagen
-                    </label>
-                    <input type="file" id="fileUpload" class="hidden" accept="image/*" aria-hidden="true">
-                    <span id="fileName" class="text-xs text-gray-400 ml-2"></span>
+                    <div id="emojiPicker" class="emoji-picker"></div>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-4">
-                <button
-                    id="submitPost"
-                    class="neon-button px-6 py-2 bg-black bg-opacity-70 border border-cyan-500 text-cyan-400 font-bold hover:border-pink-500 hover:text-pink-400"
-                    aria-label="Enviar post">
-                    🚀 ENVIAR
+            
+            <div class="post-actions-row">
+                <button id="emojiToggle" class="icon-button" aria-label="Abrir selector de emojis">😊</button>
+                <label for="fileUpload" class="icon-button" aria-label="Subir imagen">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+                </label>
+                <input type="file" id="fileUpload" class="hidden" accept="image/*" aria-hidden="true">
+                <span id="fileName" class="text-xs text-gray-500 ml-2 self-center"></span>
+                
+                <button id="postPasswordToggle" class="icon-button" aria-label="Establecer contraseña para el post">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.078 2.25c-.217-.065-.437-.12-.65-.173a1.75 1.75 0 00-1.946.002c-.213.053-.433.108-.65.173C5.77 3.072 4.5 5.25 4.5 7.5c0 1.97.823 3.717 2.096 4.904.284.344.468.756.528 1.186a3.5 3.5 0 00.878 2.033L9.18 16.06a1.75 1.75 0 002.64 0l.178-.445a3.5 3.5 0 00.878-2.033c.06-.43.243-.842.528-1.186C14.677 11.217 15.5 9.47 15.5 7.5c0-2.25-1.27-4.428-3.344-5.078zM10 9.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                 </button>
-                <button
-                    id="themeToggle"
-                    class="theme-toggle px-4 py-2 bg-black bg-opacity-70 border border-pink-500 text-pink-400 font-bold"
-                    aria-label="Cambiar tema claro/oscuro">
-                    🌓 CAMBIAR TEMA
+
+                <button id="submitPost" class="icon-button submit-button" aria-label="Enviar post">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
                 </button>
             </div>
-            <div id="typingPreview" class="mt-4 p-3 bg-black bg-opacity-30 border border-gray-700 hidden">
-                <p id="typingText" class="typing-effect text-green-400"></p>
+            <div id="typingPreview" class="mt-4 p-3 hidden">
+                <p id="typingText" class="typing-effect"></p>
             </div>
         </div>
         
         <div id="loadingMessage" class="hidden">Cargando transmisiones...</div>
 
-        <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             </div>
 
         <div id="threadContainer" class="hidden mt-8">
             </div>
         
-        <div id="tarotGameContainer" class="hidden flex flex-col items-center p-4 neon-border bg-black bg-opacity-70">
-            <h2 class="text-3xl mb-6 neon-text">Lectura de Tarot Piramidal</h2>
-            <div class="mb-6 flex gap-4">
-                <button id="shuffleTarotButton" class="neon-button px-6 py-3 bg-purple-700 hover:bg-purple-600 border-purple-500 text-white font-bold">Barajar y Tirar Cartas</button>
-                <button id="resetTarotButton" class="neon-button px-6 py-3 bg-red-700 hover:bg-red-600 border-red-500 text-white font-bold">Resetear Tirada</button>
+        <div id="tarotGameContainer" class="hidden flex flex-col items-center p-4">
+            <h2 class="text-2xl font-semibold mb-6">Lectura de Tarot Piramidal</h2>
+            <div id="tarotInitialCardContainer" class="mb-6">
+                <div id="tarotDeckCard" class="tarot-initial-card">🔮</div>
             </div>
+            <div class="mb-6 flex gap-4">
+                <button id="shuffleTarotButton" class="primary-button">Barajar y Tirar Cartas</button>
+                </div>
             <div id="tarotSpreadContainer" class="grid gap-2 justify-items-center w-full">
                 </div>
-            <div id="tarotCardInfoDisplay" class="hidden mt-6 p-6 neon-border bg-black bg-opacity-80 w-full md:max-w-2xl rounded-lg">
-                <h3 id="tarotCardNameInfo" class="text-2xl neon-text-title text-center mb-3"></h3>
-                <img id="tarotCardImageInfo" src="#" alt="Carta del Tarot Seleccionada" class="mx-auto my-3 max-h-80 border-2 border-acid-green rounded"/>
+            <div id="tarotCardInfoDisplay" class="hidden mt-6 p-6 w-full md:max-w-2xl rounded-lg">
+                <h3 id="tarotCardNameInfo" class="text-xl font-semibold text-center mb-3"></h3>
+                <img id="tarotCardImageInfo" src="#" alt="Carta del Tarot Seleccionada" class="mx-auto my-3 max-h-60 rounded"/>
                 <div class="text-sm space-y-2">
                     <p><strong>Significado (Derecha):</strong> <span id="tarotMeaningUpInfo"></span></p>
                     <p><strong>Significado (Invertida):</strong> <span id="tarotMeaningRevInfo"></span></p>
@@ -707,15 +1055,14 @@
             </div>
         </div>
 
-
         <div class="admin-panel flex items-center gap-2">
-            <button id="adminToggle" class="admin-toggle" aria-label="Panel de administrador">
-                ⚙️
+            <button id="settingsToggle" class="admin-toggle" aria-label="Configuración">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M11.078 2.25c-.217-.065-.437-.12-.65-.173a1.75 1.75 0 00-1.946.002c-.213.053-.433.108-.65.173C5.77 3.072 4.5 5.25 4.5 7.5c0 1.97.823 3.717 2.096 4.904.284.344.468.756.528 1.186a3.5 3.5 0 00.878 2.033L9.18 16.06a1.75 1.75 0 002.64 0l.178-.445a3.5 3.5 0 00.878-2.033c.06-.43.243-.842.528-1.186C14.677 11.217 15.5 9.47 15.5 7.5c0-2.25-1.27-4.428-3.344-5.078zM10 9.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
             </button>
             <button id="infoToggle" class="admin-toggle" aria-label="Información del sitio">
-                ❓
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
             </button>
-            <button id="adminLogoutButton" class="admin-toggle text-red-500 hover:text-red-400" style="display: none;" aria-label="Cerrar sesión de administrador">
+            <button id="adminLogoutButton" class="admin-toggle" style="display: none;" aria-label="Cerrar sesión de administrador">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -723,8 +1070,8 @@
         </div>
 
         <div class="fixed bottom-4 right-4">
-            <button id="audioToggle" class="neon-button w-12 h-12 rounded-full bg-black bg-opacity-70 border border-cyan-500 flex items-center justify-center" aria-label="Alternar audio">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button id="audioToggle" aria-label="Alternar audio">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" />
                 </svg>
             </button>
@@ -735,61 +1082,110 @@
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-1699.mp3" type="audio/mpeg">
     </audio>
 
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Configuración</h3>
+                <button id="closeSettingsModal" class="text-2xl font-bold leading-none hover:text-gray-700">&times;</button>
+            </div>
+            <div class="space-y-4" id="settingsModalContent">
+                <button id="themeToggleModalButton" class="secondary-button w-full">Cambiar Tema</button>
+
+                <div id="adminControlAreaSettings">
+                    <button id="adminLoginModalButton" class="secondary-button w-full">Iniciar Sesión como Administrador</button>
+                    <button id="adminLogoutFromSettingsButton" class="secondary-button w-full" style="display: none; background-color: var(--danger-color); color: white;">Cerrar Sesión de Administrador</button>
+                </div>
+
+                <div id="adminPasswordInputAreaSettings" class="mt-4 pt-4 border-t border-[var(--divider-color)]" style="display: none;">
+                    <h4 class="text-md font-semibold mb-2">Acceso de Administrador</h4>
+                    <label for="adminPasswordSettingsInput" class="block text-sm mb-1">Contraseña Maestra:</label>
+                    <input type="password" id="adminPasswordSettingsInput" class="w-full p-2 mb-3 modal-input">
+                    <div class="flex gap-2 mt-2">
+                        <button id="cancelAdminLoginSettings" class="secondary-button flex-1">Cancelar</button>
+                        <button id="confirmAdminLoginSettings" class="primary-button flex-1" style="background-color: var(--success-color);">Acceder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="postPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="postPasswordModalTitle" class="text-xl font-semibold">Establecer Contraseña</h3>
+                <button id="closePostPasswordModal" class="text-2xl font-bold leading-none hover:text-gray-700">&times;</button>
+            </div>
+            <p id="postPasswordModalMessage" class="mb-4 text-sm">Establece una contraseña para poder editar o borrar este post en el futuro.</p>
+            <div id="postPasswordModalNameField" class="mb-3" style="display: none;">
+                <label for="postPasswordModalNameInput" class="block text-sm mb-1">Tu Nombre (opcional):</label>
+                <input type="text" id="postPasswordModalNameInput" class="w-full p-2" maxlength="30" placeholder="Anónimo">
+            </div>
+            <label for="postPasswordModalInput" class="block text-sm mb-1">Contraseña (opcional):</label>
+            <input type="password" id="postPasswordModalInput" class="w-full p-2 mb-4">
+            <div class="modal-actions">
+                <button id="cancelPostPassword" class="secondary-button">Cancelar</button>
+                <button id="confirmPostPassword" class="primary-button">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileEmojiPickerModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Elige tu Avatar Emoji</h3>
+                <button id="closeProfileEmojiPickerModal" class="text-2xl font-bold leading-none hover:text-gray-700">&times;</button>
+            </div>
+            <div id="profileEmojiGrid" class="grid grid-cols-6 gap-2 text-center">
+                </div>
+        </div>
+    </div>
+
+
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h3 class="text-xl mb-4">Confirmar borrado</h3>
             <p class="mb-4">Introduce la contraseña para borrar este post:</p>
-            <input type="password" id="deletePasswordInput" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500"> <div class="flex justify-end gap-2">
-                <button id="cancelDelete" class="px-4 py-2 border border-gray-500">Cancelar</button>
-                <button id="confirmDelete" class="px-4 py-2 bg-red-500 text-white">Borrar</button>
+            <input type="password" id="deletePasswordInput" class="w-full p-2 mb-4"> 
+            <div class="modal-actions">
+                <button id="cancelDelete" class="secondary-button">Cancelar</button>
+                <button id="confirmDelete" class="primary-button" style="background-color: var(--danger-color);">Borrar</button>
             </div>
         </div>
     </div>
 
     <div id="editModal" class="modal">
         <div class="modal-content max-w-md">
-            <h3 class="text-xl mb-4 neon-text">Editar Transmisión</h3>
+            <h3 class="text-xl mb-4">Editar Transmisión</h3>
             
             <div id="editPasswordPromptContainer" class="mb-4" style="display: none;">
                 <label for="editPostPasswordPrompt" class="block mb-1 text-sm">Contraseña del Post (para editar):</label>
-                <input type="password" id="editPostPasswordPrompt" class="w-full p-2 bg-black bg-opacity-50 text-green-400 border border-purple-500">
+                <input type="password" id="editPostPasswordPrompt" class="w-full p-2">
             </div>
 
             <label for="editPostName" class="block mb-1 text-sm">Nombre:</label>
-            <input id="editPostName" class="w-full p-2 mb-2 bg-black bg-opacity-50 text-green-400 border border-purple-500" maxlength="30">
+            <input id="editPostName" class="w-full p-2 mb-2" maxlength="30">
 
             <label for="editPostTitle" class="block mb-1 text-sm">Título:</label>
-            <input id="editPostTitle" class="w-full p-2 mb-2 bg-black bg-opacity-50 text-yellow-400 border border-purple-500" maxlength="100">
+            <input id="editPostTitle" class="w-full p-2 mb-2" maxlength="100">
 
             <label for="editPostContent" class="block mb-1 text-sm">Contenido:</label>
-            <textarea id="editPostContent" class="w-full p-3 mb-2 bg-black bg-opacity-50 text-green-400 border border-cyan-500" rows="4"></textarea>
+            <textarea id="editPostContent" class="w-full p-3 mb-2" rows="4"></textarea>
 
             <div class="mb-2">
-                <img id="editImagePreview" src="#" alt="Previsualización de imagen" class="max-h-40 mb-2 neon-border" style="display:none;">
-                <label for="editFileUpload" class="file-upload-label px-3 py-1 text-xs bg-black bg-opacity-50 border border-cyan-500 text-cyan-400 cursor-pointer rounded mr-2">
+                <img id="editImagePreview" src="#" alt="Previsualización de imagen" class="max-h-40 mb-2" style="display:none; border: 1px solid var(--border-color-light); border-radius: 6px;">
+                <label for="editFileUpload" class="file-upload-label px-3 py-1 text-xs cursor-pointer rounded mr-2">
                     Cambiar Imagen
                 </label>
                 <input type="file" id="editFileUpload" class="hidden" accept="image/*">
-                <span id="editFileName" class="text-xs text-gray-400"></span>
+                <span id="editFileName" class="text-xs text-gray-500"></span>
                 <label class="ml-2 text-xs"><input type="checkbox" id="removeCurrentImage"> Remover Imagen Actual</label>
             </div>
 
             <label for="editNewPostPassword" class="block mb-1 text-sm">Nueva Contraseña (opcional, dejar en blanco para no cambiar):</label>
-            <input type="password" id="editNewPostPassword" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500">
-            <div class="flex justify-end gap-2">
-                <button id="cancelEdit" class="px-4 py-2 border border-gray-500">Cancelar</button>
-                <button id="confirmEdit" class="px-4 py-2 bg-green-500 text-white">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="adminModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <h3 class="text-xl mb-4">Acceso de Administrador</h3>
-            <p class="mb-4">Introduce la contraseña maestra:</p>
-            <input type="password" id="adminPasswordInput" class="w-full p-2 mb-4 bg-black bg-opacity-50 text-green-400 border border-purple-500"> <div class="flex justify-end gap-2">
-                <button id="cancelAdmin" class="px-4 py-2 border border-gray-500">Cancelar</button>
-                <button id="confirmAdmin" class="px-4 py-2 bg-green-500 text-white">Acceder</button>
+            <input type="password" id="editNewPostPassword" class="w-full p-2 mb-4">
+            <div class="modal-actions">
+                <button id="cancelEdit" class="secondary-button">Cancelar</button>
+                <button id="confirmEdit" class="primary-button" style="background-color: var(--success-color);">Guardar Cambios</button>
             </div>
         </div>
     </div>
@@ -797,8 +1193,8 @@
     <div id="infoModal" class="modal">
         <div class="modal-content max-w-lg">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl neon-text">Acerca de NeuroChan</h3>
-                <button id="closeInfoModal" class="text-xl">&times;</button>
+                <h3 class="text-xl">Acerca de NeuroChan</h3>
+                <button id="closeInfoModal" class="text-2xl font-bold leading-none hover:text-gray-700">&times;</button>
             </div>
             <p class="mb-4 text-sm">
                 NeuroChan es un espacio para la comunidad espiritual de los "Fungis": aquellos que exploran la conciencia, 
@@ -808,7 +1204,7 @@
                 Aquí puedes compartir tus experiencias con "inochis" (seres o energías), encuentros con entidades inorgánicas, 
                 la naturaleza del ego, despertares de conciencia y cualquier tema relacionado con la expansión de la mente y el espíritu.
             </p>
-            <h4 class="text-lg mb-2 neon-text">Reglas del Sitio (Guías Espirituales):</h4>
+            <h4 class="text-lg mb-2 font-semibold">Reglas del Sitio (Guías Espirituales):</h4>
             <ul class="list-disc list-inside text-sm space-y-1 mb-4">
                 <li>Respeta todas las perspectivas y experiencias. El camino espiritual es único para cada ser.</li>
                 <li>No se tolera el proselitismo ni la imposición de creencias. Comparte, no conviertas.</li>
@@ -816,27 +1212,32 @@
                 <li>Este es un espacio para la exploración y el aprendizaje mutuo. Sé abierto y curioso.</li>
                 <li>La información compartida es para reflexión personal y no sustituye el consejo profesional (médico, psicológico, etc.) cuando sea necesario.</li>
             </ul>
-            <p class="text-xs text-gray-400">Recuerda: la verdadera sabiduría reside en el corazón y en la experiencia directa.</p>
+            <p class="text-xs text-gray-500">Recuerda: la verdadera sabiduría reside en el corazón y en la experiencia directa.</p>
         </div>
     </div>
 
     <div id="genericModal" class="modal">
         <div class="modal-content">
-            <h3 id="genericModalTitle" class="text-xl mb-4 neon-text">Mensaje</h3>
+            <h3 id="genericModalTitle" class="text-xl mb-4">Mensaje</h3>
             <p id="genericModalMessage" class="mb-4">Este es un mensaje de ejemplo.</p>
-            <div id="genericModalButtons" class="flex justify-end gap-2">
-                <button class="px-4 py-2 border border-gray-500 generic-modal-close-button">Cerrar</button>
+            <div id="genericModalButtons" class="modal-actions">
+                <button class="secondary-button generic-modal-close-button">Cerrar</button>
             </div>
         </div>
     </div>
+
+    <footer class="app-footer">
+        <p>&copy; <span id="currentYear"></span> NeuroChan. Todos los derechos reservados a la Madre Tierra y sus habitantes conscientes.</p>
+        <p>Un espacio para la exploración libre del Ser.</p>
+    </footer>
 
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getFirestore, collection, addDoc, onSnapshot, 
-            doc, deleteDoc, updateDoc, query, where, orderBy,
-            increment, serverTimestamp, getDoc, getDocs 
+            doc, deleteDoc, updateDoc, query, where, increment, 
+            serverTimestamp, getDoc, getDocs 
             } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { 
@@ -866,58 +1267,49 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const postsCollectionRef = collection(db, "Posts");
-        const tarotCollectionRef = collection(db, "TarotCards"); // Para el futuro, si se usa Firestore para tarot
 
         (function() {
             const MAX_IMAGE_SIZE = 2 * 1024 * 1024; 
-            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vFYAcnVe'; 
+            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vYcnVe'; 
 
             const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
             let state = {
                 currentBoard: 'meta',
-                currentTheme: localStorage.getItem('neurochan_theme') || 'dark', 
+                currentTheme: localStorage.getItem('neurochan_theme') || 'light', 
                 audioEnabled: false,
                 isAdmin: localStorage.getItem('neurochan_admin') === 'true',
                 replyTo: null, 
                 currentDeletePostId: null,
-                allPostsData: {}, // Almacena todos los posts cargados (OPs y respuestas) por ID para fácil acceso
-                currentBoardOPs: [], // Almacena solo los OPs del tablero actual
+                allPostsData: {}, 
+                currentBoardOPs: [], 
                 currentEditPostId: null, 
                 currentEditPostData: null, 
                 viewingThreadId: null,
-                tarotDeck: [], // Para las cartas del tarot del juego
-                tarotSpread: [], // Para las cartas actualmente en la tirada
-                tarotCardInfoVisible: false, // Para el estado de la info de la carta de tarot
+                tarotDeck: [], 
+                tarotSpread: [], 
+                tarotCardInfoVisible: false, 
+                tarotInitialCardFlipped: false, 
+                tempPostPassword: null, 
+                tempPostName: null,    
+                currentPostAvatar: null, 
+                profileEmojiPickerTarget: null,
+                scrollAfterReply: null,
             };
 
-            const avatars = [
+            const avatars = [ 
                 '👾', '🤖', '👹', '👻', '💀', '👽', '🎮', '🕹️', '🔮', '🧿',
                 '👁️', '🧠', '🦾', '🦿', '🧬', '🔭', '🛸', '🌌', '🌀', '🌠'
             ];
 
-            const postColors = [
-                'bg-gradient-to-br from-cyan-900 to-blue-900',
-                'bg-gradient-to-br from-purple-900 to-pink-900',
-                'bg-gradient-to-br from-blue-900 to-indigo-900',
-                'bg-gradient-to-br from-pink-900 to-red-900',
-                'bg-gradient-to-br from-green-900 to-teal-900',
-                'bg-gradient-to-br from-yellow-900 to-orange-900'
-            ];
-
             const boards = {
-                meta: {
-                    title: "/meta/ - Metaprogramación y Viaje Dimensional",
-                    description: "Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime",
-                    footer: "Todos los posts son persistentes y se sincronizan en tiempo real."
-                },
+                meta: { title: "/meta/ - Metaprogramación y Viaje Dimensional", description: "Temas: Neurocircuitos, Egocuerpos, Realidades Paralelas, Estética Retro Anime", footer: "Todos los posts son persistentes y se sincronizan en tiempo real." },
                 dreams: { title: "/sueños/ - Exploración Lúcida y Oneironáutica", description: "Temas: Control de Sueños, Hipnagogia, Sueños Compartidos, Proyección Astral", footer: "El mundo de los sueños es tan real como el de la vigilia. Los límites son delgados." },
                 techno: { title: "/tecnosoma/ - Conciencia Cibernética", description: "Temas: Aumento Neural, Tecnología Cyberpunk, Interfaces Mente-Máquina", footer: "La carne es débil. La máquina está dispuesta. La mente es eterna." },
                 retro: { title: "/retro-anime/ - Nostalgia Neon y Delirio Cyber", description: "Temas: Anime Clásico, Retro-Futurismo, Estética Cyberpunk", footer: "Fantasmas en la máquina. Recuerdos en la estática. Sueños en los datos." },
                 tarot: { title: "/tarot/ - Arcanos y Sincronicidad", description: "Temas: Lecturas de Tarot, Simbolismo Arcano, Adivinación, Conexión Espiritual", footer: "Las cartas revelan los ecos del alma y los susurros del destino." }
             };
             
-            // Datos del Tarot (Arcanos Mayores)
             const tarotDeckData = [
                 { cartnumber: 0, namecart: "The Fool", significado1cart: "Inicio, potencial ilimitado, fe en el camino", significado2cart: "Circuit 1 – Biosupervivencia: seguridad, confiar en la vida", significado3cart: "Visualiza una luz cálida en tu ombligo mientras contemplas la carta y respira profundo.", urlcart: "https://video-genesis.com/NFT/wp-content/uploads/2023/11/0foolStrength-BOTAtarot.jpg" },
                 { cartnumber: 1, namecart: "The Magician", significado1cart: "Voluntad consciente, capacidad de manifestar", significado2cart: "Circuit 2 – Emocional/Territorial: energía, poder personal", significado3cart: "Siente cómo la emoción que evoca la imagen sube por tu plexo y afírmala con un gesto.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/1.BOTA_Tarot_The-Magician.jpg" },
@@ -927,7 +1319,7 @@
                 { cartnumber: 5, namecart: "The Hierophant", significado1cart: "Tradición, guía espiritual, aprendizaje", significado2cart: "Circuit 6 – Neuro‑eléctrico: intuición, visión holística", significado3cart: "Medita 10 minutos con la carta frente al entrecejo, dejando llegar flashes intuitivos.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/5.BOTA_Tarot_The-Hierophant.jpg" },
                 { cartnumber: 6, namecart: "The Lovers", significado1cart: "Integración de opuestos, elección consciente", significado2cart: "Circuit 7 – Neuro‑genético: consciencia arquetípica", significado3cart: "Antes de dormir, coloca la carta bajo la almohada y anota sueños al despertar.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/6.BOTA_Tarot_The-Lovers.jpg" },
                 { cartnumber: 7, namecart: "The Chariot", significado1cart: "Dominio de fuerzas, autodirección", significado2cart: "Circuit 8 – Cuántico‑noético: trascendencia, unidad", significado3cart: "Realiza una sesión de meditación profunda (theta) sosteniendo la carta en la mano.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/7-bota_tarot_the-chariot.jpg" },
-                { cartnumber: 8, namecart: "Strength", significado1cart: "Valor, autocontrol emocional, compasión", significado2cart: "Circuit 1 – Biosupervivencia: seguridad, confiar en la vida", significado3cart: "Visualiza una luz cálida en tu ombligo mientras contemplas la carta y respira profundo.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/8-bota_tarot_strength.jpg" },
+                { cartnumber: 8, namecart: "Strength", significado1cart: "Valor, autocontrol emocional, compasión", significado2cart: "Circuit 1 – Biosupervivencia: seguridad, confiar en la vida", significado3cart: "Visualiza una luz cálida en tu ombligo mientras contemplas la carta y respira profundo.", urlcart: "https://video-genesis.com/NFT/wp-content/uploads/2023/11/0foolStrength-BOTAtarot.jpg" },
                 { cartnumber: 9, namecart: "The Hermit", significado1cart: "Búsqueda interior, introspección, retiro", significado2cart: "Circuit 2 – Emocional/Territorial: energía, poder personal", significado3cart: "Siente cómo la emoción que evoca la imagen sube por tu plexo y afírmala con un gesto.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/9-bota_tarot_the-hermit.jpg" },
                 { cartnumber: 10, namecart: "Wheel of Fortune", significado1cart: "Cambio cíclico, destino, oportunidad", significado2cart: "Circuit 3 – Simbólico/Racional: lenguaje y lógica", significado3cart: "Toma la carta, escribe tres símbolos o palabras que surjan y observa sus conexiones.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/10-bota_tarot_wheel-of-fortune.jpg" },
                 { cartnumber: 11, namecart: "Justice", significado1cart: "Equilibrio, causa‑efecto, verdad", significado2cart: "Circuit 4 – Socio‑sexual: pertenencia e identidad", significado3cart: "Comparte tu interpretación con alguien cercano y observa la resonancia mutua.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/11-bota_tarot_justice.jpg" },
@@ -943,14 +1335,18 @@
                 { cartnumber: 21, namecart: "The World", significado1cart: "Plenitud, cierre de ciclo, maestría", significado2cart: "Circuit 6 – Neuro‑eléctrico: intuición, visión holística", significado3cart: "Medita 10 minutos con la carta frente al entrecejo, dejando llegar flashes intuitivos.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/21-bota_tarot_the-world.jpg" }
             ];
 
-
             let unsubscribePosts = null; 
 
             document.addEventListener('DOMContentLoaded', function() {
                 setupEventListeners();
                 setupEmojiPicker();
-                updateTheme(); 
+                setupProfileEmojiPicker();
+                applyInitialTheme(); 
                 if (state.isAdmin) setupAdminPanel();
+                document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+                state.currentPostAvatar = localStorage.getItem('neurochan_profile_avatar') || avatars[Math.floor(Math.random() * avatars.length)];
+                document.getElementById('mainPostAvatar').textContent = state.currentPostAvatar;
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) { 
@@ -974,15 +1370,65 @@
                         });
                     }
                 });
-
                 window.addEventListener('hashchange', handleHashChange);
             });
+
+            function showAdminLoginInSettings() {
+                document.getElementById('adminLoginModalButton').style.display = 'none';
+                document.getElementById('adminLogoutFromSettingsButton').style.display = 'none'; 
+                document.getElementById('adminPasswordInputAreaSettings').style.display = 'block';
+                document.getElementById('adminPasswordSettingsInput').focus();
+            }
+
+            function hideAdminLoginInSettings() {
+                document.getElementById('adminPasswordInputAreaSettings').style.display = 'none';
+                document.getElementById('adminPasswordSettingsInput').value = '';
+                if (state.isAdmin) {
+                    document.getElementById('adminLoginModalButton').style.display = 'none';
+                    document.getElementById('adminLogoutFromSettingsButton').style.display = 'block';
+                } else {
+                    document.getElementById('adminLoginModalButton').style.display = 'block';
+                    document.getElementById('adminLogoutFromSettingsButton').style.display = 'none';
+                }
+            }
+
+            function handleAdminLogoutFromSettings() {
+                adminLogout(); 
+                document.getElementById('adminLoginModalButton').style.display = 'block';
+                document.getElementById('adminLogoutFromSettingsButton').style.display = 'none';
+                closeSettingsModal(); 
+            }
+
+            function verifyAdminPasswordFromSettings() { 
+                const password = document.getElementById('adminPasswordSettingsInput').value; 
+                if (bcryptInstance && bcryptInstance.compareSync(password, ADMIN_HASH)) {
+                    state.isAdmin = true;
+                    localStorage.setItem('neurochan_admin', 'true');
+                    closeSettingsModal();
+                    setupAdminPanel();
+                    showGenericModal("Acceso Concedido", "Has iniciado sesión como administrador.", [{ text: 'OK', action: closeGenericModal }]);
+                    loadContentForBoard(); 
+                } else {
+                    showGenericModal("Acceso Denegado", "La contraseña de administrador es incorrecta.", [{ text: 'Intentar de Nuevo', action: () => { document.getElementById('adminPasswordSettingsInput').focus(); document.getElementById('adminPasswordSettingsInput').value = ''; } }, { text: 'Cancelar', action: closeGenericModal }]);
+                }
+            }
+
+            function applyInitialTheme() {
+                if (localStorage.getItem('neurochan_theme') === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    document.getElementById('themeColorMeta').setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--dark-app-bg').trim());
+                } else {
+                    document.body.classList.remove('dark-theme'); 
+                    document.getElementById('themeColorMeta').setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--app-bg').trim());
+                }
+                updateThemeButtonText();
+            }
             
             function handleHashChange() {
                 const hash = window.location.hash.substring(1); 
                 const params = new URLSearchParams(hash);
                 const postIdFromUrl = params.get('post');
-                const boardFromUrl = params.get('board') || state.currentBoard; // Mantener tablero si no se especifica
+                const boardFromUrl = params.get('board') || state.currentBoard;
 
                 let boardActuallyChanged = false;
                 if (boardFromUrl && boardFromUrl !== state.currentBoard) {
@@ -993,27 +1439,41 @@
                     });
                     const boardData = boards[state.currentBoard] || boards.meta;
                     document.getElementById('boardInfo').innerHTML = `
-                        <h2 class="text-2xl mb-2 neon-text">${boardData.title}</h2>
-                        <p class="mb-2">${boardData.description}</p>
-                        <p>${boardData.footer}</p>`;
+                        <h2 class="text-xl font-semibold mb-1">${boardData.title}</h2>
+                        <p class="text-sm mb-1">${boardData.description}</p>
+                        <p class="text-xs">${boardData.footer}</p>`;
                     document.getElementById('boardTitle').textContent = state.currentBoard === 'meta' ? 
-                        "/meta/ Tableros de la Mente" : 
-                        `/${state.currentBoard}/ ${state.currentBoard.charAt(0).toUpperCase() + state.currentBoard.slice(1).replace('-', ' ')}`;
+                        "NeuroChan" : 
+                        `${boardData.title.split(' - ')[0]}`;
                 }
                 
                 const previousViewingThreadId = state.viewingThreadId;
                 state.viewingThreadId = postIdFromUrl || null;
                 
-                // Determinar si es necesario recargar el contenido.
-                // Se recarga si:
-                // 1. El tablero realmente cambió.
-                // 2. El ID del hilo que se está viendo cambió (entrar/salir de un hilo).
-                // 3. Es la primera carga (unsubscribePosts es null).
-                // 4. Se especificó un tablero en la URL (incluso si es el mismo, para forzar recarga si es necesario).
                 if (boardActuallyChanged || state.viewingThreadId !== previousViewingThreadId || !unsubscribePosts || (boardFromUrl && boardFromUrl !== 'tarot') || (boardFromUrl === 'tarot' && state.currentBoard === 'tarot') ) {
                     loadContentForBoard();
                 }
-                updateUiForView(); // Llamar siempre para asegurar que la UI refleje el estado actual
+                updateUiForView(); 
+
+                // FIX: Objetivo 1 - Mostrar siempre el formulario de respuesta del OP
+                if (state.viewingThreadId && postIdFromUrl && postIdFromUrl === state.viewingThreadId) {
+                    setTimeout(() => {
+                        const opPostElement = document.querySelector(`#post-${state.viewingThreadId}`);
+                        if (opPostElement) {
+                            const replyForm = opPostElement.querySelector('.reply-form-container');
+                            if (replyForm) {
+                                showReplyForm(replyForm, true);
+                            }
+                        }
+                        if (state.scrollAfterReply) {
+                            const targetElement = document.getElementById(`post-${state.scrollAfterReply}`);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                            state.scrollAfterReply = null;
+                        }
+                    }, 300); 
+                }
             }
 
             function loadContentForBoard() {
@@ -1027,7 +1487,6 @@
 
             function setupEventListeners() {
                 document.getElementById('submitPost').addEventListener('click', createPost);
-                document.getElementById('themeToggle').addEventListener('click', toggleTheme);
                 document.getElementById('adminLogoutButton').addEventListener('click', adminLogout);
                 setupAudioToggle();
                 setupFileUpload();
@@ -1040,17 +1499,28 @@
 
                 document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
                 document.getElementById('confirmDelete').addEventListener('click', deletePostWithPassword);
-                document.getElementById('adminToggle').addEventListener('click', toggleAdminModal);
-                document.getElementById('cancelAdmin').addEventListener('click', closeAdminModal);
-                document.getElementById('confirmAdmin').addEventListener('click', verifyAdminPassword);
                 document.getElementById('infoToggle').addEventListener('click', openInfoModal);
                 document.getElementById('closeInfoModal').addEventListener('click', closeInfoModal);
                 document.getElementById('confirmEdit').addEventListener('click', () => confirmEdit()); 
                 document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
 
-                // Event listeners para el Tarot
+                document.getElementById('settingsToggle').addEventListener('click', openSettingsModal);
+                document.getElementById('closeSettingsModal').addEventListener('click', closeSettingsModal);
+                document.getElementById('themeToggleModalButton').addEventListener('click', toggleTheme);
+                document.getElementById('adminLoginModalButton').addEventListener('click', showAdminLoginInSettings);
+                document.getElementById('adminLogoutFromSettingsButton').addEventListener('click', handleAdminLogoutFromSettings);
+                document.getElementById('confirmAdminLoginSettings').addEventListener('click', verifyAdminPasswordFromSettings);
+                document.getElementById('cancelAdminLoginSettings').addEventListener('click', hideAdminLoginInSettings);
                 document.getElementById('shuffleTarotButton').addEventListener('click', shuffleAndDealTarot);
-                document.getElementById('resetTarotButton').addEventListener('click', resetTarotSpread);
+
+                document.getElementById('postPasswordToggle').addEventListener('click', () => openPostPasswordModal(false));
+                document.getElementById('closePostPasswordModal').addEventListener('click', closePostPasswordModal);
+                document.getElementById('cancelPostPassword').addEventListener('click', closePostPasswordModal);
+                document.getElementById('confirmPostPassword').addEventListener('click', confirmPostPassword);
+
+                document.getElementById('mainPostAvatar').addEventListener('click', () => openProfileEmojiPicker(document.getElementById('mainPostAvatar')));
+
+                document.getElementById('postContent').addEventListener('input', autoResizeTextarea);
             }
 
             function setupEmojiPicker() {
@@ -1064,6 +1534,7 @@
                     emojiBtn.addEventListener('click', function() {
                         insertAtCursor(textarea, emoji);
                         emojiPicker.classList.remove('active');
+                        autoResizeTextarea({ target: textarea });
                     });
                     emojiPicker.appendChild(emojiBtn);
                 });
@@ -1078,6 +1549,47 @@
                 });
             }
 
+            function setupProfileEmojiPicker() {
+                const profileEmojiGrid = document.getElementById('profileEmojiGrid');
+                const profileEmojiPickerModal = document.getElementById('profileEmojiPickerModal');
+                const closeProfileEmojiPickerModal = document.getElementById('closeProfileEmojiPickerModal');
+
+                EMOJIS.forEach(emoji => {
+                    const emojiBtn = document.createElement('button');
+                    emojiBtn.className = 'emoji-option';
+                    emojiBtn.textContent = emoji;
+                    emojiBtn.addEventListener('click', function() {
+                        if (state.profileEmojiPickerTarget) {
+                            state.profileEmojiPickerTarget.textContent = emoji;
+                            if (state.profileEmojiPickerTarget.id === 'mainPostAvatar') {
+                                state.currentPostAvatar = emoji;
+                                localStorage.setItem('neurochan_profile_avatar', emoji);
+                            } else {
+                            }
+                        }
+                        profileEmojiPickerModal.classList.remove('flex');
+                    });
+                    profileEmojiGrid.appendChild(emojiBtn);
+                });
+
+                closeProfileEmojiPickerModal.addEventListener('click', () => {
+                    profileEmojiPickerModal.classList.remove('flex');
+                    state.profileEmojiPickerTarget = null;
+                });
+
+                profileEmojiPickerModal.addEventListener('click', (e) => {
+                    if (e.target === profileEmojiPickerModal) {
+                        profileEmojiPickerModal.classList.remove('flex');
+                        state.profileEmojiPickerTarget = null;
+                    }
+                });
+            }
+
+            function openProfileEmojiPicker(targetElement) {
+                state.profileEmojiPickerTarget = targetElement;
+                document.getElementById('profileEmojiPickerModal').classList.add('flex');
+            }
+
             function insertAtCursor(textarea, text) {
                 const startPos = textarea.selectionStart;
                 const endPos = textarea.selectionEnd;
@@ -1087,11 +1599,17 @@
                 textarea.focus();
             }
 
+            function autoResizeTextarea(event) {
+                const textarea = event.target;
+                textarea.style.height = 'auto';
+                textarea.style.height = textarea.scrollHeight + 'px';
+            }
+
             async function createPost() {
                 const contentInput = document.getElementById('postContent').value.trim();
-                const name = document.getElementById('postName').value.trim() || "Anónimo";
+                const name = document.getElementById('postName').value.trim() || state.tempPostName || "Anónimo";
                 const title = document.getElementById('postTitle').value.trim(); 
-                const password = document.getElementById('postPassword').value.trim();
+                const password = state.tempPostPassword; 
                 const fileInput = document.getElementById('fileUpload');
 
                 if (!auth.currentUser) {
@@ -1105,24 +1623,16 @@
                     return;
                 }
 
-                // Lógica de replyTo:
-                // Si estamos viendo un hilo, todas las respuestas van a ese hilo OP.
-                // Si estamos en el tablero principal Y state.replyTo (del click en "responder" a un OP) está seteado,
-                // entonces es una respuesta a ese OP.
-                // Si no, es un nuevo hilo (replyTo = null).
                 let actualReplyTo = null;
-                if (state.viewingThreadId) {
-                    actualReplyTo = state.viewingThreadId;
-                } else if (state.replyTo) { // Click en "Responder" en el tablero principal
-                    actualReplyTo = state.replyTo;
-                }
-
+                if (state.viewingThreadId) { 
+                    const opPost = state.allPostsData[state.viewingThreadId];
+                    actualReplyTo = opPost.replyTo || state.viewingThreadId;
+                } 
 
                 const newPostData = {
                     authorUID: auth.currentUser.uid, 
-                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
+                    avatar: state.currentPostAvatar, 
                     board: state.currentBoard,
-                    color: postColors[Math.floor(Math.random() * postColors.length)],
                     text: DOMPurify.sanitize(contentInput),
                     title: title ? DOMPurify.sanitize(title) : null, 
                     image: null,
@@ -1133,14 +1643,12 @@
                     angryCount: 0,
                     reactedBy: {}, 
                     timestamp: serverTimestamp(), 
-                    replyTo: actualReplyTo, // Usar la lógica determinada arriba
+                    replyTo: actualReplyTo, 
                 };
-                
-                document.getElementById('postContent').placeholder = "Transmite tus pensamientos... (soporta texto, imágenes por URL)";
                 
                 const submitButton = document.getElementById('submitPost');
                 submitButton.disabled = true;
-                submitButton.textContent = 'ENVIANDO...';
+                submitButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 11.414V15a1 1 0 102 0v-3.586l1.293-1.293a1 1 0 000-1.414z" clip-rule="evenodd" /></svg>`;
 
                 try {
                     if (fileInput.files[0]) {
@@ -1148,7 +1656,7 @@
                         if (file.size > MAX_IMAGE_SIZE) {
                             showGenericModal("Error de Archivo", "La imagen es demasiado grande. El tamaño máximo permitido es 2MB.", [{ text: 'Entendido', action: closeGenericModal }]);
                             submitButton.disabled = false;
-                            submitButton.textContent = '🚀 ENVIAR';
+                            submitButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
                             return;
                         }
                         const reader = new FileReader();
@@ -1166,7 +1674,7 @@
                     console.error("Error creando post:", error);
                     showGenericModal("Error", "Ocurrió un error al enviar el post. Por favor, inténtalo de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                     submitButton.disabled = false;
-                    submitButton.textContent = '🚀 ENVIAR';
+                    submitButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
                 }
             }
             
@@ -1178,21 +1686,22 @@
                     document.getElementById('postContent').value = '';
                     document.getElementById('postName').value = '';
                     document.getElementById('postTitle').value = ''; 
-                    document.getElementById('postPassword').value = '';
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('fileName').textContent = '';
                     document.getElementById('typingPreview').classList.add('hidden');
                     
+                    state.tempPostPassword = null; 
+                    state.tempPostName = null;     
                     state.replyTo = null; 
-                    document.getElementById('postContent').placeholder = state.viewingThreadId 
-                        ? `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}` 
-                        : "Transmite tus pensamientos...";
+                    
+                    state.currentPostAvatar = localStorage.getItem('neurochan_profile_avatar') || avatars[Math.floor(Math.random() * avatars.length)];
+                    document.getElementById('mainPostAvatar').textContent = state.currentPostAvatar;
 
-                    const button = document.getElementById('submitPost');
-                    button.classList.add('bg-pink-500', 'text-white');
-                    setTimeout(() => {
-                        button.classList.remove('bg-pink-500', 'text-white');
-                    }, 300);
+                    const postContentTextarea = document.getElementById('postContent');
+                    postContentTextarea.style.height = 'auto';
+                    postContentTextarea.style.height = postContentTextarea.scrollHeight + 'px';
+
+                    document.getElementById('postContent').placeholder = "¿Qué estás pensando...?";
 
                 } catch (error) {
                     console.error("Error guardando post en Firestore:", error);
@@ -1200,7 +1709,7 @@
                 } finally {
                     const submitButton = document.getElementById('submitPost');
                     submitButton.disabled = false;
-                    submitButton.textContent = '🚀 ENVIAR';
+                    submitButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
                 }
             }
 
@@ -1225,29 +1734,37 @@
                 const threadContainer = document.getElementById('threadContainer');
                 const postFormContainer = document.getElementById('postFormContainer');
                 const boardInfoSection = document.getElementById('boardInfo');
+                const postNameInput = document.getElementById('postName');
+                const postTitleInput = document.getElementById('postTitle'); 
                 const tarotGameContainer = document.getElementById('tarotGameContainer');
+                const mainPostContentTextarea = document.getElementById('postContent');
 
                 if (state.currentBoard === 'tarot') {
                     postsContainer.classList.add('hidden');
                     threadContainer.classList.add('hidden');
                     if (postFormContainer) postFormContainer.classList.add('hidden');
-                    if (boardInfoSection) boardInfoSection.classList.remove('hidden'); // Mantener info del tablero tarot
+                    if (boardInfoSection) boardInfoSection.classList.remove('hidden'); 
                     tarotGameContainer.classList.remove('hidden');
+                    if (postTitleInput) postTitleInput.style.display = 'block'; 
+                    if (postNameInput) postNameInput.style.display = 'block'; 
                 } else if (state.viewingThreadId) {
                     postsContainer.classList.add('hidden');
                     threadContainer.classList.remove('hidden');
-                    if (postFormContainer) postFormContainer.classList.remove('hidden'); // Mostrar form para responder
+                    if (postFormContainer) postFormContainer.classList.add('hidden');
                     if (boardInfoSection) boardInfoSection.classList.add('hidden');
                     tarotGameContainer.classList.add('hidden');
-                    document.getElementById('postContent').placeholder = `Respondiendo al hilo... >>${state.viewingThreadId.slice(-4)}`;
-                } else { // Vista de tablero general (no tarot)
+                    if (postTitleInput) postTitleInput.style.display = 'none'; 
+                    if (postNameInput) postNameInput.style.display = 'none'; 
+                } else {
                     postsContainer.classList.remove('hidden');
                     threadContainer.classList.add('hidden');
                     threadContainer.innerHTML = ''; 
                     if (postFormContainer) postFormContainer.classList.remove('hidden');
                     if (boardInfoSection) boardInfoSection.classList.remove('hidden');
                     tarotGameContainer.classList.add('hidden');
-                    document.getElementById('postContent').placeholder = "Transmite tus pensamientos...";
+                    if (postTitleInput) postTitleInput.style.display = 'block'; 
+                    if (postNameInput) postNameInput.style.display = 'block'; 
+                    mainPostContentTextarea.placeholder = "¿Qué estás pensando...?";
                 }
             }
 
@@ -1274,23 +1791,26 @@
                 
                 updateUiForView(); 
 
-                const postsContainer = document.getElementById('postsContainer'); // Mover aquí para acceso general
+                const postsContainer = document.getElementById('postsContainer'); 
                 if (state.viewingThreadId) {
                     const docRef = doc(db, "Posts", state.viewingThreadId);
-                    unsubscribePosts = onSnapshot(docRef, (docSnap) => {
+                    unsubscribePosts = onSnapshot(docRef, async (docSnap) => {
                         const threadContainer = document.getElementById('threadContainer');
                         threadContainer.innerHTML = ''; 
 
                         if (docSnap.exists()) {
                             const postData = { id: docSnap.id, ...docSnap.data() };
-                            state.allPostsData[postData.id] = postData; // Actualizar caché global
-                            const postElement = createPostElement(postData, true, 0); // replyCount 0 para OP en vista de hilo
+                            state.allPostsData[postData.id] = postData; 
+                            // Pass 0 as depth for the OP (level 0)
+                            const postElement = createPostElement(postData, true, 0, 0); 
                             threadContainer.appendChild(postElement);
                             applyPostEffects(postData, postElement);
-                            loadAndRenderReplies(postData.id, threadContainer); 
+                            
+                            // Load nested replies starting from depth 1
+                            await loadNestedReplies(postData.id, postElement, 1); 
+
                         } else {
                             threadContainer.innerHTML = '<p class="text-center text-red-400">Este post no existe o fue eliminado.</p>';
-                            console.warn(`Post con ID ${state.viewingThreadId} no encontrado.`);
                         }
                         if (loadingMessage) loadingMessage.classList.add('hidden');
                     }, (error) => {
@@ -1301,56 +1821,43 @@
                         }
                     });
                 } else {
-                    // Consulta para OPs del tablero actual
-                    const q = query(postsCollectionRef, 
-                                    where("board", "==", state.currentBoard), 
-                                    where("replyTo", "==", null) 
-                                    // No se puede añadir orderBy("timestamp", "desc") aquí sin un índice compuesto.
-                                    // La ordenación se hará en el cliente.
-                                  );
+                    const q = query(postsCollectionRef, where("board", "==", state.currentBoard));
                     unsubscribePosts = onSnapshot(q, (querySnapshot) => {
-                        // postsContainer ya está definido arriba
-                        let fetchedOPs = [];
+                        let allBoardPosts = [];
                         querySnapshot.forEach(docSnap => {
-                            const opData = { id: docSnap.id, ...docSnap.data() };
-                            fetchedOPs.push(opData);
-                            state.allPostsData[opData.id] = opData; // Actualizar caché global
+                            allBoardPosts.push({ id: docSnap.id, ...docSnap.data() });
                         });
 
-                        // Ordenar OPs en el cliente
-                        fetchedOPs.sort((a, b) => {
-                            const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime();
-                            const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime();
+                        const ops = [];
+                        const repliesByParent = {};
+                        allBoardPosts.forEach(p => {
+                            state.allPostsData[p.id] = p; 
+                            if (p.replyTo === null) {
+                                ops.push(p);
+                            } else {
+                                if (!repliesByParent[p.replyTo]) repliesByParent[p.replyTo] = [];
+                                repliesByParent[p.replyTo].push(p);
+                            }
+                        });
+
+                        ops.sort((a, b) => {
+                            const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+                            const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : (b.timestamp ? new Date(b.timestamp).getTime() : 0);
                             return timeB - timeA; 
                         });
                         
-                        state.currentBoardOPs = fetchedOPs; // Guardar OPs para el tablero actual
+                        state.currentBoardOPs = ops; 
 
-                        postsContainer.innerHTML = ''; // Asegurar limpieza para vista de tablero
-                        if (fetchedOPs.length === 0) {
-                            postsContainer.innerHTML = '<p class="text-center col-span-full neon-text">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
+                        postsContainer.innerHTML = ''; 
+                        if (ops.length === 0) {
+                            postsContainer.innerHTML = '<p class="text-center col-span-full">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
                         } else {
-                            // Cargar todas las respuestas para calcular conteos
-                            const allRepliesQuery = query(postsCollectionRef, where("board", "==", state.currentBoard), where("replyTo", "!=", null));
-                            getDocs(allRepliesQuery).then(repliesSnapshot => {
-                                const replyCounts = {};
-                                repliesSnapshot.forEach(replyDoc => {
-                                    const replyData = replyDoc.data();
-                                    if (replyData.replyTo) {
-                                        replyCounts[replyData.replyTo] = (replyCounts[replyData.replyTo] || 0) + 1;
-                                        state.allPostsData[replyDoc.id] = {id: replyDoc.id, ...replyData}; // Cachear respuestas también
-                                    }
-                                });
-
-                                postsContainer.innerHTML = ''; // Limpiar por si acaso
-                                fetchedOPs.forEach(opData => {
-                                    const postElement = createPostElement(opData, false, replyCounts[opData.id] || 0);
-                                    postsContainer.appendChild(postElement);
-                                    applyPostEffects(opData, postElement);
-                                });
-                                if (fetchedOPs.length === 0 && postsContainer.innerHTML === '') { // Doble chequeo por si la promesa tarda
-                                     postsContainer.innerHTML = '<p class="text-center col-span-full neon-text">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
-                                }
+                            ops.forEach(opData => {
+                                const count = repliesByParent[opData.id] ? repliesByParent[opData.id].length : 0;
+                                // Pass 0 as depth for OPs in the main board view
+                                const postElement = createPostElement(opData, false, count, 0);
+                                postsContainer.appendChild(postElement);
+                                applyPostEffects(opData, postElement);
                             });
                         }
                         
@@ -1358,24 +1865,40 @@
                     }, (error) => {
                         console.error("Error obteniendo posts del tablero:", error);
                         if (loadingMessage) {
-                            loadingMessage.textContent = 'Error al cargar posts. Firestore podría requerir un índice para `board` y `replyTo`. Revisa la consola.';
+                            loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
                             loadingMessage.classList.remove('hidden');
                         }
                     });
                 }
             }
 
-            async function loadAndRenderReplies(postId, threadContainerElement) {
-                const repliesQuery = query(postsCollectionRef, where("replyTo", "==", postId));
+            async function loadNestedReplies(parentPostId, parentElement, depth) {
+                // Max depth is 3 (OP -> Reply -> Sub-reply -> Sub-sub-reply)
+                // So, if current depth is 3, we don't load further replies.
+                if (depth > 3) return;
+
+                const repliesQuery = query(postsCollectionRef, where("replyTo", "==", parentPostId));
                 
-                const oldRepliesContainer = threadContainerElement.querySelector('.replies-container');
-                if (oldRepliesContainer) {
-                    oldRepliesContainer.remove();
+                let repliesContainer = parentElement.querySelector(`.replies-container[data-parent-id="${parentPostId}"]`);
+                if (!repliesContainer) {
+                    repliesContainer = document.createElement('div');
+                    repliesContainer.className = `replies-container ml-4 md:ml-8 mt-4 space-y-4 border-l-2 pl-4`;
+                    repliesContainer.style.borderColor = 'var(--divider-color)';
+                    repliesContainer.dataset.parentId = parentPostId;
+                    // FIX: Objetivo 1 - Mostrar las respuestas del primer nivel en el hilo, ocultar las sub-respuestas
+                    // If depth is 1 (replies to OP), they are visible.
+                    // If depth is 2 or more (replies to replies), they are hidden by default.
+                    if (depth >= 2) {
+                        repliesContainer.classList.add('hidden');
+                    }
+                    parentElement.appendChild(repliesContainer);
+                } else {
+                    // FIX: Objetivo 3 - Mantener el estado oculto/visible de las respuestas anidadas
+                    const estabaOculto = repliesContainer.classList.contains('hidden');
+                    repliesContainer.innerHTML = '';
+                    if (estabaOculto) repliesContainer.classList.add('hidden');
                 }
 
-                const repliesContainer = document.createElement('div');
-                repliesContainer.className = 'replies-container ml-4 md:ml-8 mt-4 space-y-4 border-l-2 border-cyan-700 pl-4';
-                
                 try {
                     const querySnapshot = await getDocs(repliesQuery);
                     const repliesData = [];
@@ -1383,7 +1906,7 @@
                     querySnapshot.forEach(function(doc) { 
                         const replyData = { id: doc.id, ...doc.data() };
                         repliesData.push(replyData);
-                        state.allPostsData[replyData.id] = replyData; // Cachear respuesta
+                        state.allPostsData[replyData.id] = replyData; 
                     });
 
                     repliesData.sort((a,b) => {
@@ -1392,114 +1915,178 @@
                         return timeA - timeB; 
                     });
 
-                    repliesData.forEach(replyData => {
-                        const replyElement = createPostElement(replyData, false, 0); // Las respuestas no muestran conteo de sub-respuestas
-                        repliesContainer.appendChild(replyElement);
-                        applyPostEffects(replyData, replyElement);
-                    });
-                    
-                    // Actualizar contador de respuestas en el OP del hilo
-                    const opElementInThread = threadContainerElement.querySelector(`.post[data-id="${postId}"] .reply-count-display`);
-                    if (opElementInThread) {
-                        opElementInThread.textContent = repliesData.length;
-                    }
-
-
                     if (repliesData.length > 0) {
-                         threadContainerElement.appendChild(repliesContainer);
+                        for (const replyData of repliesData) {
+                            // Pass the current depth of the replyData being created
+                            const replyElement = createPostElement(replyData, false, 0, depth);
+                            repliesContainer.appendChild(replyElement);
+                            applyPostEffects(replyData, replyElement);
+                            // Recursively load replies for this reply, incrementing depth
+                            await loadNestedReplies(replyData.id, replyElement, depth + 1); 
+                        }
                     } else {
                         const noRepliesMessage = document.createElement('p');
-                        noRepliesMessage.className = 'text-sm text-gray-400 pl-4 mt-2';
+                        noRepliesMessage.className = 'text-sm pl-4 mt-2';
+                        noRepliesMessage.style.color = 'var(--text-secondary-color)';
                         noRepliesMessage.textContent = 'Aún no hay respuestas en este hilo.';
-                        repliesContainer.appendChild(noRepliesMessage);
-                        threadContainerElement.appendChild(repliesContainer); 
                     }
+
+                    const replyCountDisplay = parentElement.querySelector('.reply-count-display');
+                    if (replyCountDisplay) {
+                        replyCountDisplay.textContent = repliesData.length;
+                    }
+
                 } catch (e) {
-                    console.error("Error cargando respuestas: ", e);
-                    repliesContainer.innerHTML = '<p class="text-red-400">Error al cargar respuestas.</p>';
-                    threadContainerElement.appendChild(repliesContainer);
+                    console.error("Error cargando respuestas anidadas: ", e);
+                    repliesContainer.innerHTML = '<p class="text-red-500">Error al cargar respuestas.</p>';
                 }
             }
 
             function applyPostEffects(post, element) {
-                const content = ((post.text ?? '')).toLowerCase();
-                if (content.includes('sueño') || content.includes('dream')) element.classList.add('dream-glow');
-                if (content.includes('tecno') || content.includes('tech') || content.includes('ciber')) element.classList.add('tech-glow');
-                if (content.includes('dimensión') || content.includes('realidad')) element.classList.add('dimension-glow');
             }
 
-            function createPostElement(post, isThreadParent = false, replyCount = 0) {
+            function createPostElement(post, isThreadParent = false, replyCount = 0, currentPostDepth = 0) {
                 const postElement = document.createElement('div');
-                postElement.className = `post ${post.color} p-4 rounded-lg bg-opacity-20 backdrop-blur-sm neon-border hover:bg-opacity-30 transition-all duration-300`;
+                postElement.className = `post p-4 rounded-lg mb-4`; 
                 postElement.dataset.id = post.id; 
+                postElement.id = `post-${post.id}`;
 
                 if (isThreadParent) {
-                    postElement.classList.add('mb-6', 'border-2', 'border-acid-green'); 
+                    postElement.classList.add('mb-6'); 
+                    postElement.style.borderWidth = '2px';
+                    postElement.style.borderColor = 'var(--primary-accent-color)';
                 }
 
                 const postTimestamp = post.timestamp?.toDate ? post.timestamp.toDate() : new Date(post.timestamp);
                 const timeString = postTimestamp.toLocaleTimeString ? postTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-                const contentHtml = getPostContentHtml(post);
                 
-                // El indicador de respuesta >>ID se maneja en getPostContentHtml
-                // const replyIndicator = post.replyTo && !isThreadParent ? ... (eliminado)
+                const titleHtml = post.title ? `<h4 class="post-title">${DOMPurify.sanitize(post.title)}</h4>` : '';
+                const textContent = typeof post.text === 'string' ? post.text : '';
+                let sanitizedText = DOMPurify.sanitize(textContent).replace(/\n/g,'<br>');
+                
+                sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
+                    const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
+                    const targetPostId = fullReferencedPost ? fullReferencedPost.id : referencedPostIdSuffix;
+                    const targetBoard = fullReferencedPost ? fullReferencedPost.board : state.currentBoard; 
+                    const threadLinkTargetId = fullReferencedPost ? (fullReferencedPost.replyTo || fullReferencedPost.id) : targetPostId;
+                    return `<a href="#board=${targetBoard}&post=${threadLinkTargetId}" class="reply-link" data-post-id="${targetPostId}">>>${referencedPostIdSuffix.slice(-4)}</a>`;
+                });
 
-                // Usar neon-text-title para el título del post
-                const titleHtml = post.title ? `<h4 class="text-lg font-bold mb-1 neon-text-title">${DOMPurify.sanitize(post.title)}</h4>` : '';
+                const contentTextHtml = post.text ? `<div class="post-content text-sm mb-2 mt-1">${sanitizedText}</div>` : '';
+                const contentImageHtml = post.image ? `<div class="post-image-container"><img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="max-w-full h-auto"/></div>` : '';
 
                 const canShowEditButton = state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid);
                 
-                // Botón "Ver Hilo" solo para OPs en la vista de tablero.
-                // No mostrar "Volver al tablero".
                 const threadViewButtonHtml = !state.viewingThreadId && !post.replyTo ? 
-                    `<button class="view-thread-button text-xs px-2 py-1 border border-purple-500 text-purple-400" aria-label="Ver hilo">Ver Hilo</button>` :
-                    ''; 
+                    `<button class="view-thread-button reaction-button" aria-label="Ver hilo" style="color: var(--primary-accent-color);">Ver Hilo (${replyCount})</button>` : ''; 
                 
-                // Mostrar contador de respuestas para OPs
-                const replyCountHtml = !post.replyTo ? // Solo para OPs
-                    `<span class="text-xs text-gray-400 ml-2">Respuestas: <span class="reply-count-display">${replyCount}</span></span>` : '';
+                const replyCountHtml = !post.replyTo && !state.viewingThreadId ? 
+                    `<span class="text-xs ml-2" style="color: var(--text-secondary-color);">Respuestas: <span class="reply-count-display">${replyCount}</span></span>` : '';
+
+                // FIX: Check if current post is at the final reply level (depth 3)
+                const isFinalLevelPost = currentPostDepth >= 3;
+
+                // FIX: Objetivo 2 - Reemplazar la definición de nestedReplyCountHtml
+                // The 💬 icon should be visible on level 2 posts (depth 2) to show their level 3 children.
+                // It should NOT be visible on level 3 posts (depth 3).
+                const nestedReplyCountHtml = state.viewingThreadId && post.replyTo && !isFinalLevelPost ?
+                  `<button type="button"
+                          class="nested-reply-toggle text-xs ml-2 flex items-center gap-0.5"
+                          aria-label="Mostrar/ocultar respuestas">
+                      💬 <span class="reply-count-display">${replyCount}</span>
+                  </button>` : '';
+
+                // FIX: Objetivo 3 - Hide "Responder" button for final level posts (depth 3)
+                const replyButtonHtml = !isThreadParent && !isFinalLevelPost ? `
+                    <button class="reply-button reaction-button" aria-label="Responder a este post">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                        Responder
+                    </button>
+                ` : '';
 
 
-                postElement.innerHTML = `
-                    <div class="flex items-start mb-2">
-                        <span class="avatar text-3xl mr-3">${post.avatar}</span>
-                        <div>
-                            <span class="text-xs text-gray-400">${DOMPurify.sanitize(post.name)}</span>
-                            <span class="text-xs text-gray-400 ml-2">${timeString}</span>
-                            ${post.authorUID === auth.currentUser?.uid ? '<span class="text-xs text-acid-green ml-2">(Tú)</span>' : ''}
-                            ${replyCountHtml}
+                const replyFormHtml = `
+                    <div class="reply-form-container post-form-card mt-4 p-4" style="display: none;">
+                        <div class="post-input-area mb-2">
+                            <div class="avatar reply-avatar"></div>
+                            <div class="relative flex-grow">
+                                <textarea
+                                    class="reply-content w-full focus:ring-0" 
+                                    rows="1"
+                                    placeholder="Escribe una respuesta..."
+                                    aria-label="Contenido de la respuesta"></textarea>
+                                <div class="emoji-picker reply-emoji-picker"></div>
+                            </div>
                         </div>
-                    </div>
-                    ${titleHtml}
-                    <div class="post-content text-sm mb-2 mt-1">${contentHtml}</div> 
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-1 items-center flex-wrap"> 
-                            <button class="reaction-button heart-reaction-button text-xs px-2 py-1 border border-pink-500 text-pink-400 flex items-center gap-1" aria-label="Reaccionar con Corazón">
-                                ❤️ <span class="count">${post.heartCount || 0}</span>
+                        <div class="post-actions-row">
+                            <button class="emoji-toggle icon-button" aria-label="Abrir selector de emojis">😊</button>
+                            <label class="reply-file-upload-label icon-button" aria-label="Subir imagen">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+                            </label>
+                            <input type="file" class="reply-file-upload hidden" accept="image/*" aria-hidden="true">
+                            <span class="reply-file-name text-xs text-gray-500 ml-2 self-center"></span>
+                            
+                            <button class="reply-password-toggle icon-button" aria-label="Establecer nombre y contraseña para la respuesta">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.078 2.25c-.217-.065-.437-.12-.65-.173a1.75 1.75 0 00-1.946.002c-.213.053-.433.108-.65.173C5.77 3.072 4.5 5.25 4.5 7.5c0 1.97.823 3.717 2.096 4.904.284.344.468.756.528 1.186a3.5 3.5 0 00.878 2.033L9.18 16.06a1.75 1.75 0 002.64 0l.178-.445a3.5 3.5 0 00.878-2.033c.06-.43.243-.842.528-1.186C14.677 11.217 15.5 9.47 15.5 7.5c0-2.25-1.27-4.428-3.344-5.078zM10 9.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                             </button>
-                            <button class="reaction-button funny-reaction-button text-xs px-2 py-1 border border-yellow-500 text-yellow-400 flex items-center gap-1" aria-label="Reaccionar con Me Diverte">
-                                😂 <span class="count">${post.funnyCount || 0}</span>
+
+                            <button class="submit-reply icon-button submit-button" aria-label="Enviar respuesta">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
                             </button>
-                            <button class="reaction-button angry-reaction-button text-xs px-2 py-1 border border-red-500 text-red-400 flex items-center gap-1" aria-label="Reaccionar con Me Enoja">
-                                😠 <span class="count">${post.angryCount || 0}</span>
-                            </button>
-                            <button class="reply-button text-xs px-2 py-1 border border-cyan-500 text-cyan-400" aria-label="Responder a este post">
-                                ↩ Responder
-                            </button>
-                            ${threadViewButtonHtml}
-                        </div>
-                        <div class="flex items-center">
-                            ${state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid) ? '<button class="delete-button text-xs px-1" aria-label="Eliminar post">🗑️</button>' : ''}
-                            ${canShowEditButton ? `<button class="edit-button text-xs px-1 ml-1" aria-label="Editar post">✏️</button>` : ''}
-                            <span class="text-xs text-gray-500 ml-2">ID: ${post.id.slice(-4)}</span>
                         </div>
                     </div>
                 `;
 
+
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${post.avatar}</div>
+                        <div class="post-userinfo">
+                            <span class="post-username">${DOMPurify.sanitize(post.name)}</span>
+                            <span class="post-timestamp">${timeString} ${post.authorUID === auth.currentUser?.uid ? '<span style="color: var(--success-color);">(Tú)</span>' : ''} ${replyCountHtml} ${nestedReplyCountHtml}</span>
+                        </div>
+                    </div>
+                    ${titleHtml}
+                    ${contentTextHtml} 
+                    ${contentImageHtml}
+                    <div class="post-actions">
+                        <div class="flex gap-1 items-center flex-wrap"> 
+                            <button class="reaction-button heart-reaction-button flex items-center gap-1" aria-label="Reaccionar con Corazón">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+                                <span class="count">${post.heartCount || 0}</span>
+                            </button>
+                            <button class="reaction-button funny-reaction-button flex items-center gap-1" aria-label="Reaccionar con Me Diverte">
+                                😂 <span class="count">${post.funnyCount || 0}</span>
+                            </button>
+                            <button class="reaction-button angry-reaction-button flex items-center gap-1" aria-label="Reaccionar con Me Enoja">
+                                😠 <span class="count">${post.angryCount || 0}</span>
+                            </button>
+                            ${replyButtonHtml}
+                            ${threadViewButtonHtml}
+                        </div>
+                        <div class="flex items-center">
+                            ${state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid) ? '<button class="delete-button reaction-button delete" aria-label="Eliminar post"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>' : ''}
+                            ${canShowEditButton ? `<button class="edit-button reaction-button" aria-label="Editar post"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>` : ''}
+                            <span class="text-xs ml-2" style="color: var(--text-tertiary-color);">ID: ${post.id.slice(-4)}</span>
+                        </div>
+                    </div>
+                    ${replyFormHtml} 
+                `;
+
+                // FIX: Objetivo 1 - Mostrar siempre el formulario de respuesta del OP
+                if (isThreadParent) {
+                    const replyFormContainer = postElement.querySelector('.reply-form-container');
+                    showReplyForm(replyFormContainer);
+                }
+
                 postElement.querySelector('.heart-reaction-button').addEventListener('click', () => reaccionarCorazon(post.id));
                 postElement.querySelector('.funny-reaction-button').addEventListener('click', () => reaccionarMeDiverte(post.id));
                 postElement.querySelector('.angry-reaction-button').addEventListener('click', () => reaccionarMeEnoja(post.id));
-                postElement.querySelector('.reply-button').addEventListener('click', () => replyToPost(post.id));
+                
+                const replyBtn = postElement.querySelector('.reply-button');
+                if (replyBtn) {
+                    replyBtn.addEventListener('click', () => replyToPost(post.id));
+                }
                 
                 const deleteBtn = postElement.querySelector('.delete-button');
                 if (deleteBtn) {
@@ -1517,7 +2104,7 @@
                     link.addEventListener('mouseenter', () => showReplyPreview(link.dataset.postId, link));
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        viewThread(link.dataset.postId); // El postId aquí es el ID del OP del hilo al que se hace referencia
+                        viewThread(link.dataset.postId); 
                     });
                 });
 
@@ -1525,13 +2112,174 @@
                 if (viewThreadBtn) {
                     viewThreadBtn.addEventListener('click', () => viewThread(post.id));
                 }
+
+                // FIX: Objetivo 2 - Añadir listener para el nuevo botón 💬
+                const nestedToggle = postElement.querySelector('.nested-reply-toggle');
+                if (nestedToggle) {
+                  nestedToggle.addEventListener('click', () => {
+                    const container = postElement.querySelector(
+                      `.replies-container[data-parent-id="${post.id}"]`
+                    );
+                    if (container) container.classList.toggle('hidden');
+                  });
+                }
+
+                // Only set up reply form if it's not a final level post
+                if (!isFinalLevelPost) {
+                    setupReplyForm(postElement, post.id);
+                }
+
                 return postElement;
             }
 
+            function setupReplyForm(postElement, parentPostId) {
+                const replyFormContainer = postElement.querySelector('.reply-form-container');
+                if (!replyFormContainer) return;
+
+                const replyContentTextarea = replyFormContainer.querySelector('.reply-content');
+                const replyEmojiToggle = replyFormContainer.querySelector('.emoji-toggle');
+                const replyEmojiPicker = replyFormContainer.querySelector('.reply-emoji-picker');
+                const replyFileUploadLabel = replyFormContainer.querySelector('.reply-file-upload-label');
+                const replyFileUploadInput = replyFormContainer.querySelector('.reply-file-upload');
+                const replyFileNameSpan = replyFormContainer.querySelector('.reply-file-name');
+                const replyPasswordToggle = replyFormContainer.querySelector('.reply-password-toggle');
+                const submitReplyButton = replyFormContainer.querySelector('.submit-reply');
+                const replyAvatar = replyFormContainer.querySelector('.reply-avatar'); 
+
+                replyAvatar.addEventListener('click', () => openProfileEmojiPicker(replyAvatar));
+
+                replyAvatar.textContent = avatars[Math.floor(Math.random() * avatars.length)];
+
+                replyContentTextarea.addEventListener('input', autoResizeTextarea);
+                replyContentTextarea.addEventListener('blur', (e) => {
+                    const isOPReplyForm = state.viewingThreadId === parentPostId && postElement.dataset.id === parentPostId;
+                    if (!isOPReplyForm && e.target.value.trim() === '' && !replyFileUploadInput.files[0]) {
+                        hideReplyForm(replyFormContainer);
+                    }
+                });
+
+                EMOJIS.forEach(emoji => {
+                    const emojiBtn = document.createElement('button');
+                    emojiBtn.className = 'emoji-option';
+                    emojiBtn.textContent = emoji;
+                    emojiBtn.addEventListener('click', function() {
+                        insertAtCursor(replyContentTextarea, emoji);
+                        replyEmojiPicker.classList.remove('active');
+                        autoResizeTextarea({ target: replyContentTextarea });
+                    });
+                    replyEmojiPicker.appendChild(emojiBtn);
+                });
+                replyEmojiToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    replyEmojiPicker.classList.toggle('active');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!replyEmojiPicker.contains(e.target) && e.target !== replyEmojiToggle) {
+                        replyEmojiPicker.classList.remove('active');
+                    }
+                });
+
+                replyFileUploadInput.addEventListener('change', () => {
+                    replyFileNameSpan.textContent = replyFileUploadInput.files[0] ? replyFileUploadInput.files[0].name : '';
+                });
+
+                replyPasswordToggle.addEventListener('click', () => openPostPasswordModal(true, parentPostId));
+
+                submitReplyButton.addEventListener('click', async () => {
+                    const content = replyContentTextarea.value.trim();
+                    const name = state.tempPostName || "Anónimo"; 
+                    const password = state.tempPostPassword; 
+                    const file = replyFileUploadInput.files[0];
+
+                    if (!content && !file) {
+                        showGenericModal("Atención", "El contenido de la respuesta no puede estar vacío si no adjuntas una imagen.", [{ text: 'Entendido', action: closeGenericModal }]);
+                        return;
+                    }
+
+                    let targetReplyTo = parentPostId;
+                    // The reply is always to the direct parent of the form used.
+                    // This ensures replies to replies are correctly nested under their direct parent.
+
+                    const newReplyData = {
+                        authorUID: auth.currentUser.uid,
+                        avatar: replyAvatar.textContent, 
+                        board: state.currentBoard,
+                        text: DOMPurify.sanitize(content),
+                        title: null, 
+                        image: null,
+                        name: name,
+                        passwordHash: password && bcryptInstance ? bcryptInstance.hashSync(password, 10) : null,
+                        heartCount: 0,
+                        funnyCount: 0,
+                        angryCount: 0,
+                        reactedBy: {},
+                        timestamp: serverTimestamp(),
+                        replyTo: targetReplyTo,
+                    };
+
+                    submitReplyButton.disabled = true;
+                    submitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 11.414V15a1 1 0 102 0v-3.586l1.293-1.293a1 1 0 000-1.414z" clip-rule="evenodd" /></svg>`;
+
+                    try {
+                        if (file) {
+                            if (file.size > MAX_IMAGE_SIZE) {
+                                showGenericModal("Error de Archivo", "La imagen es demasiado grande. El tamaño máximo permitido es 2MB.", [{ text: 'Entendido', action: closeGenericModal }]);
+                                return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = async function(e) {
+                                compressImage(e.target.result, async function(compressedImage) {
+                                    newReplyData.image = compressedImage;
+                                    await addDoc(postsCollectionRef, newReplyData);
+                                    resetReplyForm(replyFormContainer, replyAvatar);
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            await addDoc(postsCollectionRef, newReplyData);
+                            resetReplyForm(replyFormContainer, replyAvatar);
+                        }
+                    } catch (error) {
+                        console.error("Error creando respuesta:", error);
+                        showGenericModal("Error", "Ocurrió un error al enviar la respuesta. Por favor, inténtalo de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
+                    } finally {
+                        submitReplyButton.disabled = false;
+                        submitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
+                    }
+                });
+            }
+
+            function resetReplyForm(formContainer, avatarElement) {
+                formContainer.querySelector('.reply-content').value = '';
+                formContainer.querySelector('.reply-file-upload').value = '';
+                formContainer.querySelector('.reply-file-name').textContent = '';
+                avatarElement.textContent = avatars[Math.floor(Math.random() * avatars.length)]; 
+                state.tempPostName = null;
+                state.tempPostPassword = null;
+                autoResizeTextarea({ target: formContainer.querySelector('.reply-content') });
+                const isOPReplyForm = state.viewingThreadId !== null && formContainer.closest(`.post[data-id="${state.viewingThreadId}"]`);
+                if (!isOPReplyForm) {
+                    hideReplyForm(formContainer);
+                }
+            }
+
+            function showReplyForm(formContainer, autoFocus = false) {
+                formContainer.style.display = 'block';
+                if (autoFocus) {
+                    formContainer.querySelector('.reply-content').focus();
+                }
+                autoResizeTextarea({ target: formContainer.querySelector('.reply-content') });
+            }
+
+            function hideReplyForm(formContainer) {
+                formContainer.style.display = 'none';
+            }
+
+
             function showReplyPreview(postId, element) {
-                const post = state.allPostsData[postId]; // Buscar en el caché global
+                const post = state.allPostsData[postId]; 
                 if (!post) {
-                    console.warn(`Post ${postId} no encontrado para preview.`);
+                    console.warn(`Post ${postId} no encontrado en caché para preview.`);
                     return;
                 }
                 let tooltip = element.querySelector('.tooltip-text');
@@ -1542,8 +2290,8 @@
                     if (previewContent.length > 100) previewContent = previewContent.substring(0, 100) + '...';
                     tooltip.innerHTML = `
                         <div class="flex items-center mb-1">
-                            <span class="text-xs mr-2">${post.avatar}</span>
-                            <span class="text-xs">${DOMPurify.sanitize(post.name)}</span>
+                            <span class="post-avatar text-base mr-1">${post.avatar}</span>
+                            <span class="text-xs font-semibold">${DOMPurify.sanitize(post.name)}</span>
                         </div>
                         <div class="text-xs">${DOMPurify.sanitize(previewContent)}</div>`;
                     element.appendChild(tooltip);
@@ -1551,93 +2299,39 @@
             }
 
             function replyToPost(postId) {
-                // postId es el ID del post al que se hizo clic "Responder"
-                // Esto es para el feedback visual (>>ID)
-                state.replyTo = postId; 
-                document.getElementById('postContent').placeholder = `Respondiendo a >>${postId.slice(-4)}... `;
-                document.getElementById('postContent').focus();
+                state.scrollAfterReply = postId; 
+
+                const postElement = document.getElementById(`post-${postId}`);
+                if (postElement) {
+                    const replyForm = postElement.querySelector('.reply-form-container');
+                    if (replyForm) {
+                        showReplyForm(replyForm, true);
+                    }
+                } else {
+                    console.error(`Post element with ID ${postId} not found for reply.`);
+                    window.location.hash = `board=${state.currentBoard}&post=${state.viewingThreadId || postId}`;
+                }
             }
 
             function viewThread(postId) {
                 window.location.hash = `board=${state.currentBoard}&post=${postId}`;
             }
 
-            function updatePostElementDOM(postElement, postData) {
-                postElement.querySelector('.heart-reaction-button .count').textContent = postData.heartCount || 0;
-                postElement.querySelector('.funny-reaction-button .count').textContent = postData.funnyCount || 0;
-                postElement.querySelector('.angry-reaction-button .count').textContent = postData.angryCount || 0;
-
-                const currentUserUID = auth.currentUser ? auth.currentUser.uid : null;
-                const userReactions = (currentUserUID && postData.reactedBy && postData.reactedBy[currentUserUID]) ? postData.reactedBy[currentUserUID] : [];
-
-                const heartButton = postElement.querySelector('.heart-reaction-button');
-                const funnyButton = postElement.querySelector('.funny-reaction-button');
-                const angryButton = postElement.querySelector('.angry-reaction-button');
-
-                if (heartButton) heartButton.classList.toggle('active', userReactions.includes('corazón'));
-                if (funnyButton) funnyButton.classList.toggle('active', userReactions.includes('me diverte'));
-                if (angryButton) angryButton.classList.toggle('active', userReactions.includes('me enoja'));
-                
-                const nameSpan = postElement.querySelector('.flex.items-start.mb-2 > div > span:first-child');
-                if (nameSpan && nameSpan.textContent !== DOMPurify.sanitize(postData.name)) {
-                    nameSpan.textContent = DOMPurify.sanitize(postData.name);
-                }
-                const contentDiv = postElement.querySelector('.post-content');
-                if (contentDiv) contentDiv.innerHTML = getPostContentHtml(postData);
-
-                let titleElement = postElement.querySelector('h4.neon-text-title');
-                if (postData.title) {
-                    if (!titleElement) { 
-                        titleElement = document.createElement('h4');
-                        titleElement.className = 'text-lg font-bold mb-1 neon-text-title';
-                        if (contentDiv && contentDiv.parentNode) { 
-                           contentDiv.parentNode.insertBefore(titleElement, contentDiv);
-                        } else if (postElement.querySelector('.flex.items-start.mb-2').nextSibling) { 
-                           postElement.querySelector('.flex.items-start.mb-2').parentNode.insertBefore(titleElement, postElement.querySelector('.flex.items-start.mb-2').nextSibling);
-                        }
-                    }
-                    titleElement.innerHTML = DOMPurify.sanitize(postData.title);
-                } else if (titleElement) { 
-                    titleElement.remove();
-                }
-            }
-
             function getPostContentHtml(post) {
                 let html = '';
-                if (post.image) {
-                    html += `<img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="w-full h-auto max-h-64 object-contain rounded mb-2 neon-border" onerror="this.parentNode.innerHTML='<p class=\\'text-red-400\\'>Error al cargar imagen</p>'">`;
-                }
                 
                 const textContent = typeof post.text === 'string' ? post.text : '';
                 let sanitizedText = DOMPurify.sanitize(textContent).replace(/\n/g,'<br>');
                 
-                // Convertir >>ID a links que apuntan al hilo del post referenciado
-                sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
-                    // Intentar encontrar el post completo para obtener su 'board' y 'replyTo' (si es una respuesta) o su propio 'id' (si es un OP)
-                    // Esta parte es compleja porque necesitaríamos saber si referencedPostIdSuffix es un OP o una respuesta
-                    // y a qué hilo pertenece para construir el enlace correctamente.
-                    // Por simplicidad, si el referencedPostIdSuffix es un OP, el enlace es directo.
-                    // Si es una respuesta, idealmente el enlace debería ir al hilo del OP de esa respuesta.
-                    // Para esta versión, enlazaremos directamente al post si lo encontramos, o al sufijo.
-                    // La navegación real al hilo se maneja al hacer clic.
-                    const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
-                    const targetPostId = fullReferencedPost ? fullReferencedPost.id : referencedPostIdSuffix;
-                    const targetBoard = fullReferencedPost ? fullReferencedPost.board : state.currentBoard; // Asumir tablero actual si no se encuentra
-                    
-                    // El enlace debe apuntar al hilo del post al que se hace referencia.
-                    // Si el post referenciado es un OP, targetPostId es el ID del hilo.
-                    // Si el post referenciado es una respuesta, su campo replyTo es el ID del hilo.
-                    const threadLinkTargetId = fullReferencedPost ? (fullReferencedPost.replyTo || fullReferencedPost.id) : targetPostId;
-
-                    return `<a href="#board=${targetBoard}&post=${threadLinkTargetId}" class="reply-link text-cyan-400" data-post-id="${targetPostId}">>>${referencedPostIdSuffix.slice(-4)}</a>`;
-                });
-
-
                 if (post.text) { 
                     html += `<p>${sanitizedText}</p>`;
                 }
                 
-                return html || (post.image ? '' : '[sin contenido]'); 
+                if (post.image) {
+                    html += `<div class="post-image-container"><img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="max-w-full h-auto"/></div>`;
+                }
+                
+                return html || (post.image ? '' : '<p style="color: var(--text-tertiary-color);">[sin contenido textual]</p>'); 
             }
    
             function updateTypingEffect(text) {
@@ -1659,10 +2353,12 @@
                     state.audioEnabled = !state.audioEnabled;
                     if (state.audioEnabled) {
                         audio.play().catch(e => console.log("Error al reproducir audio:", e));
-                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14a2 2 0 100-4 2 2 0 000 4z" /></svg>`;
+                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 4a1 1 0 000 2H4v2a1 1 0 102 0V6h3a1 1 0 100-2H7zM6 8a2 2 0 11-4 0 2 2 0 014 0zM13 4a1 1 0 100 2h3v2a1 1 0 102 0V6h-3a1 1 0 100-2h-3zM14 8a2 2 0 11-4 0 2 2 0 014 0zM4 12a1 1 0 100 2h12a1 1 0 100-2H4z" /></svg>`;
+                        toggleButton.style.color = 'var(--primary-accent-color)';
                     } else {
                         audio.pause();
-                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 0115.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 0115.657-2.343" /></svg>`;
+                        toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>`;
+                        toggleButton.style.color = 'var(--icon-color)';
                     }
                 });
             }
@@ -1700,18 +2396,18 @@
                 const boardData = boards[board] || boards.meta; 
                 const boardInfoEl = document.getElementById('boardInfo');
                 boardInfoEl.innerHTML = `
-                    <h2 class="text-2xl mb-2 neon-text">${boardData.title}</h2>
-                    <p class="mb-2">${boardData.description}</p>
-                    <p>${boardData.footer}</p>`;
+                    <h2 class="text-xl font-semibold mb-1">${boardData.title}</h2>
+                    <p class="text-sm mb-1">${boardData.description}</p>
+                    <p class="text-xs">${boardData.footer}</p>`;
                 document.getElementById('boardTitle').textContent = board === 'meta' ? 
-                    "/meta/ Tableros de la Mente" : 
-                    `/${board}/ ${board.charAt(0).toUpperCase() + board.slice(1).replace('-', ' ')}`;
+                    "NeuroChan" : 
+                    `${boardData.title.split(' - ')[0]}`;
                 
                 if (updateHash) { 
                     state.viewingThreadId = null; 
                     window.location.hash = `board=${board}`;
                 } else {
-                    loadContentForBoard(); // Cargar contenido específico del tablero (posts o tarot)
+                    loadContentForBoard(); 
                 }
             }
 
@@ -1720,19 +2416,13 @@
                 localStorage.removeItem('neurochan_admin');
                 showGenericModal("Sesión Cerrada", "Has cerrado la sesión de administrador.", [{ text: 'OK', action: closeGenericModal }]);
                 document.getElementById('adminLogoutButton').style.display = 'none';
-                document.getElementById('adminToggle')?.classList.remove('text-pink-400');
+                document.getElementById('adminToggle')?.classList.remove('text-pink-400'); 
                 setupAdminPanel(); 
-                if (state.viewingThreadId) {
-                    loadAndRenderPostsRealtime(); 
-                } else {
-                    // Re-render OPs del tablero, el contador de respuestas se recalculará
-                    loadAndRenderPostsRealtime();
-                }
+                loadContentForBoard(); 
             }
 
-            async function reactWith(postId, reactionType, reactionField, buttonClass) {
+            async function reactWith(postId, reactionType, reactionField) {
                 if (!auth.currentUser) {
-                    console.warn(`Intento de reaccionar (${reactionType}) sin usuario autenticado.`);
                     showGenericModal("Error de Autenticación", "Debes estar conectado para reaccionar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
@@ -1766,38 +2456,47 @@
                 }
             }
 
-            function reaccionarCorazon(postId) { reactWith(postId, 'corazón', 'heartCount', 'heart-reaction-button'); }
-            function reaccionarMeDiverte(postId) { reactWith(postId, 'me diverte', 'funnyCount', 'funny-reaction-button'); }
-            function reaccionarMeEnoja(postId) { reactWith(postId, 'me enoja', 'angryCount', 'angry-reaction-button'); }
+            function reaccionarCorazon(postId) { reactWith(postId, 'corazón', 'heartCount'); }
+            function reaccionarMeDiverte(postId) { reactWith(postId, 'me diverte', 'funnyCount'); }
+            function reaccionarMeEnoja(postId) { reactWith(postId, 'me enoja', 'angryCount'); }
 
             function toggleTheme() {
-                if (state.currentTheme === 'dark') {
-                    state.currentTheme = 'pink'; 
+                if (document.body.classList.contains('dark-theme')) {
+                    state.currentTheme = 'light'; 
                 } else { 
                     state.currentTheme = 'dark';  
                 }
-                updateTheme();
+                applyCurrentTheme();
                 saveThemePreference();
+            }
+
+            function updateThemeButtonText() {
+                const themeToggle = document.getElementById('themeToggleModalButton'); 
+                if (document.body.classList.contains('dark-theme')) {
+                    themeToggle.innerHTML = '☀️ Cambiar a Tema Claro';
+                } else {
+                    themeToggle.innerHTML = '🌙 Cambiar a Tema Oscuro';
+                }
             }
             
             function saveThemePreference() {
                 localStorage.setItem('neurochan_theme', state.currentTheme);
             }
             
-            function updateTheme() {
-                document.body.classList.remove('pink-theme', 'light'); 
-
-                if (state.currentTheme === 'pink') { 
-                    document.body.classList.add('pink-theme');
-                    document.getElementById('themeColorMeta').setAttribute('content', '#3D001D'); 
-                } else { 
-                    document.getElementById('themeColorMeta').setAttribute('content', '#0d0221');
+            function applyCurrentTheme() {
+                if (state.currentTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    document.getElementById('themeColorMeta').setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--dark-app-bg').trim());
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    document.getElementById('themeColorMeta').setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--app-bg').trim());
                 }
+                updateThemeButtonText();
             }
+
 
             async function deletePostFirestore(postId) {
                  if (!auth.currentUser) {
-                    console.warn("Intento de borrar sin usuario autenticado.");
                     showGenericModal("Error de Autenticación", "Debes estar conectado para borrar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     return;
                 }
@@ -1806,8 +2505,8 @@
                     "Confirmar Borrado",
                     "¿Seguro que quieres borrar este post permanentemente? Esta acción también borrará todas sus respuestas y no se puede deshacer.",
                     [
-                        { text: 'Cancelar', class: 'border-gray-500', action: closeGenericModal },
-                        { text: 'Borrar Definitivamente', class: 'bg-red-500 text-white', action: async () => {
+                        { text: 'Cancelar', class: 'secondary-button', action: closeGenericModal },
+                        { text: 'Borrar Definitivamente', class: 'primary-button', style: {backgroundColor: 'var(--danger-color)'}, action: async () => {
                             try { 
                                 const repliesQuery = query(postsCollectionRef, where("replyTo", "==", postId));
                                 const repliesSnapshot = await getDocs(repliesQuery);
@@ -1850,7 +2549,6 @@
 
             async function deletePostWithPassword() {
                 if (!auth.currentUser) {
-                    console.warn("Intento de borrar con contraseña sin usuario autenticado.");
                     showGenericModal("Error de Autenticación", "Debes estar conectado para borrar. Por favor, recarga la página.", [{ text: 'Entendido', action: closeGenericModal }]);
                     closeDeleteModal();
                     return;
@@ -1873,48 +2571,43 @@
             function openInfoModal() { document.getElementById('infoModal').classList.add('flex'); }
             function closeInfoModal() { document.getElementById('infoModal').classList.remove('flex'); }
             
-            function setupAdminPanel() {
-                const adminLogoutBtn = document.getElementById('adminLogoutButton');
-                const adminToggleBtn = document.getElementById('adminToggle');
+            function openSettingsModal() {
+                const adminLoginBtn = document.getElementById('adminLoginModalButton');
+                const adminLogoutBtn = document.getElementById('adminLogoutFromSettingsButton');
+                const adminPasswordArea = document.getElementById('adminPasswordInputAreaSettings');
 
-                if(state.isAdmin) {
-                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline-block';
-                    if (adminToggleBtn) adminToggleBtn.classList.add('text-pink-400'); 
+                if (state.isAdmin) {
+                    adminLoginBtn.style.display = 'none';
+                    adminLogoutBtn.style.display = 'block';
                 } else {
-                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'none';
-                    if (adminToggleBtn) adminToggleBtn.classList.remove('text-pink-400'); 
+                    adminLoginBtn.style.display = 'block';
+                    adminLogoutBtn.style.display = 'none';
                 }
-                // Después de cambiar el estado de isAdmin, es necesario re-renderizar los posts
-                // para que los botones de editar/borrar se muestren u oculten correctamente.
-                // Solo hacerlo si no estamos en el tablero de tarot.
-                if (state.currentBoard !== 'tarot') {
-                    loadAndRenderPostsRealtime();
-                }
+                adminPasswordArea.style.display = 'none'; 
+                document.getElementById('adminPasswordSettingsInput').value = ''; 
+                document.getElementById('settingsModal').classList.add('flex');
             }
-            function toggleAdminModal() {
-                document.getElementById('adminModal').classList.add('flex');
-                document.getElementById('adminPasswordInput').value = '';
-                document.getElementById('adminPasswordInput').focus();
+            function closeSettingsModal() { 
+                document.getElementById('settingsModal').classList.remove('flex'); 
+                const adminPasswordArea = document.getElementById('adminPasswordInputAreaSettings');
+                if (adminPasswordArea) adminPasswordArea.style.display = 'none';
+                const adminLoginBtn = document.getElementById('adminLoginModalButton');
+                if (adminLoginBtn && !state.isAdmin) adminLoginBtn.style.display = 'block';
             }
             
-            function closeAdminModal() {
-                document.getElementById('adminModal').classList.remove('flex');
-                document.getElementById('adminPasswordInput').value = '';
-            }
-         
-            function verifyAdminPassword() { 
-                const password = document.getElementById('adminPasswordInput').value; 
-                if (bcryptInstance && bcryptInstance.compareSync(password, ADMIN_HASH)) {
-                    state.isAdmin = true;
-                    localStorage.setItem('neurochan_admin', 'true');
-                    closeAdminModal();
-                    setupAdminPanel();
-                    showGenericModal("Acceso Concedido", "Has iniciado sesión como administrador.", [{ text: 'OK', action: closeGenericModal }]);
+            function setupAdminPanel() {
+                const adminLogoutBtn = document.getElementById('adminLogoutButton');
+                const adminToggleBtn = document.getElementById('settingsToggle'); 
+
+                if(state.isAdmin) {
+                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'inline-flex'; 
+                    if (adminToggleBtn) adminToggleBtn.style.color = 'var(--primary-accent-color)'; 
                 } else {
-                    showGenericModal("Acceso Denegado", "La contraseña de administrador es incorrecta.", [{ text: 'Intentar de Nuevo', action: () => { document.getElementById('adminPasswordInput').focus(); document.getElementById('adminPasswordInput').value = ''; } }, { text: 'Cancelar', action: closeAdminModal }]);
+                    if (adminLogoutBtn) adminLogoutBtn.style.display = 'none';
+                    if (adminToggleBtn) adminToggleBtn.style.color = 'var(--icon-color)';
                 }
             }
-
+         
             function showGenericModal(title, message, buttons = [{ text: 'OK', action: closeGenericModal }], closeModalOnClickOutside = true) {
                 const modal = document.getElementById('genericModal');
                 document.getElementById('genericModalTitle').textContent = title;
@@ -1926,7 +2619,18 @@
                 buttons.forEach(btnConfig => {
                     const button = document.createElement('button');
                     button.textContent = btnConfig.text;
-                    button.className = `px-4 py-2 rounded ${btnConfig.class || 'border border-gray-500'}`;
+                    let baseClass = 'secondary-button';
+                    if (btnConfig.class && btnConfig.class.includes('primary-button')) {
+                        baseClass = 'primary-button';
+                    } else if (btnConfig.style && btnConfig.style.backgroundColor === 'var(--danger-color)') {
+                        baseClass = 'primary-button'; 
+                    }
+                    
+                    button.className = `${baseClass} ${btnConfig.class || ''}`;
+                    if (btnConfig.style) { 
+                        Object.assign(button.style, btnConfig.style);
+                    }
+
                     button.addEventListener('click', () => {
                         if (btnConfig.action) btnConfig.action();
                     });
@@ -1954,7 +2658,7 @@
             function closeGenericModal() { document.getElementById('genericModal').classList.remove('flex'); }
 
             function openEditModal(postId) {
-                const postToEdit = state.allPostsData[postId]; // Buscar en el caché global
+                const postToEdit = state.allPostsData[postId]; 
                 if (!postToEdit) { showGenericModal("Error", "Post no encontrado para editar.", [{ text: 'OK', action: closeGenericModal }]); return; }
 
                 if (!state.isAdmin && !(postToEdit.passwordHash && postToEdit.authorUID === auth.currentUser?.uid)) {
@@ -2096,102 +2800,168 @@
                 }
             }
 
+            function openPostPasswordModal(isReply = false, targetPostId = null) {
+                const modal = document.getElementById('postPasswordModal');
+                const title = document.getElementById('postPasswordModalTitle');
+                const message = document.getElementById('postPasswordModalMessage');
+                const nameField = document.getElementById('postPasswordModalNameField');
+                const nameInput = document.getElementById('postPasswordModalNameInput');
+                const passwordInput = document.getElementById('postPasswordModalInput');
+
+                if (isReply) {
+                    title.textContent = "Establecer Nombre y Contraseña";
+                    message.textContent = "Establece un nombre (opcional) y una contraseña (opcional) para poder editar o borrar esta respuesta en el futuro.";
+                    nameField.style.display = 'block';
+                    nameInput.value = state.tempPostName || ''; 
+                    passwordInput.value = state.tempPostPassword || ''; 
+                    nameInput.focus();
+                } else {
+                    title.textContent = "Establecer Contraseña del Post";
+                    message.textContent = "Establece una contraseña (opcional) para poder editar o borrar este post en el futuro.";
+                    nameField.style.display = 'none';
+                    nameInput.value = '';
+                    passwordInput.value = state.tempPostPassword || ''; 
+                    passwordInput.focus();
+                }
+                modal.classList.add('flex');
+            }
+
+            function closePostPasswordModal() {
+                document.getElementById('postPasswordModal').classList.remove('flex');
+                if (state.scrollAfterReply) {
+                    const targetElement = document.getElementById(`post-${state.scrollAfterReply}`);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    state.scrollAfterReply = null; 
+                }
+            }
+
+            function confirmPostPassword() {
+                state.tempPostName = document.getElementById('postPasswordModalNameInput').value.trim();
+                state.tempPostPassword = document.getElementById('postPasswordModalInput').value.trim();
+                closePostPasswordModal();
+            }
+
             // --- Funciones del Juego de Tarot ---
             function setupTarotGame() {
                 console.log("Configurando juego de Tarot...");
-                updateUiForView(); // Asegura que se muestre el contenedor correcto
-                state.tarotDeck = [...tarotDeckData]; // Copia fresca del mazo
-                shuffleAndDealTarot(); // Barajar y repartir al entrar al tablero
+                updateUiForView(); 
+                state.tarotDeck = [...tarotDeckData]; 
+                const spreadContainer = document.getElementById('tarotSpreadContainer');
+                const initialCardContainer = document.getElementById('tarotInitialCardContainer');
+                const cardInfoDisplay = document.getElementById('tarotCardInfoDisplay');
+                
+                spreadContainer.innerHTML = ''; 
+                if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
+                if (initialCardContainer) initialCardContainer.classList.remove('hidden');
+                
+                const tarotDeckCard = document.getElementById('tarotDeckCard');
+                if (tarotDeckCard) {
+                    tarotDeckCard.classList.remove('spin'); 
+                    tarotDeckCard.style.opacity = '1';
+                    tarotDeckCard.style.transform = 'rotateY(0deg) scale(1)';
+                }
+                state.tarotInitialCardFlipped = false;
             }
 
-            function shuffleArray(array) { // Algoritmo Fisher-Yates
+            function shuffleArray(array) { 
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [array[i], array[j]] = [array[j], array[i]];
                 }
             }
 
-            function shuffleAndDealTarot() {
+            async function shuffleAndDealTarot() {
+                const initialCardContainer = document.getElementById('tarotInitialCardContainer');
+                const tarotDeckCard = document.getElementById('tarotDeckCard');
                 const spreadContainer = document.getElementById('tarotSpreadContainer');
                 const cardInfoDisplay = document.getElementById('tarotCardInfoDisplay');
+                
+                if (tarotDeckCard) {
+                    tarotDeckCard.classList.add('spin');
+                    await new Promise(resolve => setTimeout(resolve, 1000)); 
+                    if (initialCardContainer) initialCardContainer.classList.add('hidden');
+                }
+
                 spreadContainer.innerHTML = '';
                 if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
 
-
                 shuffleArray(state.tarotDeck);
-                state.tarotSpread = state.tarotDeck.slice(0, 15); // 5 + 4 + 3 + 2 + 1 = 15 cartas
+                state.tarotSpread = state.tarotDeck.slice(0, 15); 
 
                 let cardIndex = 0;
                 const rows = [5, 4, 3, 2, 1];
-                rows.forEach(numCardsInRow => {
+                
+                function dealRowSequentially(rowIndex) {
+                    if (rowIndex >= rows.length) return; 
+
+                    const numCardsInRow = rows[rowIndex];
                     const rowDiv = document.createElement('div');
                     rowDiv.className = 'tarot-row';
-                    for (let i = 0; i < numCardsInRow; i++) {
-                        if (cardIndex < state.tarotSpread.length) {
-                            const cardData = state.tarotSpread[cardIndex];
-                            const cardElement = document.createElement('div');
-                            cardElement.className = 'tarot-card';
-                            cardElement.dataset.cardIndex = cardIndex; // Guardar el índice en la tirada actual
-                            
-                            cardElement.innerHTML = `
-                                <div class="card-face card-back">🔮</div>
-                                <div class="card-face card-front">
-                                    <img src="${cardData.urlcart}" alt="${cardData.namecart}" class="tarot-image-display"/>
-                                    <div class="tarot-info-overlay">
-                                        <p style="font-weight: bold; font-size: 0.7rem;">${cardData.namecart}</p>
-                                    </div>
-                                </div>`;
-                            
-                            cardElement.addEventListener('click', () => flipTarotCard(cardElement, cardData));
-                            rowDiv.appendChild(cardElement);
-                            cardIndex++;
-                        }
-                    }
                     spreadContainer.appendChild(rowDiv);
-                });
+
+                    function dealCardInRowSequentially(cardInRowIndex) {
+                        if (cardInRowIndex >= numCardsInRow || cardIndex >= state.tarotSpread.length) {
+                            setTimeout(() => dealRowSequentially(rowIndex + 1), 100); 
+                            return;
+                        }
+
+                        const cardData = state.tarotSpread[cardIndex];
+                        const cardElement = document.createElement('div');
+                        cardElement.className = 'tarot-card'; 
+                        cardElement.dataset.cardIndex = cardIndex; 
+                        
+                        cardElement.innerHTML = `
+                            <div class="card-face card-back">🔮</div>
+                            <div class="card-face card-front">
+                                <img src="${cardData.urlcart}" alt="${DOMPurify.sanitize(cardData.namecart)}" class="tarot-image-display"/>
+                                </div>`;
+                        
+                        cardElement.addEventListener('click', () => flipTarotCard(cardElement, cardData));
+                        rowDiv.appendChild(cardElement);
+                        
+                        void cardElement.offsetWidth; 
+                        cardElement.classList.add('placed'); 
+
+                        cardIndex++;
+                        setTimeout(() => dealCardInRowSequentially(cardInRowIndex + 1), 150); 
+                    }
+                    dealCardInRowSequentially(0);
+                }
+                dealRowSequentially(0); 
             }
 
             function flipTarotCard(cardElement, cardData) {
-                const isFlipped = cardElement.classList.toggle('flipped');
+                const isCurrentlyFlipped = cardElement.classList.contains('flipped');
                 const cardInfoDisplay = document.getElementById('tarotCardInfoDisplay');
 
-                if (isFlipped) {
-                    // Mostrar información detallada en el contenedor separado
-                    document.getElementById('tarotCardNameInfo').textContent = cardData.namecart;
-                    document.getElementById('tarotCardImageInfo').src = cardData.urlcart;
-                    document.getElementById('tarotCardImageInfo').alt = cardData.namecart;
-                    document.getElementById('tarotMeaningUpInfo').textContent = cardData.significado1cart;
-                    document.getElementById('tarotMeaningRevInfo').textContent = cardData.significado2cart; // Asumiendo que sig2 es invertida
-                    document.getElementById('tarotQuestionInfo').textContent = cardData.significado3cart; // Asumiendo que sig3 es pregunta
-                    
-                    if (cardInfoDisplay) cardInfoDisplay.classList.remove('hidden');
-                    
-                    // Des-seleccionar otras cartas si alguna estaba seleccionada
-                    document.querySelectorAll('.tarot-card.selected-for-info').forEach(c => {
-                        if (c !== cardElement) c.classList.remove('selected-for-info');
-                    });
-                    cardElement.classList.add('selected-for-info');
-
-
-                } else {
-                    // Si se vuelve a hacer clic para ocultar, o si se hace clic en otra carta
-                    if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
+                if (isCurrentlyFlipped && cardElement.classList.contains('selected-for-info')) {
+                    cardElement.classList.remove('flipped');
                     cardElement.classList.remove('selected-for-info');
+                    if (cardInfoDisplay) cardInfoDisplay.classList.add('hidden');
+                    return;
                 }
-            }
 
-            function resetTarotSpread() {
-                showGenericModal(
-                    "Resetear Tirada",
-                    "Si vas a resetear espera media hora pues la fluctuación cuántica podría mentirte. ¿Estás seguro?",
-                    [
-                        { text: 'Cancelar', action: closeGenericModal },
-                        { text: 'Sí, Resetear', class: 'bg-red-500 text-white', action: () => {
-                            shuffleAndDealTarot();
-                            closeGenericModal();
-                        }}
-                    ]
-                );
+                document.querySelectorAll('.tarot-card.flipped').forEach(c => {
+                    if (c !== cardElement) {
+                        c.classList.remove('flipped');
+                        c.classList.remove('selected-for-info');
+                    }
+                });
+                
+                cardElement.classList.add('flipped');
+                cardElement.classList.add('selected-for-info');
+
+
+                document.getElementById('tarotCardNameInfo').textContent = cardData.namecart;
+                document.getElementById('tarotCardImageInfo').src = cardData.urlcart;
+                document.getElementById('tarotCardImageInfo').alt = cardData.namecart;
+                document.getElementById('tarotMeaningUpInfo').textContent = cardData.significado1cart;
+                document.getElementById('tarotMeaningRevInfo').textContent = cardData.significado2cart; 
+                document.getElementById('tarotQuestionInfo').textContent = cardData.significado3cart; 
+                
+                if (cardInfoDisplay) cardInfoDisplay.classList.remove('hidden');
             }
 
              console.log("Script principal IIFE ejecutado completamente.");
