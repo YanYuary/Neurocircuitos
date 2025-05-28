@@ -99,18 +99,16 @@
         }
 
         .board-selectors-container {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 0.5rem;
+            /* Removed background, border-radius, padding, box-shadow */
             margin-bottom: 1.5rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .board-selector {
             font-weight: 500;
             padding: 0.625rem 1rem;
             border-radius: 6px;
-            border: 1px solid transparent;
+            border: 1px solid var(--border-color-light); /* Added border */
+            background-color: var(--card-bg); /* Added background */
             color: var(--text-secondary-color);
             transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
@@ -124,9 +122,11 @@
             background-color: var(--primary-accent-color);
             color: #FFFFFF;
             font-weight: 600;
+            border-color: var(--primary-accent-color); /* Active border */
         }
         .board-selector.active:hover {
             background-color: var(--primary-accent-hover-color);
+            border-color: var(--primary-accent-hover-color); /* Active hover border */
         }
 
         #boardInfo {
@@ -863,7 +863,7 @@
         body.dark-theme .admin-toggle,
         body.dark-theme #audioToggle,
         body.dark-theme .app-header,
-        body.dark-theme .board-selectors-container,
+        body.dark-theme .board-selector, /* Apply dark theme to individual selectors */
         body.dark-theme #tarotGameContainer,
         body.dark-theme #tarotCardInfoDisplay {
             border-color: var(--dark-border-color-light);
@@ -882,6 +882,7 @@
 
         body.dark-theme .board-selector:not(.active) {
             color: var(--dark-text-secondary-color);
+            background-color: var(--dark-card-bg); /* Dark theme for individual selectors */
         }
         body.dark-theme .board-selector:not(.active):hover {
              background-color: var(--dark-button-secondary-hover-bg);
@@ -894,6 +895,7 @@
          }
          body.dark-theme .file-upload-label:hover {
              background-color: var(--dark-button-secondary-hover-bg);
+             border-color: var(--dark-border-color-strong);
          }
 
         button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible:not([tabindex="-1"]) {
@@ -979,19 +981,6 @@
         </div>
 
         <div id="postFormContainer" class="post-form-card relative"> 
-            <input 
-                id="postName"
-                class="input-field mb-2" 
-                placeholder="Nombre (opcional)"
-                maxlength="30"
-                aria-label="Nombre del usuario">
-            <input 
-                id="postTitle"
-                class="input-field mb-3"
-                placeholder="Título del Post (opcional)"
-                maxlength="100"
-                aria-label="Título del post">
-
             <div class="post-input-area mb-2">
                 <div id="mainPostAvatar" class="avatar"></div>
                 <div class="relative flex-grow">
@@ -1116,9 +1105,11 @@
                 <button id="closePostPasswordModal" class="text-2xl font-bold leading-none hover:text-gray-700">&times;</button>
             </div>
             <p id="postPasswordModalMessage" class="mb-4 text-sm">Establece una contraseña para poder editar o borrar este post en el futuro.</p>
-            <div id="postPasswordModalNameField" class="mb-3" style="display: none;">
+            <div id="postPasswordModalNameTitleFields" class="mb-3">
                 <label for="postPasswordModalNameInput" class="block text-sm mb-1">Tu Nombre (opcional):</label>
-                <input type="text" id="postPasswordModalNameInput" class="w-full p-2" maxlength="30" placeholder="Anónimo">
+                <input type="text" id="postPasswordModalNameInput" class="w-full p-2 mb-3" maxlength="30" placeholder="Anónimo">
+                <label for="postPasswordModalTitleInput" class="block text-sm mb-1">Título del Post (opcional):</label>
+                <input type="text" id="postPasswordModalTitleInput" class="w-full p-2 mb-3" maxlength="100" placeholder="Título">
             </div>
             <label for="postPasswordModalInput" class="block text-sm mb-1">Contraseña (opcional):</label>
             <input type="password" id="postPasswordModalInput" class="w-full p-2 mb-4">
@@ -1292,9 +1283,11 @@
                 tarotInitialCardFlipped: false, 
                 tempPostPassword: null, 
                 tempPostName: null,    
+                tempPostTitle: null, // Nuevo: para el título del post principal
                 currentPostAvatar: null, 
                 profileEmojiPickerTarget: null,
                 scrollAfterReply: null,
+                directChildrenCounts: {}, // Nuevo: para almacenar el conteo de hijos directos de cada post
             };
 
             const avatars = [ 
@@ -1317,7 +1310,7 @@
                 { cartnumber: 3, namecart: "The Empress", significado1cart: "Creatividad, fertilidad, abundancia", significado2cart: "Circuit 4 – Socio‑sexual: pertenencia e identidad", significado3cart: "Comparte tu interpretación con alguien cercano y observa la resonancia mutua.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/3.BOTA_Tarot_The-Empress.jpg" },
                 { cartnumber: 4, namecart: "The Emperor", significado1cart: "Estructura, autoridad, disciplina", significado2cart: "Circuit 5 – Neuro‑somático: éxtasis corporal, bienestar", significado3cart: "Haz respiración consciente moviendo el cuerpo con la imagen presente ante ti.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/4-bota_tarot_the-emperor.jpg" },
                 { cartnumber: 5, namecart: "The Hierophant", significado1cart: "Tradición, guía espiritual, aprendizaje", significado2cart: "Circuit 6 – Neuro‑eléctrico: intuición, visión holística", significado3cart: "Medita 10 minutos con la carta frente al entrecejo, dejando llegar flashes intuitivos.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/5.BOTA_Tarot_The-Hierophant.jpg" },
-                { cartnumber: 6, namecart: "The Lovers", significado1cart: "Integración de opuestos, elección consciente", significado2cart: "Circuit 7 – Neuro‑genético: consciencia arquetípica", significado3cart: "Antes de dormir, coloca la carta bajo la almohada y anota sueños al despertar.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/6.BOTA_Tarot_The-Lovers.jpg" },
+                { cartnumber: 6, namecart: "TThe Lovers", significado1cart: "Integración de opuestos, elección consciente", significado2cart: "Circuit 7 – Neuro‑genético: consciencia arquetípica", significado3cart: "Antes de dormir, coloca la carta bajo la almohada y anota sueños al despertar.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2020/08/6.BOTA_Tarot_The-Lovers.jpg" },
                 { cartnumber: 7, namecart: "The Chariot", significado1cart: "Dominio de fuerzas, autodirección", significado2cart: "Circuit 8 – Cuántico‑noético: trascendencia, unidad", significado3cart: "Realiza una sesión de meditación profunda (theta) sosteniendo la carta en la mano.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/7-bota_tarot_the-chariot.jpg" },
                 { cartnumber: 8, namecart: "Strength", significado1cart: "Valor, autocontrol emocional, compasión", significado2cart: "Circuit 1 – Biosupervivencia: seguridad, confiar en la vida", significado3cart: "Visualiza una luz cálida en tu ombligo mientras contemplas la carta y respira profundo.", urlcart: "https://video-genesis.com/NFT/wp-content/uploads/2023/11/0foolStrength-BOTAtarot.jpg" },
                 { cartnumber: 9, namecart: "The Hermit", significado1cart: "Búsqueda interior, introspección, retiro", significado2cart: "Circuit 2 – Emocional/Territorial: energía, poder personal", significado3cart: "Siente cómo la emoción que evoca la imagen sube por tu plexo y afírmala con un gesto.", urlcart: "https://www.esotericmeanings.com/wp-content/uploads/2016/07/9-bota_tarot_the-hermit.jpg" },
@@ -1450,6 +1443,10 @@
                 const previousViewingThreadId = state.viewingThreadId;
                 state.viewingThreadId = postIdFromUrl || null;
                 
+                // Clear containers before loading new content
+                document.getElementById('postsContainer').innerHTML = '';
+                document.getElementById('threadContainer').innerHTML = '';
+
                 if (boardActuallyChanged || state.viewingThreadId !== previousViewingThreadId || !unsubscribePosts || (boardFromUrl && boardFromUrl !== 'tarot') || (boardFromUrl === 'tarot' && state.currentBoard === 'tarot') ) {
                     loadContentForBoard();
                 }
@@ -1489,7 +1486,7 @@
                 document.getElementById('submitPost').addEventListener('click', createPost);
                 document.getElementById('adminLogoutButton').addEventListener('click', adminLogout);
                 setupAudioToggle();
-                setupFileUpload();
+                setupFileUpload(); // Main post file upload
 
                 document.querySelectorAll('.board-selector').forEach(btn => {
                     btn.addEventListener('click', function() {
@@ -1515,7 +1512,7 @@
 
                 document.getElementById('postPasswordToggle').addEventListener('click', () => openPostPasswordModal(false));
                 document.getElementById('closePostPasswordModal').addEventListener('click', closePostPasswordModal);
-                document.getElementById('cancelPostPassword').addEventListener('click', closePostPasswordModal);
+                document.getElementById('cancelPostPassword').addEventListener('click', cancelPostPassword); // Changed to cancelPostPassword
                 document.getElementById('confirmPostPassword').addEventListener('click', confirmPostPassword);
 
                 document.getElementById('mainPostAvatar').addEventListener('click', () => openProfileEmojiPicker(document.getElementById('mainPostAvatar')));
@@ -1565,6 +1562,11 @@
                                 state.currentPostAvatar = emoji;
                                 localStorage.setItem('neurochan_profile_avatar', emoji);
                             } else {
+                                // For reply avatars, update the specific reply form's avatar
+                                const replyAvatarElement = state.profileEmojiPickerTarget;
+                                if (replyAvatarElement.classList.contains('reply-avatar')) {
+                                    replyAvatarElement.dataset.avatar = emoji; // Store in dataset for retrieval
+                                }
                             }
                         }
                         profileEmojiPickerModal.classList.remove('flex');
@@ -1607,8 +1609,8 @@
 
             async function createPost() {
                 const contentInput = document.getElementById('postContent').value.trim();
-                const name = document.getElementById('postName').value.trim() || state.tempPostName || "Anónimo";
-                const title = document.getElementById('postTitle').value.trim(); 
+                const name = state.tempPostName || "Anónimo"; // Get name from state
+                const title = state.tempPostTitle || null; // Get title from state
                 const password = state.tempPostPassword; 
                 const fileInput = document.getElementById('fileUpload');
 
@@ -1684,14 +1686,14 @@
                     console.log("Post creado con ID: ", docRef.id);
                     
                     document.getElementById('postContent').value = '';
-                    document.getElementById('postName').value = '';
-                    document.getElementById('postTitle').value = ''; 
+                    // Campos de nombre y título ya no están aquí
                     document.getElementById('fileUpload').value = '';
                     document.getElementById('fileName').textContent = '';
                     document.getElementById('typingPreview').classList.add('hidden');
                     
                     state.tempPostPassword = null; 
-                    state.tempPostName = null;     
+                    state.tempPostName = null;    
+                    state.tempPostTitle = null; // Clear temp title
                     state.replyTo = null; 
                     
                     state.currentPostAvatar = localStorage.getItem('neurochan_profile_avatar') || avatars[Math.floor(Math.random() * avatars.length)];
@@ -1734,8 +1736,6 @@
                 const threadContainer = document.getElementById('threadContainer');
                 const postFormContainer = document.getElementById('postFormContainer');
                 const boardInfoSection = document.getElementById('boardInfo');
-                const postNameInput = document.getElementById('postName');
-                const postTitleInput = document.getElementById('postTitle'); 
                 const tarotGameContainer = document.getElementById('tarotGameContainer');
                 const mainPostContentTextarea = document.getElementById('postContent');
 
@@ -1745,16 +1745,12 @@
                     if (postFormContainer) postFormContainer.classList.add('hidden');
                     if (boardInfoSection) boardInfoSection.classList.remove('hidden'); 
                     tarotGameContainer.classList.remove('hidden');
-                    if (postTitleInput) postTitleInput.style.display = 'block'; 
-                    if (postNameInput) postNameInput.style.display = 'block'; 
                 } else if (state.viewingThreadId) {
                     postsContainer.classList.add('hidden');
                     threadContainer.classList.remove('hidden');
                     if (postFormContainer) postFormContainer.classList.add('hidden');
                     if (boardInfoSection) boardInfoSection.classList.add('hidden');
                     tarotGameContainer.classList.add('hidden');
-                    if (postTitleInput) postTitleInput.style.display = 'none'; 
-                    if (postNameInput) postNameInput.style.display = 'none'; 
                 } else {
                     postsContainer.classList.remove('hidden');
                     threadContainer.classList.add('hidden');
@@ -1762,8 +1758,6 @@
                     if (postFormContainer) postFormContainer.classList.remove('hidden');
                     if (boardInfoSection) boardInfoSection.classList.remove('hidden');
                     tarotGameContainer.classList.add('hidden');
-                    if (postTitleInput) postTitleInput.style.display = 'block'; 
-                    if (postNameInput) postNameInput.style.display = 'block'; 
                     mainPostContentTextarea.placeholder = "¿Qué estás pensando...?";
                 }
             }
@@ -1796,18 +1790,30 @@
                     const docRef = doc(db, "Posts", state.viewingThreadId);
                     unsubscribePosts = onSnapshot(docRef, async (docSnap) => {
                         const threadContainer = document.getElementById('threadContainer');
-                        threadContainer.innerHTML = ''; 
+                        // Clear only if the main OP changes or is removed
+                        if (!docSnap.exists() || threadContainer.querySelector(`#post-${docSnap.id}`) === null) {
+                            threadContainer.innerHTML = ''; 
+                        }
 
                         if (docSnap.exists()) {
                             const postData = { id: docSnap.id, ...docSnap.data() };
                             state.allPostsData[postData.id] = postData; 
-                            // Pass 0 as depth for the OP (level 0)
-                            const postElement = createPostElement(postData, true, 0, 0); 
-                            threadContainer.appendChild(postElement);
-                            applyPostEffects(postData, postElement);
+                            
+                            // Recalcular directChildrenCounts para el hilo actual y sus descendientes
+                            await calculateDirectChildrenCountsForThread(postData.id);
+
+                            let opElement = threadContainer.querySelector(`#post-${postData.id}`);
+                            if (opElement) {
+                                updatePostElement(opElement, postData, 0); // Depth 0 for OPs
+                            } else {
+                                const totalCount = state.directChildrenCounts[postData.id] || 0; // This will be the total descendants
+                                opElement = createPostElement(postData, true, totalCount, 0); 
+                                threadContainer.appendChild(opElement);
+                                applyPostEffects(postData, opElement);
+                            }
                             
                             // Load nested replies starting from depth 1
-                            await loadNestedReplies(postData.id, postElement, 1); 
+                            await loadNestedReplies(postData.id, opElement, 1); 
 
                         } else {
                             threadContainer.innerHTML = '<p class="text-center text-red-400">Este post no existe o fue eliminado.</p>';
@@ -1821,7 +1827,8 @@
                         }
                     });
                 } else {
-                    const q = query(postsCollectionRef, where("board", "==", state.currentBoard));
+                    // FIX: Filter for only original posts (replyTo === null)
+                    const q = query(postsCollectionRef, where("board", "==", state.currentBoard), where("replyTo", "==", null));
                     unsubscribePosts = onSnapshot(q, (querySnapshot) => {
                         let allBoardPosts = [];
                         querySnapshot.forEach(docSnap => {
@@ -1830,38 +1837,109 @@
 
                         const ops = [];
                         const repliesByParent = {};
+                        state.directChildrenCounts = {};
+
                         allBoardPosts.forEach(p => {
-                            state.allPostsData[p.id] = p; 
-                            if (p.replyTo === null) {
-                                ops.push(p);
-                            } else {
-                                if (!repliesByParent[p.replyTo]) repliesByParent[p.replyTo] = [];
-                                repliesByParent[p.replyTo].push(p);
-                            }
+                            state.allPostsData[p.id] = p;
+                            // Only OPs are fetched by the query now, so all are added to ops
+                            ops.push(p); 
+                            // We still need to populate repliesByParent and directChildrenCounts for potential nested replies if we were to load them here,
+                            // but for the main board, we only care about OPs.
+                            // The directChildrenCounts will be populated when viewing a specific thread.
                         });
 
-                        ops.sort((a, b) => {
-                            const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : (a.timestamp ? new Date(a.timestamp).getTime() : 0);
-                            const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : (b.timestamp ? new Date(b.timestamp).getTime() : 0);
-                            return timeB - timeA; 
-                        });
-                        
-                        state.currentBoardOPs = ops; 
+                        // For main board, directChildrenCounts for OPs will be based on their total descendants
+                        const allPostsInBoard = [];
+                        // Temporarily fetch all posts in the board to calculate true descendant counts for OPs
+                        // This is inefficient but necessary if we want accurate reply counts on the main board without a separate query.
+                        // A better approach for large apps would be to store reply counts directly in the OP document.
+                        getDocs(query(postsCollectionRef, where("board", "==", state.currentBoard)))
+                            .then(fullBoardSnapshot => {
+                                fullBoardSnapshot.forEach(docSnap => {
+                                    allPostsInBoard.push({ id: docSnap.id, ...docSnap.data() });
+                                });
 
-                        postsContainer.innerHTML = ''; 
-                        if (ops.length === 0) {
-                            postsContainer.innerHTML = '<p class="text-center col-span-full">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
-                        } else {
-                            ops.forEach(opData => {
-                                const count = repliesByParent[opData.id] ? repliesByParent[opData.id].length : 0;
-                                // Pass 0 as depth for OPs in the main board view
-                                const postElement = createPostElement(opData, false, count, 0);
-                                postsContainer.appendChild(postElement);
-                                applyPostEffects(opData, postElement);
+                                const tempRepliesByParentForCounts = {};
+                                allPostsInBoard.forEach(p => {
+                                    if (p.replyTo) {
+                                        if (!tempRepliesByParentForCounts[p.replyTo]) tempRepliesByParentForCounts[p.replyTo] = [];
+                                        tempRepliesByParentForCounts[p.replyTo].push(p);
+                                    }
+                                });
+
+                                function countDescendants(postId) {
+                                    let count = 0;
+                                    const directReplies = tempRepliesByParentForCounts[postId] || [];
+                                    count += directReplies.length;
+                                    for (const reply of directReplies) {
+                                        count += countDescendants(reply.id);
+                                    }
+                                    return count;
+                                }
+
+                                ops.forEach(op => {
+                                    state.directChildrenCounts[op.id] = countDescendants(op.id);
+                                });
+
+                                ops.sort((a, b) => {
+                                    const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+                                    const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+                                    return timeB - timeA;
+                                });
+
+                                // Granular update logic for main board view
+                                const currentOpElements = new Map(); // Map of postId to DOM element
+                                Array.from(postsContainer.children).forEach(child => {
+                                    if (child.dataset.id) {
+                                        currentOpElements.set(child.dataset.id, child);
+                                    }
+                                });
+
+                                const newOpIds = new Set(ops.map(op => op.id));
+
+                                // Remove old posts
+                                for (const [postId, element] of currentOpElements) {
+                                    if (!newOpIds.has(postId)) {
+                                        element.remove();
+                                        currentOpElements.delete(postId);
+                                    }
+                                }
+
+                                // Add/Update posts and re-order
+                                const fragment = document.createDocumentFragment();
+                                ops.forEach(opData => {
+                                    let opElement = currentOpElements.get(opData.id);
+                                    const totalCount = state.directChildrenCounts[opData.id] || 0;
+
+                                    if (opElement) {
+                                        // Update existing post
+                                        updatePostElement(opElement, opData, 0); // Depth 0 for OPs
+                                    } else {
+                                        // Create new post
+                                        opElement = createPostElement(opData, false, totalCount, 0);
+                                        applyPostEffects(opData, opElement);
+                                        currentOpElements.set(opData.id, opElement);
+                                    }
+                                    fragment.appendChild(opElement);
+                                });
+                                
+                                // Clear and append all to ensure correct order
+                                postsContainer.innerHTML = '';
+                                postsContainer.appendChild(fragment);
+
+                                if (ops.length === 0) {
+                                    postsContainer.innerHTML = '<p class="text-center col-span-full">No hay transmisiones en este tablero aún. ¡Sé el primero!</p>';
+                                }
+
+                                if (loadingMessage) loadingMessage.classList.add('hidden');
+                            })
+                            .catch(error => {
+                                console.error("Error obteniendo todos los posts para contar respuestas:", error);
+                                if (loadingMessage) {
+                                    loadingMessage.textContent = 'Error al cargar posts. Revisa la consola.';
+                                    loadingMessage.classList.remove('hidden');
+                                }
                             });
-                        }
-                        
-                        if (loadingMessage) loadingMessage.classList.add('hidden');
                     }, (error) => {
                         console.error("Error obteniendo posts del tablero:", error);
                         if (loadingMessage) {
@@ -1872,9 +1950,193 @@
                 }
             }
 
+            // Nuevo: Función para actualizar un elemento de post existente de forma granular
+            function updatePostElement(postElement, newPostData, currentPostDepth = 0) {
+                // Update avatar if changed (unlikely but good to have)
+                const avatarElement = postElement.querySelector('.post-avatar');
+                if (avatarElement && avatarElement.textContent !== newPostData.avatar) {
+                    avatarElement.textContent = newPostData.avatar;
+                }
+
+                // Update username
+                const usernameElement = postElement.querySelector('.post-username');
+                if (usernameElement && usernameElement.textContent !== DOMPurify.sanitize(newPostData.name)) {
+                    usernameElement.textContent = DOMPurify.sanitize(newPostData.name);
+                }
+
+                // Update timestamp (only if it significantly changes, or for consistency)
+                const timestampElement = postElement.querySelector('.post-timestamp');
+                if (timestampElement) {
+                    const newTimestamp = newPostData.timestamp?.toDate ? newPostData.timestamp.toDate() : (newPostData.timestamp ? new Date(newPostData.timestamp).getTime() : 0); // Fallback for timestamp
+                    const newTimeString = newTimestamp.toLocaleTimeString ? newTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                    
+                    const currentTimestampText = timestampElement.textContent;
+                    const newTimestampText = `${newTimeString} ${newPostData.authorUID === auth.currentUser?.uid ? '<span style="color: var(--success-color);">(Tú)</span>' : ''}`;
+
+                    // Only update if the content has actually changed to prevent unnecessary DOM writes
+                    if (!currentTimestampText.includes(newTimeString) || !currentTimestampText.includes(newPostData.authorUID === auth.currentUser?.uid ? '(Tú)' : '')) {
+                        timestampElement.innerHTML = newTimestampText;
+                    }
+                }
+
+                // Update title
+                const titleElement = postElement.querySelector('.post-title');
+                if (newPostData.title) {
+                    if (titleElement) {
+                        if (titleElement.textContent !== DOMPurify.sanitize(newPostData.title)) {
+                            titleElement.textContent = DOMPurify.sanitize(newPostData.title);
+                        }
+                    } else {
+                        // If title was empty and now has content, create and insert
+                        const newTitleEl = document.createElement('h4');
+                        newTitleEl.className = 'post-title';
+                        newTitleEl.textContent = DOMPurify.sanitize(newPostData.title);
+                        postElement.insertBefore(newTitleEl, postElement.querySelector('.post-content') || postElement.querySelector('.post-image-container') || postElement.querySelector('.post-actions'));
+                    }
+                } else if (titleElement) {
+                    titleElement.remove(); // Remove if title is now empty
+                }
+
+                // Update content text
+                const contentTextElement = postElement.querySelector('.post-content');
+                const newSanitizedText = DOMPurify.sanitize(newPostData.text || '').replace(/\n/g,'<br>');
+                const newTextWithLinks = newSanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
+                    const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
+                    const targetPostId = fullReferencedPost ? fullReferencedPost.id : referencedPostIdSuffix;
+                    const targetBoard = fullReferencedPost ? fullReferencedPost.board : state.currentBoard;
+                    const threadLinkTargetId = fullReferencedPost ? (fullReferencedPost.replyTo || fullReferencedPost.id) : targetPostId;
+                    return `<a href="#board=${targetBoard}&post=${threadLinkTargetId}" class="reply-link" data-post-id="${targetPostId}">>>${referencedPostIdSuffix.slice(-4)}</a>`;
+                });
+
+                if (contentTextElement) {
+                    if (contentTextElement.innerHTML !== newTextWithLinks) {
+                        contentTextElement.innerHTML = newTextWithLinks;
+                    }
+                } else if (newPostData.text) {
+                    // If text was empty and now has content, create and insert
+                    const newTextEl = document.createElement('div');
+                    newTextEl.className = 'post-content text-sm mb-2 mt-1';
+                    newTextEl.innerHTML = newTextWithLinks;
+                    postElement.insertBefore(newTextEl, postElement.querySelector('.post-image-container') || postElement.querySelector('.post-actions'));
+                }
+
+                // Update image
+                const imageContainer = postElement.querySelector('.post-image-container');
+                if (newPostData.image) {
+                    if (imageContainer) {
+                        const img = imageContainer.querySelector('img');
+                        if (img && img.src !== DOMPurify.sanitize(newPostData.image)) {
+                            img.src = DOMPurify.sanitize(newPostData.image);
+                        }
+                    } else {
+                        // Add new image container if it didn't exist
+                        const newImageDiv = document.createElement('div');
+                        newImageDiv.className = 'post-image-container';
+                        newImageDiv.innerHTML = `<img src="${DOMPurify.sanitize(newPostData.image)}" alt="Imagen del post" class="max-w-full h-auto"/>`;
+                        postElement.insertBefore(newImageDiv, postElement.querySelector('.post-actions'));
+                    }
+                } else if (imageContainer) {
+                    imageContainer.remove(); // Remove image if it's no longer present
+                }
+
+                // Update reaction counts
+                const heartCountSpan = postElement.querySelector('.heart-reaction-button .count');
+                if (heartCountSpan && parseInt(heartCountSpan.textContent) !== (newPostData.heartCount || 0)) {
+                    heartCountSpan.textContent = newPostData.heartCount || 0;
+                }
+                const funnyCountSpan = postElement.querySelector('.funny-reaction-button .count');
+                if (funnyCountSpan && parseInt(funnyCountSpan.textContent) !== (newPostData.funnyCount || 0)) {
+                    funnyCountSpan.textContent = newPostData.funnyCount || 0;
+                }
+                const angryCountSpan = postElement.querySelector('.angry-reaction-button .count');
+                if (angryCountSpan && parseInt(angryCountSpan.textContent) !== (newPostData.angryCount || 0)) {
+                    angryCountSpan.textContent = newPostData.angryCount || 0;
+                }
+
+                // Update reaction button active states
+                const userUID = auth.currentUser?.uid;
+                const reactedBy = newPostData.reactedBy || {};
+                const userReactions = reactedBy[userUID] || [];
+
+                const heartButton = postElement.querySelector('.heart-reaction-button');
+                if (heartButton) heartButton.classList.toggle('active', userReactions.includes('corazón'));
+                const funnyButton = postElement.querySelector('.funny-reaction-button');
+                if (funnyButton) funnyButton.classList.toggle('active', userReactions.includes('me diverte'));
+                const angryButton = postElement.querySelector('.angry-reaction-button');
+                if (angryButton) angryButton.classList.toggle('active', userReactions.includes('me enoja'));
+
+                // Update delete/edit button visibility (if admin status or password hash changes)
+                const deleteButton = postElement.querySelector('.delete-button');
+                const editButton = postElement.querySelector('.edit-button');
+                const canShowEditButton = state.isAdmin || (newPostData.passwordHash && newPostData.authorUID === auth.currentUser?.uid);
+
+                if (deleteButton) deleteButton.style.display = canShowEditButton ? 'inline-flex' : 'none';
+                if (editButton) editButton.style.display = canShowEditButton ? 'inline-flex' : 'none';
+
+                // Update reply count for main posts (OPs)
+                const viewThreadButton = postElement.querySelector('.view-thread-button');
+                if (viewThreadButton && !state.viewingThreadId && !newPostData.replyTo) {
+                    const newReplyCount = state.directChildrenCounts[newPostData.id] || 0; // This needs to be total descendants for OPs
+                    const currentReplyCountText = viewThreadButton.textContent;
+                    if (!currentReplyCountText.includes(`(${newReplyCount})`)) {
+                         viewThreadButton.textContent = `Respuestas (${newReplyCount})`;
+                    }
+                }
+
+                // Update nested reply count for replies (depth 1, 2, 3)
+                const nestedReplyToggle = postElement.querySelector('.nested-reply-toggle');
+                if (nestedReplyToggle) {
+                    const replyCountDisplay = nestedReplyToggle.querySelector('.reply-count-display');
+                    if (replyCountDisplay) {
+                        const newNestedCount = state.directChildrenCounts[newPostData.id] || 0;
+                        if (parseInt(replyCountDisplay.textContent) !== newNestedCount) {
+                            replyCountDisplay.textContent = newNestedCount;
+                        }
+                    }
+                }
+
+                // Re-setup the reply form for this updated post element
+                const replyFormContainer = postElement.querySelector('.reply-form-container');
+                if (replyFormContainer) {
+                    const isThisPostTheThreadParent = currentPostDepth === 0 && state.viewingThreadId === newPostData.id;
+                    setupReplyForm(replyFormContainer, newPostData.id, isThisPostTheThreadParent, currentPostDepth);
+                }
+            }
+
+
+            // Nuevo: Función para calcular directChildrenCounts para un hilo específico
+            async function calculateDirectChildrenCountsForThread(opId) {
+                state.directChildrenCounts = {}; // Reset for thread view
+                const allPostsInThread = [];
+                const q = query(postsCollectionRef, where("board", "==", state.currentBoard)); // Fetch all posts in board to build full hierarchy
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(docSnap => {
+                    allPostsInThread.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Build a temporary repliesByParent structure for this thread
+                const tempRepliesByParent = {};
+                allPostsInThread.forEach(p => {
+                    if (p.replyTo) {
+                        if (!tempRepliesByParent[p.replyTo]) tempRepliesByParent[p.replyTo] = [];
+                        tempRepliesByParent[p.replyTo].push(p);
+                    }
+                });
+
+                // Recursively calculate direct children counts for the thread
+                function populateDirectCounts(postId) {
+                    const directChildren = tempRepliesByParent[postId] || [];
+                    state.directChildrenCounts[postId] = directChildren.length;
+                    directChildren.forEach(child => populateDirectCounts(child.id));
+                }
+                populateDirectCounts(opId); // Start from the OP of the thread
+            }
+
+
             async function loadNestedReplies(parentPostId, parentElement, depth) {
                 // Max depth is 3 (OP -> Reply -> Sub-reply -> Sub-sub-reply)
                 // So, if current depth is 3, we don't load further replies.
+                // The user can still reply to depth 3 posts, but the reply will be linked to the parent of the depth 3 post.
                 if (depth > 3) return;
 
                 const repliesQuery = query(postsCollectionRef, where("replyTo", "==", parentPostId));
@@ -1892,12 +2154,7 @@
                         repliesContainer.classList.add('hidden');
                     }
                     parentElement.appendChild(repliesContainer);
-                } else {
-                    // FIX: Objetivo 3 - Mantener el estado oculto/visible de las respuestas anidadas
-                    const estabaOculto = repliesContainer.classList.contains('hidden');
-                    repliesContainer.innerHTML = '';
-                    if (estabaOculto) repliesContainer.classList.add('hidden');
-                }
+                } 
 
                 try {
                     const querySnapshot = await getDocs(repliesQuery);
@@ -1915,25 +2172,67 @@
                         return timeA - timeB; 
                     });
 
-                    if (repliesData.length > 0) {
-                        for (const replyData of repliesData) {
-                            // Pass the current depth of the replyData being created
-                            const replyElement = createPostElement(replyData, false, 0, depth);
-                            repliesContainer.appendChild(replyElement);
-                            applyPostEffects(replyData, replyElement);
-                            // Recursively load replies for this reply, incrementing depth
-                            await loadNestedReplies(replyData.id, replyElement, depth + 1); 
+                    // Granular update logic for replies
+                    const currentReplyElements = new Map();
+                    Array.from(repliesContainer.children).forEach(child => {
+                        if (child.dataset.id) {
+                            currentReplyElements.set(child.dataset.id, child);
                         }
-                    } else {
+                    });
+
+                    const newReplyIds = new Set(repliesData.map(reply => reply.id));
+
+                    // Remove old replies
+                    for (const [replyId, element] of currentReplyElements) {
+                        if (!newReplyIds.has(replyId)) {
+                            element.remove();
+                            currentReplyElements.delete(replyId);
+                        }
+                    }
+
+                    // Add/Update replies and re-order
+                    const fragment = document.createDocumentFragment();
+                    repliesData.forEach(replyData => {
+                        let replyElement = currentReplyElements.get(replyData.id);
+                        const directChildrenCountForReply = state.directChildrenCounts[replyData.id] || 0;
+
+                        if (replyElement) {
+                            // Update existing reply
+                            updatePostElement(replyElement, replyData, depth);
+                        } else {
+                            // Create new reply
+                            replyElement = createPostElement(replyData, false, directChildrenCountForReply, depth);
+                            applyPostEffects(replyData, replyElement);
+                            currentReplyElements.set(replyData.id, replyElement);
+                        }
+                        fragment.appendChild(replyElement);
+                    });
+
+                    // Clear and append all to ensure correct order
+                    repliesContainer.innerHTML = '';
+                    repliesContainer.appendChild(fragment);
+
+                    // Update the parent's reply count display (if it exists)
+                    const parentReplyCountDisplay = parentElement.querySelector('.reply-count-display');
+                    if (parentReplyCountDisplay) {
+                        parentReplyCountDisplay.textContent = repliesData.length;
+                    }
+
+
+                    if (repliesData.length === 0) {
                         const noRepliesMessage = document.createElement('p');
                         noRepliesMessage.className = 'text-sm pl-4 mt-2';
                         noRepliesMessage.style.color = 'var(--text-secondary-color)';
                         noRepliesMessage.textContent = 'Aún no hay respuestas en este hilo.';
+                        repliesContainer.appendChild(noRepliesMessage); // Añadir el mensaje si no hay respuestas
                     }
 
-                    const replyCountDisplay = parentElement.querySelector('.reply-count-display');
-                    if (replyCountDisplay) {
-                        replyCountDisplay.textContent = repliesData.length;
+                    // Recursively load replies for this reply, incrementing depth
+                    for (const replyData of repliesData) {
+                        const replyElement = repliesContainer.querySelector(`#post-${replyData.id}`);
+                        if (replyElement) {
+                           await loadNestedReplies(replyData.id, replyElement, depth + 1);
+                        }
                     }
 
                 } catch (e) {
@@ -1978,17 +2277,18 @@
                 const canShowEditButton = state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid);
                 
                 const threadViewButtonHtml = !state.viewingThreadId && !post.replyTo ? 
-                    `<button class="view-thread-button reaction-button" aria-label="Ver hilo" style="color: var(--primary-accent-color);">Ver Hilo (${replyCount})</button>` : ''; 
+                    `<button class="view-thread-button reaction-button" aria-label="Ver respuestas" style="color: var(--primary-accent-color);">Respuestas (${replyCount})</button>` : '';
                 
-                const replyCountHtml = !post.replyTo && !state.viewingThreadId ? 
-                    `<span class="text-xs ml-2" style="color: var(--text-secondary-color);">Respuestas: <span class="reply-count-display">${replyCount}</span></span>` : '';
+                // Removed the "Respuestas: n" indicator by making replyCountHtml always empty
+                const replyCountHtml = '';
 
                 // FIX: Check if current post is at the final reply level (depth 3)
+                // The user can still reply to depth 3 posts, but the reply will be linked to the parent of the depth 3 post.
                 const isFinalLevelPost = currentPostDepth >= 3;
 
-                // FIX: Objetivo 2 - Reemplazar la definición de nestedReplyCountHtml
                 // The 💬 icon should be visible on level 2 posts (depth 2) to show their level 3 children.
                 // It should NOT be visible on level 3 posts (depth 3).
+                // Use the passed replyCount (which is direct children count for replies)
                 const nestedReplyCountHtml = state.viewingThreadId && post.replyTo && !isFinalLevelPost ?
                   `<button type="button"
                           class="nested-reply-toggle text-xs ml-2 flex items-center gap-0.5"
@@ -1996,13 +2296,14 @@
                       💬 <span class="reply-count-display">${replyCount}</span>
                   </button>` : '';
 
-                // FIX: Objetivo 3 - Hide "Responder" button for final level posts (depth 3)
-                const replyButtonHtml = !isThreadParent && !isFinalLevelPost ? `
+                // FIX: Hide "Responder" button for final level posts (depth 3)
+                // A.1. Mostrar el botón “Responder” también en las tarjetas de nivel 3
+                const replyButtonHtml = `
                     <button class="reply-button reaction-button" aria-label="Responder a este post">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                         Responder
                     </button>
-                ` : '';
+                `;
 
 
                 const replyFormHtml = `
@@ -2022,8 +2323,8 @@
                             <button class="emoji-toggle icon-button" aria-label="Abrir selector de emojis">😊</button>
                             <label class="reply-file-upload-label icon-button" aria-label="Subir imagen">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+                                <input type="file" class="reply-file-upload hidden" accept="image/*" aria-hidden="true">
                             </label>
-                            <input type="file" class="reply-file-upload hidden" accept="image/*" aria-hidden="true">
                             <span class="reply-file-name text-xs text-gray-500 ml-2 self-center"></span>
                             
                             <button class="reply-password-toggle icon-button" aria-label="Establecer nombre y contraseña para la respuesta">
@@ -2079,9 +2380,21 @@
                     showReplyForm(replyFormContainer);
                 }
 
-                postElement.querySelector('.heart-reaction-button').addEventListener('click', () => reaccionarCorazon(post.id));
-                postElement.querySelector('.funny-reaction-button').addEventListener('click', () => reaccionarMeDiverte(post.id));
-                postElement.querySelector('.angry-reaction-button').addEventListener('click', () => reaccionarMeEnoja(post.id));
+                // Add null checks for reaction buttons
+                const heartButton = postElement.querySelector('.heart-reaction-button');
+                if (heartButton) {
+                    heartButton.addEventListener('click', () => reaccionarCorazon(post.id));
+                }
+                
+                const funnyButton = postElement.querySelector('.funny-reaction-button');
+                if (funnyButton) {
+                    funnyButton.addEventListener('click', () => reaccionarMeDiverte(post.id));
+                }
+
+                const angryButton = postElement.querySelector('.angry-reaction-button');
+                if (angryButton) {
+                    angryButton.addEventListener('click', () => reaccionarMeEnoja(post.id));
+                }
                 
                 const replyBtn = postElement.querySelector('.reply-button');
                 if (replyBtn) {
@@ -2124,87 +2437,151 @@
                   });
                 }
 
-                // Only set up reply form if it's not a final level post
-                if (!isFinalLevelPost) {
-                    setupReplyForm(postElement, post.id);
-                }
+                // Determine if this reply form should stay open on blur
+                const shouldStayOpen = isThreadParent || (post.replyTo === null);
+                setupReplyForm(postElement, post.id, shouldStayOpen, currentPostDepth);
 
                 return postElement;
             }
 
-            function setupReplyForm(postElement, parentPostId) {
+            // Modificación: Añadir shouldStayOpenOnBlur y currentPostDepth como parámetros
+            function setupReplyForm(postElement, parentPostId, shouldStayOpenOnBlur = false, currentPostDepth = 0) {
                 const replyFormContainer = postElement.querySelector('.reply-form-container');
                 if (!replyFormContainer) return;
 
                 const replyContentTextarea = replyFormContainer.querySelector('.reply-content');
                 const replyEmojiToggle = replyFormContainer.querySelector('.emoji-toggle');
                 const replyEmojiPicker = replyFormContainer.querySelector('.reply-emoji-picker');
-                const replyFileUploadLabel = replyFormContainer.querySelector('.reply-file-upload-label');
+                const replyFileUploadLabel = replyFormContainer.querySelector('.reply-file-upload-label'); // Obtener la etiqueta
                 const replyFileUploadInput = replyFormContainer.querySelector('.reply-file-upload');
                 const replyFileNameSpan = replyFormContainer.querySelector('.reply-file-name');
                 const replyPasswordToggle = replyFormContainer.querySelector('.reply-password-toggle');
                 const submitReplyButton = replyFormContainer.querySelector('.submit-reply');
                 const replyAvatar = replyFormContainer.querySelector('.reply-avatar'); 
 
-                replyAvatar.addEventListener('click', () => openProfileEmojiPicker(replyAvatar));
+                let ignoreBlurForFileUpload = false; // Nueva bandera para este formulario específico
 
-                replyAvatar.textContent = avatars[Math.floor(Math.random() * avatars.length)];
+                // Clear existing listeners to prevent duplicates
+                const oldReplyAvatar = replyAvatar.cloneNode(true);
+                replyAvatar.parentNode.replaceChild(oldReplyAvatar, replyAvatar);
+                const newReplyAvatar = oldReplyAvatar; // Reference to the new element
+                newReplyAvatar.addEventListener('click', () => openProfileEmojiPicker(newReplyAvatar));
 
-                replyContentTextarea.addEventListener('input', autoResizeTextarea);
-                replyContentTextarea.addEventListener('blur', (e) => {
-                    const isOPReplyForm = state.viewingThreadId === parentPostId && postElement.dataset.id === parentPostId;
-                    if (!isOPReplyForm && e.target.value.trim() === '' && !replyFileUploadInput.files[0]) {
-                        hideReplyForm(replyFormContainer);
+                // Clear existing listeners for textarea and re-add
+                const oldReplyContentTextarea = replyContentTextarea.cloneNode(true);
+                replyContentTextarea.parentNode.replaceChild(oldReplyContentTextarea, replyContentTextarea);
+                const newReplyContentTextarea = oldReplyContentTextarea;
+                newReplyContentTextarea.addEventListener('input', autoResizeTextarea);
+                newReplyContentTextarea.addEventListener('focus', () => {
+                    ignoreBlurForFileUpload = false;
+                });
+                newReplyContentTextarea.addEventListener('blur', (e) => {
+                    const currentText = e.target.value.trim();
+                    const hasFile = replyFileUploadInput.files[0];
+                    if (ignoreBlurForFileUpload) {
+                        ignoreBlurForFileUpload = false;
+                        return;
+                    }
+                    if (!shouldStayOpenOnBlur && currentText === '' && !hasFile) {
+                        setTimeout(() => {
+                            if (e.target.value.trim() === '' && !replyFileUploadInput.files[0]) {
+                                hideReplyForm(replyFormContainer);
+                            }
+                        }, 50);
                     }
                 });
 
+                // Re-add listeners for file upload
+                const oldReplyFileUploadLabel = replyFileUploadLabel.cloneNode(true);
+                replyFileUploadLabel.parentNode.replaceChild(oldReplyFileUploadLabel, replyFileUploadLabel);
+                const newReplyFileUploadLabel = oldReplyFileUploadLabel;
+                newReplyFileUploadLabel.addEventListener('mousedown', (e) => {
+                    ignoreBlurForFileUpload = true;
+                });
+                const oldReplyFileUploadInput = replyFileUploadInput.cloneNode(true);
+                replyFileUploadInput.parentNode.replaceChild(oldReplyFileUploadInput, replyFileUploadInput);
+                const newReplyFileUploadInput = oldReplyFileUploadInput;
+                newReplyFileUploadInput.addEventListener('change', () => {
+                    replyFileNameSpan.textContent = newReplyFileUploadInput.files[0] ? newReplyFileUploadInput.files[0].name : '';
+                });
+
+
+                newReplyAvatar.textContent = newReplyAvatar.dataset.avatar || avatars[Math.floor(Math.random() * avatars.length)];
+
+                // Clear and re-populate emoji picker to avoid duplicate buttons and listeners
+                replyEmojiPicker.innerHTML = '';
                 EMOJIS.forEach(emoji => {
                     const emojiBtn = document.createElement('button');
                     emojiBtn.className = 'emoji-option';
                     emojiBtn.textContent = emoji;
                     emojiBtn.addEventListener('click', function() {
-                        insertAtCursor(replyContentTextarea, emoji);
+                        insertAtCursor(newReplyContentTextarea, emoji);
                         replyEmojiPicker.classList.remove('active');
-                        autoResizeTextarea({ target: replyContentTextarea });
+                        autoResizeTextarea({ target: newReplyContentTextarea });
                     });
                     replyEmojiPicker.appendChild(emojiBtn);
                 });
-                replyEmojiToggle.addEventListener('click', function(e) {
+
+                // Clear existing listeners for emoji toggle and re-add
+                const oldReplyEmojiToggle = replyEmojiToggle.cloneNode(true);
+                replyEmojiToggle.parentNode.replaceChild(oldReplyEmojiToggle, replyEmojiToggle);
+                const newReplyEmojiToggle = oldReplyEmojiToggle;
+                newReplyEmojiToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    document.querySelectorAll('.reply-emoji-picker.active').forEach(picker => {
+                        if (picker !== replyEmojiPicker) {
+                            picker.classList.remove('active');
+                        }
+                    });
                     replyEmojiPicker.classList.toggle('active');
                 });
-                document.addEventListener('click', function(e) {
-                    if (!replyEmojiPicker.contains(e.target) && e.target !== replyEmojiToggle) {
-                        replyEmojiPicker.classList.remove('active');
-                    }
-                });
 
-                replyFileUploadInput.addEventListener('change', () => {
-                    replyFileNameSpan.textContent = replyFileUploadInput.files[0] ? replyFileUploadInput.files[0].name : '';
-                });
+                // Document click listener for emoji picker (needs to be global but target specific picker)
+                // This listener should be added only once globally, not per form.
+                // It's already in setupEmojiPicker and handles all emoji pickers.
 
-                replyPasswordToggle.addEventListener('click', () => openPostPasswordModal(true, parentPostId));
+                // Clear existing listeners for password toggle and re-add
+                const oldReplyPasswordToggle = replyPasswordToggle.cloneNode(true);
+                replyPasswordToggle.parentNode.replaceChild(oldReplyPasswordToggle, replyPasswordToggle);
+                const newReplyPasswordToggle = oldReplyPasswordToggle;
+                newReplyPasswordToggle.addEventListener('click', () => openPostPasswordModal(true, parentPostId));
 
-                submitReplyButton.addEventListener('click', async () => {
-                    const content = replyContentTextarea.value.trim();
+                // Clear existing listeners for submit button and re-add
+                const oldSubmitReplyButton = submitReplyButton.cloneNode(true);
+                submitReplyButton.parentNode.replaceChild(oldSubmitReplyButton, submitReplyButton);
+                const newSubmitReplyButton = oldSubmitReplyButton;
+                newSubmitReplyButton.addEventListener('click', async () => {
+                    const content = newReplyContentTextarea.value.trim();
                     const name = state.tempPostName || "Anónimo"; 
                     const password = state.tempPostPassword; 
-                    const file = replyFileUploadInput.files[0];
+                    const file = newReplyFileUploadInput.files[0];
 
                     if (!content && !file) {
                         showGenericModal("Atención", "El contenido de la respuesta no puede estar vacío si no adjuntas una imagen.", [{ text: 'Entendido', action: closeGenericModal }]);
                         return;
                     }
 
-                    let targetReplyTo = parentPostId;
-                    // The reply is always to the direct parent of the form used.
-                    // This ensures replies to replies are correctly nested under their direct parent.
+                    let targetReplyTo = parentPostId; // Default: reply to the direct parent
+                    let initialReplyText = DOMPurify.sanitize(content);
+
+                    // A.2. Cuando el usuario responda a una tarjeta de nivel 3
+                    if (currentPostDepth >= 3) {
+                        // Si se responde a un post de nivel 3, la nueva respuesta debe ir al padre de nivel 2
+                        const parentOfLevel3Post = state.allPostsData[parentPostId];
+                        if (parentOfLevel3Post && parentOfLevel3Post.replyTo) {
+                            targetReplyTo = parentOfLevel3Post.replyTo;
+                            // Inserta automáticamente la referencia al post de nivel 3
+                            initialReplyText = `>>${parentPostId.slice(-4)} ${initialReplyText}`;
+                        } else {
+                            console.warn(`No se encontró el padre para el post de nivel 3 ${parentPostId} o el padre no tiene replyTo.`);
+                        }
+                    }
 
                     const newReplyData = {
                         authorUID: auth.currentUser.uid,
-                        avatar: replyAvatar.textContent, 
+                        avatar: newReplyAvatar.textContent, 
                         board: state.currentBoard,
-                        text: DOMPurify.sanitize(content),
+                        text: initialReplyText, // Usar el texto potencialmente modificado
                         title: null, 
                         image: null,
                         name: name,
@@ -2214,11 +2591,11 @@
                         angryCount: 0,
                         reactedBy: {},
                         timestamp: serverTimestamp(),
-                        replyTo: targetReplyTo,
+                        replyTo: targetReplyTo, // Usar el targetReplyTo potencialmente modificado
                     };
 
-                    submitReplyButton.disabled = true;
-                    submitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 11.414V15a1 1 0 102 0v-3.586l1.293-1.293a1 1 0 000-1.414z" clip-rule="evenodd" /></svg>`;
+                    newSubmitReplyButton.disabled = true;
+                    newSubmitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 11.414V15a1 1 0 102 0v-3.586l1.293-1.293a1 1 0 000-1.414z" clip-rule="evenodd" /></svg>`;
 
                     try {
                         if (file) {
@@ -2231,39 +2608,57 @@
                                 compressImage(e.target.result, async function(compressedImage) {
                                     newReplyData.image = compressedImage;
                                     await addDoc(postsCollectionRef, newReplyData);
-                                    resetReplyForm(replyFormContainer, replyAvatar);
+                                    resetReplyForm(replyFormContainer, newReplyAvatar, shouldStayOpenOnBlur); // Pass shouldStayOpenOnBlur
                                 });
                             };
                             reader.readAsDataURL(file);
                         } else {
                             await addDoc(postsCollectionRef, newReplyData);
-                            resetReplyForm(replyFormContainer, replyAvatar);
+                            resetReplyForm(replyFormContainer, newReplyAvatar, shouldStayOpenOnBlur); // Pass shouldStayOpenOnBlur
                         }
+                            // --- INICIO DEL CAMBIO: Forzar refresco del hilo ---
+                            if (state.viewingThreadId) {
+                                const opElement = document.querySelector(`#post-${state.viewingThreadId}`);
+                                if (opElement) {
+                                    console.log(`Respuesta añadida en hilo ${state.viewingThreadId}, refrescando respuestas anidadas del OP.`);
+                                    await loadNestedReplies(state.viewingThreadId, opElement, 1);
+                                }
+                            }
+                            // --- FIN DEL CAMBIO ---
                     } catch (error) {
                         console.error("Error creando respuesta:", error);
                         showGenericModal("Error", "Ocurrió un error al enviar la respuesta. Por favor, inténtalo de nuevo.", [{ text: 'OK', action: closeGenericModal }]);
                     } finally {
-                        submitReplyButton.disabled = false;
-                        submitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
+                        newSubmitReplyButton.disabled = false;
+                        newSubmitReplyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
                     }
                 });
             }
 
-            function resetReplyForm(formContainer, avatarElement) {
+            // Modificación: Añadir shouldStayOpenOnBlur como parámetro
+            function resetReplyForm(formContainer, avatarElement, shouldStayOpenOnBlur) {
                 formContainer.querySelector('.reply-content').value = '';
                 formContainer.querySelector('.reply-file-upload').value = '';
                 formContainer.querySelector('.reply-file-name').textContent = '';
                 avatarElement.textContent = avatars[Math.floor(Math.random() * avatars.length)]; 
+                avatarElement.dataset.avatar = avatarElement.textContent; // Update dataset for consistency
                 state.tempPostName = null;
+                state.tempPostTitle = null; // Clear temp title
                 state.tempPostPassword = null;
                 autoResizeTextarea({ target: formContainer.querySelector('.reply-content') });
-                const isOPReplyForm = state.viewingThreadId !== null && formContainer.closest(`.post[data-id="${state.viewingThreadId}"]`);
-                if (!isOPReplyForm) {
+                // Solo ocultar si no es un formulario que deba permanecer abierto en blur
+                if (!shouldStayOpenOnBlur) {
                     hideReplyForm(formContainer);
                 }
             }
 
             function showReplyForm(formContainer, autoFocus = false) {
+                // Hide all other reply forms first
+                document.querySelectorAll('.reply-form-container').forEach(form => {
+                    if (form !== formContainer) {
+                        hideReplyForm(form);
+                    }
+                });
                 formContainer.style.display = 'block';
                 if (autoFocus) {
                     formContainer.querySelector('.reply-content').focus();
@@ -2517,13 +2912,21 @@
                                 await Promise.all(deletePromises);
                                 console.log(`Borradas ${deletePromises.length} respuestas para el post ${postId}`);
 
-                                await deleteDoc(doc(db, "Posts", postId)); 
+                                await deleteDoc(doc(db, "Posts", postId));
                                 closeGenericModal(); 
                                 if (state.viewingThreadId === postId) {
                                     window.location.hash = `board=${state.currentBoard}`;
+                                } else if (state.viewingThreadId) { // Si se borró una respuesta DENTRO del hilo actual
+                                    // Forzar recarga del hilo para actualizar contadores y estructura
+                                    const opElement = document.querySelector(`#post-${state.viewingThreadId}`);
+                                    if (opElement) {
+                                        console.log(`Post ${postId} o sus respuestas borradas en hilo ${state.viewingThreadId}, refrescando respuestas anidadas del OP.`);
+                                        await loadNestedReplies(state.viewingThreadId, opElement, 1);
+                                    }
                                 }
                             }
                             catch (error) { console.error("Error borrando post y/o respuestas:", error); showGenericModal("Error", "No se pudo borrar el post o sus respuestas.", [{ text: 'OK', action: closeGenericModal }]); }
+                            // No es necesario llamar a loadContentForBoard() aquí si el refresco del hilo ya se hizo o se redirigió.
                         }}
                     ],
                     false 
@@ -2804,24 +3207,27 @@
                 const modal = document.getElementById('postPasswordModal');
                 const title = document.getElementById('postPasswordModalTitle');
                 const message = document.getElementById('postPasswordModalMessage');
-                const nameField = document.getElementById('postPasswordModalNameField');
+                const nameTitleFields = document.getElementById('postPasswordModalNameTitleFields'); // Renamed
                 const nameInput = document.getElementById('postPasswordModalNameInput');
+                const titleInput = document.getElementById('postPasswordModalTitleInput'); // New
                 const passwordInput = document.getElementById('postPasswordModalInput');
 
                 if (isReply) {
                     title.textContent = "Establecer Nombre y Contraseña";
                     message.textContent = "Establece un nombre (opcional) y una contraseña (opcional) para poder editar o borrar esta respuesta en el futuro.";
-                    nameField.style.display = 'block';
+                    nameTitleFields.style.display = 'block'; // Show name and title fields for replies
                     nameInput.value = state.tempPostName || ''; 
+                    titleInput.value = ''; // Replies don't have titles, so clear it
                     passwordInput.value = state.tempPostPassword || ''; 
                     nameInput.focus();
                 } else {
-                    title.textContent = "Establecer Contraseña del Post";
-                    message.textContent = "Establece una contraseña (opcional) para poder editar o borrar este post en el futuro.";
-                    nameField.style.display = 'none';
-                    nameInput.value = '';
+                    title.textContent = "Configuración de Post"; // Changed title
+                    message.textContent = "Establece tu nombre y título (opcionales) y una contraseña (opcional) para poder editar o borrar este post en el futuro."; // Changed message
+                    nameTitleFields.style.display = 'block'; // Show name and title fields for main posts
+                    nameInput.value = state.tempPostName || '';
+                    titleInput.value = state.tempPostTitle || ''; // Populate with temp title
                     passwordInput.value = state.tempPostPassword || ''; 
-                    passwordInput.focus();
+                    nameInput.focus();
                 }
                 modal.classList.add('flex');
             }
@@ -2839,7 +3245,16 @@
 
             function confirmPostPassword() {
                 state.tempPostName = document.getElementById('postPasswordModalNameInput').value.trim();
+                state.tempPostTitle = document.getElementById('postPasswordModalTitleInput').value.trim(); // Get title
                 state.tempPostPassword = document.getElementById('postPasswordModalInput').value.trim();
+                closePostPasswordModal();
+            }
+
+            function cancelPostPassword() {
+                // Reset temp values if user cancels
+                state.tempPostName = null;
+                state.tempPostTitle = null; // Clear temp title
+                state.tempPostPassword = null;
                 closePostPasswordModal();
             }
 
