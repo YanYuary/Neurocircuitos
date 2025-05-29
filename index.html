@@ -138,7 +138,7 @@
             border: 1px solid var(--border-color-light);
             border-radius: 8px;
             padding: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem; /* Reduced vertical space */
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         #boardInfo h2 {
@@ -158,7 +158,7 @@
             border: 1.5px solid var(--border-color-light); /* Slightly thicker border */
             border-radius: 12px; /* More rounded corners */
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem; /* Reduced vertical space */
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Stronger shadow */
         }
 
@@ -200,7 +200,7 @@
             border: 1px solid var(--border-color-light);
             color: var(--text-primary-color);
             border-radius: 20px;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 1rem; /* Adjusted padding for better button alignment */
             font-size: 0.95rem;
             resize: none;
             min-height: 40px;
@@ -208,7 +208,7 @@
             overflow: hidden;
             transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
             /* Adjusted padding-right for button alignment */
-            padding-right: calc(1rem + 36px + 0.5rem); /* 1rem default padding, 36px button width, 0.5rem space */
+            padding-right: calc(1rem + 36px + 1rem); /* 1rem default padding, 36px button width, 1rem space */
         }
         .post-input-area textarea::placeholder {
             color: var(--text-secondary-color);
@@ -266,8 +266,10 @@
         .icon-button.submit-button {
             background-color: var(--primary-accent-color);
             color: #FFFFFF;
-            /* Adjusted right for button alignment */
-            right: 0.5rem; /* Align to the right edge of the parent, which is the textarea's container */
+            right: 1rem; /* Aligned with textarea padding */
+            /* Vertically center the button within the textarea's padding */
+            transform: translateY(-50%);
+            top: 50%; /* Position relative to the middle of the textarea container */
         }
         .icon-button.submit-button:hover {
             background-color: var(--primary-accent-hover-color);
@@ -365,7 +367,7 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color-light);
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem; /* Reduced vertical space */
             padding: 1rem;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             transition: box-shadow 0.2s;
@@ -413,16 +415,16 @@
         .post .post-title { 
             font-size: 1.15rem; 
             font-weight: 600;
-            color: var(--text-primary-color);
+            color: var(--primary-accent-color); /* Matches NeuroChan title color */
             margin-bottom: 0.5rem;
         }
         .post-title-link {
-            text-decoration: none;
+            text-decoration: none; /* No underline */
             color: inherit;
         }
         .post-title-link:hover {
-            text-decoration: underline;
-            color: var(--primary-accent-color);
+            opacity: 0.8; /* Subtle hover effect */
+            text-decoration: none; /* Ensure no underline on hover */
         }
 
 
@@ -445,15 +447,26 @@
         .post-image-container { 
             margin: 0.75rem 0;
         }
-        .post-image-container img {
-            width: 100%; /* Ensure homogeneous width */
+        /* Main board images: full width, no gaps */
+        #postsContainer .post-image-container img {
+            width: 100%; 
             height: auto;
             max-height: 500px; 
-            object-fit: cover;
+            object-fit: cover; /* Ensures image fills container */
             border-radius: 8px;
             border: 1px solid var(--border-color-light);
-            cursor: zoom-in; /* Indicate clickability */
+            cursor: zoom-in;
         }
+        /* Thread view images: normal size, not stretched */
+        #threadContainer .post-image-container img {
+            max-width: 100%; /* Ensure it doesn't overflow */
+            height: auto;
+            object-fit: contain; /* Show full image, even if it leaves space */
+            border-radius: 8px;
+            border: 1px solid var(--border-color-light);
+            cursor: zoom-in;
+        }
+
 
         .post-actions {
             display: flex;
@@ -561,6 +574,12 @@
             display: flex; 
             gap: 0.5rem; 
         }
+        /* Hide admin panel and audio toggle when modal is open */
+        body.modal-open .admin-panel,
+        body.modal-open #audioToggle {
+            display: none !important;
+        }
+
         .admin-toggle, #audioToggle {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color-light);
@@ -900,14 +919,15 @@
         body.dark-theme .board-selector,
         body.dark-theme #tarotGameContainer,
         body.dark-theme #tarotCardInfoDisplay,
-        body.dark-theme .image-viewer-content {
+        body.dark-theme .image-viewer-content,
+        body.dark-theme .stories-container { /* Dark theme for stories container */
             border-color: var(--dark-border-color-light);
         }
         body.dark-theme .post-form-card .input-field,
         body.dark-theme .post-input-area textarea,
         body.dark-theme .modal-content input[type="password"],
         body.dark-theme .modal-content input[type="text"],
-        body.dark-theme .modal-content textarea {
+        body.dark-content textarea {
              background-color: var(--dark-app-bg);
              border-color: var(--dark-border-color-strong);
         }
@@ -1101,7 +1121,7 @@
 
         #enlargedImage {
             max-width: 100%;
-            max-height: 70vh; /* Leave space for details and reply form */
+            max-height: 70vh; /* Leave space for details and reactions */
             object-fit: contain;
             border-radius: 8px;
             border: 1px solid var(--border-color-light);
@@ -1129,28 +1149,123 @@
         .image-viewer-content .close-button:hover {
             background: rgba(0, 0, 0, 0.6);
         }
-
-        /* Removed #imageViewerPostDetails as requested */
-        /* #imageViewerPostDetails {
-            color: var(--text-secondary-color);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        } */
-
-        #imageViewerReplyFormContainer {
-            width: 100%;
-            /* Apply post-form-card styles for consistency */
-            background-color: var(--card-bg);
-            border: 1.5px solid var(--border-color-light); 
-            border-radius: 12px; 
-            padding: 1.5rem; /* Use post-form-card padding */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-            margin-top: 1rem; /* Add some margin from the image */
+        /* New: Download button styling */
+        .image-viewer-content #downloadImageButton {
+            right: 2.5rem; /* Position next to close button */
         }
-        body.dark-theme #imageViewerReplyFormContainer {
-            background-color: var(--dark-card-bg); /* Use dark-card-bg for consistency */
+        
+        /* Image viewer reactions container */
+        #imageViewerReactionsContainer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--divider-color);
+            margin-top: 1rem;
+            background-color: var(--card-bg); /* Match post-form-card background */
+            border: 1.5px solid var(--border-color-light); /* Match post-form-card border */
+            border-radius: 12px; /* Match post-form-card border-radius */
+            padding: 1.5rem; /* Match post-form-card padding */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Match post-form-card shadow */
+        }
+        body.dark-theme #imageViewerReactionsContainer {
+            background-color: var(--dark-card-bg);
             border-color: var(--dark-border-color-strong);
+        }
+
+        /* Stories styles */
+        #storiesContainer {
+            display: flex;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scroll-snap-type: x mandatory; /* Snap to items */
+            gap: 0.75rem; /* Space between stories */
+            padding: 0.5rem 0.5rem; /* Vertical padding and slight horizontal padding */
+            margin-bottom: 1rem; /* Reduced vertical space */
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color-light);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #storiesContainer::-webkit-scrollbar { /* Hide scrollbar for Webkit browsers */
+            display: none;
+        }
+
+        .story-item {
+            flex-shrink: 0; /* Prevent shrinking */
+            width: 80px; /* Fixed width */
+            height: 120px; /* Taller than wide */
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            scroll-snap-align: start; /* Snap point */
+            border: 2px solid transparent; /* For hover effect */
+            transition: border-color 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow for stories */
+        }
+        .story-item:hover {
+            border-color: var(--primary-accent-color);
+        }
+        .story-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the container */
+            filter: brightness(0.8); /* Slightly darken for text readability */
+        }
+        .story-author-name {
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0;
+            right: 0;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.25rem 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            word-break: break-word; /* Allow long names to break */
+            white-space: normal; /* Allow text to wrap */
+        }
+
+        /* Responsive grid for posts container */
+        @media (min-width: 1024px) { /* lg breakpoint */
+            .container {
+                padding-left: 6rem; /* Wider margins for desktop */
+                padding-right: 6rem; /* Wider margins for desktop */
+            }
+            #postsContainer {
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Two columns on desktop */
+            }
+        }
+        @media (max-width: 1023px) { /* Below lg breakpoint (mobile/tablet) */
+            .container {
+                padding-left: 0; /* No padding on mobile */
+                padding-right: 0; /* No padding on mobile */
+            }
+            #postsContainer {
+                grid-template-columns: repeat(1, minmax(0, 1fr)); /* Single column on mobile/tablet */
+                gap: 0; /* No gap between posts on mobile */
+            }
+            /* Ensure posts themselves have no horizontal padding on mobile */
+            .post {
+                border-radius: 0; /* No rounded corners on mobile edges */
+                margin-left: 0;
+                margin-right: 0;
+            }
+            /* Ensure post-form-card and storiesContainer have no horizontal padding on mobile */
+            .post-form-card, #storiesContainer, #boardInfo {
+                border-radius: 0; /* No rounded corners on mobile edges */
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .app-header {
+                border-radius: 0;
+            }
         }
     </style>
 </head>
@@ -1160,7 +1275,7 @@
         <p id="boardTitle">/meta/ Tableros de la Mente</p>
     </header>
 
-    <div class="container mx-auto px-4 py-2 md:py-4"> 
+    <div class="container mx-auto px-4 lg:px-24 py-2 md:py-4"> 
         <div class="board-selectors-container flex flex-wrap gap-2 mb-6 justify-center">
             <button class="board-selector active" data-board="meta" aria-label="Tablero meta">
                 /meta/
@@ -1233,9 +1348,12 @@
             </div>
         </div>
         
+        <div id="storiesContainer" class="stories-container">
+            </div>
+
         <div id="loadingMessage" class="hidden">Cargando transmisiones...</div>
 
-        <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             </div>
 
         <div id="threadContainer" class="hidden mt-8">
@@ -1437,37 +1555,24 @@
 
     <div id="imageViewerModal" class="modal">
         <div class="modal-content image-viewer-content">
+            <button id="downloadImageButton" class="close-button" aria-label="Descargar imagen">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+            </button>
             <button id="closeImageViewerModal" class="close-button">&times;</button>
             <img id="enlargedImage" src="" alt="Enlarged Post Image" class="w-full h-auto max-h-[70vh] object-contain rounded-lg mb-4"/>
-            <div id="imageViewerReplyFormContainer" class="post-form-card">
-                <div class="post-input-area mb-2">
-                    <div class="avatar reply-avatar"></div>
-                    <div class="relative flex-grow">
-                        <textarea
-                            class="reply-content w-full focus:ring-0" 
-                            rows="1"
-                            placeholder="Escribe una respuesta..."
-                            aria-label="Contenido de la respuesta"></textarea>
-                        <div class="emoji-picker reply-emoji-picker"></div>
-                        <button class="submit-reply icon-button submit-button absolute bottom-2" aria-label="Enviar respuesta">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11a1 1 0 112 0v5.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="post-actions-row">
-                    <div class="post-actions-left"></div> <div class="post-actions-right">
-                        <button class="emoji-toggle icon-button" aria-label="Abrir selector de emojis">😊</button>
-                        <label class="reply-file-upload-label icon-button" aria-label="Subir imagen">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
-                            <input type="file" class="reply-file-upload hidden" accept="image/*" aria-hidden="true">
-                        </label>
-                        <span class="reply-file-name text-xs text-gray-500 ml-2 self-center"></span>
-                        
-                        <button class="reply-password-toggle icon-button" aria-label="Establecer nombre y contraseña para la respuesta">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.078 2.25c-.217-.065-.437-.12-.65-.173a1.75 1.75 0 00-1.946.002c-.213.053-.433.108-.65.173C5.77 3.072 4.5 5.25 4.5 7.5c0 1.97.823 3.717 2.096 4.904.284.344.468.756.528 1.186a3.5 3.5 0 00.878 2.033L9.18 16.06a1.75 1.75 0 002.64 0l.178-.445a3.5 3.5 0 00.878-2.033c.06-.43.243-.842.528-1.186C14.677 11.217 15.5 9.47 15.5 7.5c0-2.25-1.27-4.428-3.344-5.078zM10 9.5a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>
-                </div>
+            <div id="imageViewerReactionsContainer" class="flex gap-1 items-center flex-wrap"> 
+                <button class="reaction-button heart-reaction-button flex items-center gap-1" aria-label="Reaccionar con Corazón">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+                    <span class="count">0</span>
+                </button>
+                <button class="reaction-button funny-reaction-button flex items-center gap-1" aria-label="Reaccionar con Me Diverte">
+                    😂 <span class="count">0</span>
+                </button>
+                <button class="reaction-button angry-reaction-button flex items-center gap-1" aria-label="Reaccionar con Me Enoja">
+                    😠 <span class="count">0</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1515,10 +1620,10 @@
         const postsCollectionRef = collection(db, "Posts");
 
         (function() {
-            const MAX_IMAGE_SIZE = 2 * 1024 * 1024; 
-            const ADMIN_HASH = '$2a$12$gN31vHGzyvonWERy0c9K6ubv/LRrh6IJmzWgXYlJ8eJJ4vUcnVe'; 
+            const MAX_IMAGE_SIZE = 3 * 1024 * 1024; 
+            const ADMIN_HASH = '$2a$12$WOw1y6eWAuHGhRJp7Q/P.uuE4mnnkscCmCAWTQig6/FijJlJ5EhYm'; 
 
-            const EMOJIS = ['😀','😂','🤣','🥲','😍','🤯','😎','🤖','👾','👻','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
+            const EMOJIS = ['😀','😂','🤣','❤️','😍','🤯','😎','👁️','🤖', '🦾', '🦿', '🧬', '🔭','👾','👻','👹','💀','👽','🚀','🛸','🌀','🧠','🌌','🔮','🔥','⚡','🌈','🎮','📺'];
             
             let state = {
                 currentBoard: 'meta',
@@ -1544,6 +1649,7 @@
                 scrollAfterReply: null,
                 directChildrenCounts: {},
                 imageViewerCurrentPostId: null, // New state for image viewer
+                unsubscribeImageViewer: null, // New unsubscribe for image viewer
             };
 
             const avatars = [ 
@@ -1785,6 +1891,7 @@
 
                 // Image Viewer
                 document.getElementById('closeImageViewerModal').addEventListener('click', closeImageViewerModal);
+                document.getElementById('downloadImageButton').addEventListener('click', downloadEnlargedImage);
             }
 
             function setupEmojiPicker() {
@@ -2015,6 +2122,8 @@
                 const searchToggle = document.getElementById('searchToggle');
                 const searchInputContainer = document.querySelector('.search-input-container');
                 const randomPostButton = document.getElementById('randomPostButton');
+                const storiesContainer = document.getElementById('storiesContainer');
+
 
                 if (state.currentBoard === 'tarot') {
                     postsContainer.classList.add('hidden');
@@ -2024,6 +2133,7 @@
                     if (searchToggle) searchToggle.style.display = 'none'; // Hide search toggle
                     if (searchInputContainer) searchInputContainer.classList.remove('active'); // Hide search input
                     if (randomPostButton) randomPostButton.style.display = 'none'; // Hide random button
+                    if (storiesContainer) storiesContainer.classList.add('hidden'); // Hide stories
                     tarotGameContainer.classList.remove('hidden');
                 } else if (state.viewingThreadId) {
                     postsContainer.classList.add('hidden');
@@ -2033,6 +2143,7 @@
                     if (searchToggle) searchToggle.style.display = 'none'; // Hide search toggle
                     if (searchInputContainer) searchInputContainer.classList.remove('active'); // Hide search input
                     if (randomPostButton) randomPostButton.style.display = 'none'; // Hide random button
+                    if (storiesContainer) storiesContainer.classList.add('hidden'); // Hide stories
                     tarotGameContainer.classList.add('hidden');
                 } else {
                     postsContainer.classList.remove('hidden');
@@ -2042,6 +2153,7 @@
                     if (boardInfoSection) boardInfoSection.classList.remove('hidden');
                     if (searchToggle) searchToggle.style.display = 'inline-flex'; // Show search toggle
                     if (randomPostButton) randomPostButton.style.display = 'inline-flex'; // Show random button
+                    if (storiesContainer) storiesContainer.classList.remove('hidden'); // Show stories
                     tarotGameContainer.classList.add('hidden');
                     mainPostContentTextarea.placeholder = "¿Qué estás pensando...?";
                 }
@@ -2180,6 +2292,7 @@
                                 state.allRootPosts = [...ops]; // Store for search and random button
 
                                 renderFilteredPosts(ops); // Render initial posts (no filter)
+                                renderStories(); // Render stories after posts are loaded
 
                                 if (loadingMessage) loadingMessage.classList.add('hidden');
                             })
@@ -2337,7 +2450,9 @@
                 }
 
                 const contentTextElement = postElement.querySelector('.post-content');
-                const newSanitizedText = DOMPurify.sanitize(newPostData.text || '').replace(/\n/g,'<br>');
+                // Corrected: Define textContent from newPostData.text
+                const postTextContent = typeof newPostData.text === 'string' ? newPostData.text : '';
+                const newSanitizedText = DOMPurify.sanitize(postTextContent).replace(/\n/g,'<br>');
                 
                 const newTextWithLinks = newSanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
                     const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
@@ -2373,19 +2488,21 @@
                             img = document.createElement('img');
                             img.src = DOMPurify.sanitize(newPostData.image);
                             img.alt = "Imagen del post";
-                            img.className = "max-w-full h-auto w-full cursor-zoom-in"; /* Added w-full */
+                            // Apply class based on view (main board vs thread)
+                            img.className = state.viewingThreadId ? "max-w-full h-auto object-contain cursor-zoom-in" : "max-w-full h-auto w-full object-cover cursor-zoom-in";
                             imageContainer.appendChild(img);
                         }
                     } else {
                         console.log(`Adding new image container for post ${newPostData.id}.`);
                         const newImageDiv = document.createElement('div');
                         newImageDiv.className = 'post-image-container';
-                        newImageDiv.innerHTML = `<img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="max-w-full h-auto w-full cursor-zoom-in"/>`; /* Added w-full */
+                        // Apply class based on view (main board vs thread)
+                        newImageDiv.innerHTML = `<img src="${DOMPurify.sanitize(newPostData.image)}" alt="Imagen del post" class="${state.viewingThreadId ? "max-w-full h-auto object-contain cursor-zoom-in" : "max-w-full h-auto w-full object-cover cursor-zoom-in"}"/>`;
                         postElement.insertBefore(newImageDiv, postElement.querySelector('.post-actions'));
                         img = newImageDiv.querySelector('img');
                     }
                     if (img) {
-                        img.onclick = () => openImageViewerModal(post.id);
+                        img.onclick = () => openImageViewerModal(newPostData.id);
                     }
                 } else if (imageContainer) {
                     console.log(`Removing image container for post ${newPostData.id}.`);
@@ -2556,8 +2673,8 @@
                 
                 const titleHtml = post.title ? 
                     `<h4 class="post-title"><a href="#board=${post.board}&post=${post.id}" class="post-title-link">${DOMPurify.sanitize(post.title)}</a></h4>` : '';
-                const textContent = typeof post.text === 'string' ? post.text : '';
-                let sanitizedText = DOMPurify.sanitize(textContent).replace(/\n/g,'<br>');
+                const postTextContent = typeof post.text === 'string' ? post.text : ''; // Corrected: Define postTextContent
+                let sanitizedText = DOMPurify.sanitize(postTextContent).replace(/\n/g,'<br>');
                 
                 sanitizedText = sanitizedText.replace(/&gt;&gt;(\w+)/g, (match, referencedPostIdSuffix) => {
                     const fullReferencedPost = Object.values(state.allPostsData).find(p => p.id.endsWith(referencedPostIdSuffix));
@@ -2570,7 +2687,9 @@
                 const contentTextHtml = post.text ? `<div class="post-content text-sm mb-2 mt-1">${sanitizedText}</div>` : '';
                 
                 console.log(`Creating post element for ID: ${post.id}, isReply: ${!!post.replyTo}, Image present: ${!!post.image}, Image data type: ${typeof post.image}`);
-                const contentImageHtml = post.image ? `<div class="post-image-container"><img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="max-w-full h-auto w-full cursor-zoom-in"/></div>` : '';
+                // Conditional class for image based on view
+                const imageClass = state.viewingThreadId ? "max-w-full h-auto object-contain cursor-zoom-in" : "max-w-full h-auto w-full object-cover cursor-zoom-in";
+                const contentImageHtml = post.image ? `<div class="post-image-container"><img src="${DOMPurify.sanitize(post.image)}" alt="Imagen del post" class="${imageClass}"/></div>` : '';
 
                 const canShowEditButton = state.isAdmin || (post.passwordHash && post.authorUID === auth.currentUser?.uid);
                 
@@ -3674,6 +3793,27 @@
                 if (cardInfoDisplay) cardInfoDisplay.classList.remove('hidden');
             }
 
+            function updateImageViewerReactionsUI(postData) {
+                const reactionsContainer = document.getElementById('imageViewerReactionsContainer');
+                if (!reactionsContainer) return;
+
+                const userUID = auth.currentUser?.uid;
+                const reactedBy = postData.reactedBy || {};
+                const userReactions = reactedBy[userUID] || [];
+
+                const heartButton = reactionsContainer.querySelector('.heart-reaction-button');
+                const funnyButton = reactionsContainer.querySelector('.funny-reaction-button');
+                const angryButton = reactionsContainer.querySelector('.angry-reaction-button');
+
+                if (heartButton) heartButton.querySelector('.count').textContent = postData.heartCount || 0;
+                if (funnyButton) funnyButton.querySelector('.count').textContent = postData.funnyCount || 0;
+                if (angryButton) angryButton.querySelector('.count').textContent = postData.angryCount || 0;
+
+                if (heartButton) heartButton.classList.toggle('active', userReactions.includes('corazón'));
+                if (funnyButton) funnyButton.classList.toggle('active', userReactions.includes('me diverte'));
+                if (angryButton) angryButton.classList.toggle('active', userReactions.includes('me enoja'));
+            }
+
             function openImageViewerModal(postId) {
                 const post = state.allPostsData[postId];
                 if (!post || !post.image) {
@@ -3685,17 +3825,55 @@
 
                 const modal = document.getElementById('imageViewerModal');
                 const enlargedImage = modal.querySelector('#enlargedImage');
-                const replyFormContainer = modal.querySelector('#imageViewerReplyFormContainer');
+                const reactionsContainer = modal.querySelector('#imageViewerReactionsContainer');
 
                 enlargedImage.src = DOMPurify.sanitize(post.image);
                 enlargedImage.alt = `Imagen de post por ${post.name}`;
 
-                // Setup reply form for the image viewer
-                const replyAvatar = replyFormContainer.querySelector('.reply-avatar');
-                replyAvatar.textContent = avatars[Math.floor(Math.random() * avatars.length)];
-                replyAvatar.dataset.avatar = replyAvatar.textContent; // Store for consistent avatar in replies
+                // Update reaction counts and active states initially
+                updateImageViewerReactionsUI(post);
 
-                setupReplyForm(replyFormContainer, postId, true, 0, true); // Pass true for isImageViewer
+                // Setup real-time listener for the specific post
+                if (state.unsubscribeImageViewer) {
+                    state.unsubscribeImageViewer(); // Unsubscribe from any previous listener
+                }
+                state.unsubscribeImageViewer = onSnapshot(doc(db, "Posts", postId), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const updatedPostData = { id: docSnap.id, ...docSnap.data() };
+                        state.allPostsData[updatedPostData.id] = updatedPostData; // Keep global state updated
+                        updateImageViewerReactionsUI(updatedPostData); // Update modal UI
+                    } else {
+                        console.log("Post for image viewer no longer exists.");
+                        closeImageViewerModal(); // Close modal if post is deleted
+                    }
+                }, (error) => {
+                    console.error("Error listening to image viewer post:", error);
+                });
+
+                // Ensure reaction buttons in modal have correct listeners
+                // Get current references
+                let heartButton = reactionsContainer.querySelector('.heart-reaction-button');
+                let funnyButton = reactionsContainer.querySelector('.funny-reaction-button');
+                let angryButton = reactionsContainer.querySelector('.angry-reaction-button');
+
+                // Clone and replace to remove old listeners
+                const clonedHeartButton = heartButton.cloneNode(true);
+                const clonedFunnyButton = funnyButton.cloneNode(true);
+                const clonedAngryButton = angryButton.cloneNode(true);
+
+                heartButton.replaceWith(clonedHeartButton);
+                funnyButton.replaceWith(clonedFunnyButton);
+                angryButton.replaceWith(clonedAngryButton);
+
+                // Get new references after cloning
+                heartButton = reactionsContainer.querySelector('.heart-reaction-button');
+                funnyButton = reactionsContainer.querySelector('.funny-reaction-button');
+                angryButton = reactionsContainer.querySelector('.angry-reaction-button');
+
+                // Add new listeners
+                heartButton.addEventListener('click', () => reaccionarCorazon(postId));
+                funnyButton.addEventListener('click', () => reaccionarMeDiverte(postId));
+                angryButton.addEventListener('click', () => reaccionarMeEnoja(postId));
 
                 modal.classList.add('flex');
                 document.body.classList.add('modal-open'); // Prevent background scrolling
@@ -3705,15 +3883,82 @@
                 document.getElementById('imageViewerModal').classList.remove('flex');
                 document.body.classList.remove('modal-open'); // Re-enable background scrolling
                 state.imageViewerCurrentPostId = null;
-                // Optionally clear reply form content
-                const replyFormContainer = document.getElementById('imageViewerReplyFormContainer');
-                if (replyFormContainer) {
-                    replyFormContainer.querySelector('.reply-content').value = '';
-                    replyFormContainer.querySelector('.reply-file-upload').value = '';
-                    replyFormContainer.querySelector('.reply-file-name').textContent = '';
-                    autoResizeTextarea({ target: replyFormContainer.querySelector('.reply-content') });
+                if (state.unsubscribeImageViewer) {
+                    state.unsubscribeImageViewer(); // Unsubscribe when closing
+                    state.unsubscribeImageViewer = null;
                 }
             }
+
+            function downloadEnlargedImage() {
+                const enlargedImage = document.getElementById('enlargedImage');
+                const imageUrl = enlargedImage.src;
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                // Attempt to get a reasonable filename, default to a generic one
+                const filename = `neurochan_image_${state.imageViewerCurrentPostId || 'download'}.png`; 
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            function renderStories() {
+                const storiesContainer = document.getElementById('storiesContainer');
+                storiesContainer.innerHTML = ''; // Clear existing stories
+
+                const postsWithImages = state.allRootPosts.filter(post => post.image);
+                
+                if (postsWithImages.length === 0) {
+                    storiesContainer.classList.add('hidden');
+                    return;
+                } else {
+                    storiesContainer.classList.remove('hidden');
+                }
+
+                postsWithImages.forEach(post => {
+                    const storyItem = document.createElement('div');
+                    storyItem.className = 'story-item';
+                    storyItem.dataset.postId = post.id;
+                    storyItem.innerHTML = `
+                        <img src="${DOMPurify.sanitize(post.image)}" alt="Story image from ${DOMPurify.sanitize(post.name)}" class="story-image"/>
+                        <div class="story-author-name">${DOMPurify.sanitize(post.name)}</div>
+                    `;
+                    storyItem.addEventListener('click', () => viewThread(post.id));
+                    storiesContainer.appendChild(storyItem);
+                });
+            }
+
+            // Implement horizontal scrolling for stories container (mouse drag)
+            let isDragging = false;
+            let startX;
+            let scrollLeft;
+
+            const storiesContainer = document.getElementById('storiesContainer');
+
+            storiesContainer.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                storiesContainer.classList.add('active');
+                startX = e.pageX - storiesContainer.offsetLeft;
+                scrollLeft = storiesContainer.scrollLeft;
+            });
+
+            storiesContainer.addEventListener('mouseleave', () => {
+                isDragging = false;
+                storiesContainer.classList.remove('active');
+            });
+
+            storiesContainer.addEventListener('mouseup', () => {
+                isDragging = false;
+                storiesContainer.classList.remove('active');
+            });
+
+            storiesContainer.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - storiesContainer.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll-fastness
+                storiesContainer.scrollLeft = scrollLeft - walk;
+            });
 
              console.log("Script principal IIFE ejecutado completamente.");
         })();
